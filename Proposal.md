@@ -28,7 +28,7 @@ el cliente accede al contrato y debe firmarlo para continuar con el pago.Desde e
 |CRUD simple |1. CRUD Cliente<br>2. CRUD Salón<br>3. CRUD Ubicación|
 |CRUD dependiente |1. CRUD Reserva (depende de) CRUD Cliente<br>2. CRUD TipoSalón (depende de) CRUD Salón|
 |Listado<br>+<br>detalle |1. Listado de salones filtrado por tipo de salón o nombre, muestra nombre, cantidad mínima y máxima de invitados ⇒ detalle CRUD Salón<br>2. Listado de reservas filtrado por cliente, muestra id  de reserva, fecha, cantidad invitados y estado de reserva ⇒ detalle muestra datos completos de la reserva y servicios incluidos| 
-|CUU/Epic|1. Realizar reserva de salón para un eventp<br>2. Visualizar agenda de eventos|
+|CUU/Epic|1. Realizar reserva de salón para un evento<br>2. Visualizar agenda de eventos|
 
 
 
