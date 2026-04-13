@@ -24,8 +24,8 @@ el cliente accede al contrato y debe firmarlo para continuar con el pago.Desde e
 ### Alcance Mínimo
 |Req|Detalle|
 |:-|:-|
-|CRUD simple |1. CRUD Cliente<br>2. CRUD Salón<br>3. CRUD ???|
-|CRUD dependiente |1. CRUD Reserva (depende de) CRUD Usuario<br>2. CRUD TipoSalón (depende de) CRUD Salón|
+|CRUD simple |1. CRUD Cliente<br>2. CRUD Salón<br>3. CRUD Ubicación|
+|CRUD dependiente |1. CRUD Reserva (depende de) CRUD Cliente<br>2. CRUD TipoSalón (depende de) CRUD Salón|
 |Listado<br>+<br>detalle |1. Listado de productos filtrado por categoría o nombre, muestra nombre, precio, stock ⇒ detalle CRUD Producto<br>2. Listado de pedidos filtrado por usuario, muestra número de pedido, fecha, total ⇒ detalle muestra datos completos del pedido y productos incluidos|
 |CUU/Epic|1. Agregar productos al carrito y realizar una compra<br>2. Visualizar historial de compras|
 
