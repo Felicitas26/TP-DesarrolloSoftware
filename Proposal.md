@@ -36,4 +36,4 @@ Adicionales
 |Req|Detalle|
 |:-|:-|
 |CRUD |1. CRUD Cliente<br>2. CRUD Salón<br>3. CRUD Ubicación<br>4. CRUD tipoSalon<br>5. CRUD Precio<br>6. CRUD Reserva<br>7. Contrato<br>8. DetalleTarjeta<br>9. ServicioExtra|
-|CUU/Epic|1. Realizar una reserva de un salón<br>2. Modificar contrato de salón<br>3. Realizar pago de seña del evento|
+|CUU/Epic|1. Anular contrato vigente<br>2. Modificar contrato de salón<br>3. Realizar pago de seña del evento|
