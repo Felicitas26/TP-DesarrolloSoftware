@@ -35,5 +35,5 @@ el cliente accede al contrato y debe firmarlo para continuar con el pago.Desde e
 Adicionales
 |Req|Detalle|
 |:-|:-|
-|CRUD |1. CRUD Reseñas de productos<br>2. CRUD Métodos de pago<br>3. CRUD Dirección de envío<br>4. CRUD Estado de pedido<br>5. CRUD Notificaciones<br>6. CRUD Carrito de compras|
-|CUU/Epic|1. Calificar productos comprados<br>2. Modificar datos personales y dirección<br>3. Consultar estado de un pedido|
+|CRUD |1. CRUD Cliente<br>2. CRUD Salón<br>3. CRUD Ubicación<br>4. CRUD tipoSalon<br>5. CRUD Precio<br>6. CRUD Reserva<br>7.Contrato<br>8.DetalleTarjeta<br>9.ServicioExtra|
+|CUU/Epic|1. Realizar una reserva de un salón<br>2. Modificar contrato de salón<br>3. Realizar pago de seña del evento|
