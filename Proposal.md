@@ -16,7 +16,8 @@ El proyecto es un sistema de reservación de salones de fiesta para eventos, don
 el cliente accede al contrato y debe firmarlo para continuar con el pago.Desde el lado del administrador,el sistema permitirá llevar un seguimiento de los eventos programados, aceptar o rechazar solicitudes y gestionar actualizaciones con respecto a pagos y/o cancelaciones. 
 
 ### Modelo
-![dsw2](https://github.com/user-attachments/assets/27058b21-ed13-409d-8c8a-8d640d9f9215)
+<img width="496" height="544" alt="image" src="https://github.com/user-attachments/assets/d4001c91-0f5f-43e7-8bd5-e8ffc46d5f2d" />
+
 
 
 ## Alcance Funcional 
