@@ -25,8 +25,8 @@ el cliente accede al contrato y debe firmarlo para continuar con el pago.Desde e
 ### Alcance Mínimo
 |Req|Detalle|
 |:-|:-|
-|CRUD simple |1. CRUD Cliente<br>2. CRUD Salón<br>3. CRUD Ubicación|
-|CRUD dependiente |1. CRUD Reserva (depende de) CRUD Cliente<br>2. CRUD TipoSalón (depende de) CRUD Salón|
+|CRUD simple |1. CRUD Cliente<br>2. CRUD TipoSalón<br>3. CRUD Ubicación|
+|CRUD dependiente |1. CRUD Reserva (depende de) CRUD Cliente<br>2. CRUD Salón (depende de) CRUD TipoSalón|
 |Listado<br>+<br>detalle |1. Listado de salones filtrado por tipo de salón o nombre, muestra nombre, cantidad mínima y máxima de invitados ⇒ detalle CRUD Salón<br>2. Listado de reservas filtrado por cliente, muestra id  de reserva, fecha, cantidad invitados y estado de reserva ⇒ detalle muestra datos completos de la reserva, del cliente y servicios incluidos| 
 |CUU/Epic|1. Realizar reserva de salón para un evento<br>2. Visualizar agenda de eventos|
 
@@ -35,5 +35,5 @@ el cliente accede al contrato y debe firmarlo para continuar con el pago.Desde e
 Adicionales
 |Req|Detalle|
 |:-|:-|
-|CRUD |1. CRUD Cliente<br>2. CRUD Salón<br>3. CRUD Ubicación<br>4. CRUD tipoSalon<br>5. CRUD Precio<br>6. CRUD Reserva<br>7. Contrato<br>8. DetalleTarjeta<br>9. ServicioExtra|
+|CRUD |1. CRUD Cliente<br>2. CRUD TipoSalón<br>3. CRUD Ubicación<br>4. CRUD Salon<br>5. CRUD Precio<br>6. CRUD Reserva<br>7. Contrato<br>8. DetalleTarjeta<br>9. ServicioExtra|
 |CUU/Epic|1. Anular contrato vigente<br>2. Modificar contrato de salón<br>3. Realizar pago de seña del evento|
