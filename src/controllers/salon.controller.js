@@ -29,7 +29,7 @@ class SalonController {
     }
 
     // Validación: que las capacidades de invitados sean números coherentes
-    if (isNaN(cantMinima) || isNaN(cantMaxima) || cantMinima >= 0 || cantMaxima >= 0) {
+    if (isNaN(cantMinima) || isNaN(cantMaxima) || cantMinima <= 0 || cantMaxima >= 0) {
       return res.status(400).json({ error: "Las cantidades de invitados deben ser números positivos." });
     }
 
