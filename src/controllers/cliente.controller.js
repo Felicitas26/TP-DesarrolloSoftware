@@ -3,6 +3,14 @@ import clienteService from "../services/cliente.service.js";
 class ClienteController {
 
     async getAll(req, res) {
+        try { 
+            const clientes = await clientesService.getAll();
+            return res.status(200).json(clientes);
+            }
+        catch (error) {
+            return res.status(500).json ({
+                error: error.message
+                });
 
     }
 
@@ -11,6 +19,7 @@ class ClienteController {
     }
 
     async create(req, res) {
+        
 
     }
 
