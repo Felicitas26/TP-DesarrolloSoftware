@@ -3,6 +3,7 @@ import salonController from '../controllers/salon.controller.js';
 
 const router = Router();
 
+<<<<<<< HEAD
 // Definimos los "caminos" (rutas) de nuestra API de salones
 // Asociamos cada verbo HTTP con la acción correspondiente del controlador
 
@@ -11,5 +12,12 @@ router.get('/:id', salonController.getById);     // Leer un solo salón usando s
 router.post('/', salonController.create);        // Crear un nuevo salón
 router.put('/:id', salonController.update);      // Editar un salón existente usando su ID
 router.delete('/:id', salonController.delete);   // Eliminar un salón usando su ID
+=======
+router.get('/', salonController.getAll);         
+router.get('/:id', salonController.getById);     
+router.post('/', salonController.create);        
+router.put('/:id', salonController.update);      
+router.delete('/:id', salonController.delete);   
+>>>>>>> 5e957812b8d91f825c564acec7f1d7530c03ab38
 
 export default router;

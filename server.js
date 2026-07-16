@@ -22,6 +22,7 @@ app.get('/clientes', async (req, res) => {
     res.status(500).json({ error: "Hubo un error al obtener los clientes" });
   }
 });
+
 // Conectamos las rutas de salones. Ahora todas las URL van a empezar con /api/salones
 app.use('/api/salones', salonRoutes);
 
@@ -29,4 +30,3 @@ app.use('/api/salones', salonRoutes);
 app.listen(3000, () => {
   console.log('¡Servidor del TP encendido y escuchando en el puerto 3000!');
 }); 
-
