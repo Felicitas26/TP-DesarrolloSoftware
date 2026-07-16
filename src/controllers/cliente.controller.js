@@ -11,7 +11,7 @@ class ClienteController {
             return res.status(500).json ({
                 error: error.message
                 });
-
+        }
     }
 
     async getById(req, res) {
@@ -30,9 +30,9 @@ class ClienteController {
                 error: error.message
                 });
         }
-
+    }
+    
     async create(req, res) {
-        
         const {
             nombreCli, apellidoCli, telefonoCli, dniCli, emailCli, direccionCli, localidadCli } = req.body;
 
