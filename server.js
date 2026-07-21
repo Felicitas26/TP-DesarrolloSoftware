@@ -1,6 +1,6 @@
 import db from './db.js';
 import express from 'express';
-import salonRoutes from './src/routes/tiposalon.routes.js';
+import tiposalonRoutes from './src/routes/tiposalon.routes.js';
 import clienteRoutes from './src/routes/cliente.routes.js';
 
 const app = express();
@@ -25,7 +25,7 @@ app.get('/clientes', async (req, res) => {
 });
 
 // Conectamos las rutas de salones. Ahora todas las URL van a empezar con /api/salones
-app.use('/api/salones', salonRoutes);
+app.use('/api/tiposalones', tiposalonRoutes);
 app.use('/api/clientes', clienteRoutes);
 
 // Mensaje de encendido en la terminal
