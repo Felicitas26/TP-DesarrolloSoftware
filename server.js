@@ -1,6 +1,6 @@
 import db from './db.js';
 import express from 'express';
-import salonRoutes from './src/routes/salon.routes.js';
+import salonRoutes from './src/routes/tiposalon.routes.js';
 import clienteRoutes from './src/routes/cliente.routes.js';
 
 const app = express();
