@@ -1,11 +1,12 @@
 import detalleTarjetaService from "../services/detalleTarjeta.service.js";
 
-class detalleTarjetaController {
+class DetalleTarjetaController {
 
     async getAll(req, res) {
         try {
-            const detalleT = await detalleTarjetaService.getAll();
-            return res.status(200).json(detalleT);
+            const detallesTarjeta = await detalleTarjetaService.getAll();
+
+            return res.status(200).json(detallesTarjeta);
 
         } catch (error) {
             return res.status(500).json({
@@ -18,15 +19,15 @@ class detalleTarjetaController {
         const { id } = req.params;
 
         try {
-            const detalleT = await detalleTarjetaService.getById(id);
+            const detalleTarjeta = await detalleTarjetaService.getById(id);
 
-            if (!detalleT) {
+            if (!detalleTarjeta) {
                 return res.status(404).json({
                     error: `Detalle de Tarjeta con ID ${id} no encontrado.`
                 });
             }
 
-            return res.status(200).json(detalleT);
+            return res.status(200).json(detalleTarjeta);
 
         } catch (error) {
             return res.status(500).json({
@@ -36,23 +37,24 @@ class detalleTarjetaController {
     }
 
     async create(req, res) {
-        const { etapaMenu, detalle, presupuesto } = req.body;
+        const { etapaMenu, detalle, presupuesto, idContrato } = req.body;
 
         try {
 
-            if (!etapaMenu || !detalle || !presupuesto) {
+            if (!etapaMenu || !detalle || !presupuesto || !idContrato) {
                 return res.status(400).json({
                     error: "Todos los campos son obligatorios."
                 });
             }
 
-            if (!/^\d+$/.test(presupuesto)) {
-               return res.status(400).json({
-                    error: "El presupuesto solo puede contener números."
+            if (typeof presupuesto !== "number" || presupuesto <= 0) {
+                return res.status(400).json({
+                    error: "El presupuesto debe ser un número positivo."
                 });
             }
-            
-            const nuevoDetalleTarjeta = await detalleTarjetaService.create(req.body);
+
+            const nuevoDetalleTarjeta =
+                await detalleTarjetaService.create(req.body);
 
             return res.status(201).json(nuevoDetalleTarjeta);
 
@@ -68,7 +70,8 @@ class detalleTarjetaController {
 
             const { id } = req.params;
 
-            const detalleTarjetaUpdated = await detalleTarjetaService.update(id, req.body);
+            const detalleTarjetaUpdated =
+                await detalleTarjetaService.update(id, req.body);
 
             if (!detalleTarjetaUpdated) {
                 return res.status(404).json({
@@ -93,7 +96,8 @@ class detalleTarjetaController {
 
             const { id } = req.params;
 
-            const detalleTarjetaDeleted = await detalleTaretaService.delete(id);
+            const detalleTarjetaDeleted =
+                await detalleTarjetaService.delete(id);
 
             if (!detalleTarjetaDeleted) {
                 return res.status(404).json({
@@ -114,4 +118,4 @@ class detalleTarjetaController {
 
 }
 
-export default new detalleTarjetaController();
+export default new DetalleTarjetaController();
