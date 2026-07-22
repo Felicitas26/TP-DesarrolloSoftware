@@ -46,6 +46,12 @@ class detalleTarjetaController {
                 });
             }
 
+            if (!/^\d+$/.test(presupuesto)) {
+               return res.status(400).json({
+                    error: "El presupuesto solo puede contener números."
+                });
+            }
+            
             const nuevoDetalleTarjeta = await detalleTarjetaService.create(req.body);
 
             return res.status(201).json(nuevoDetalleTarjeta);
@@ -62,17 +68,17 @@ class detalleTarjetaController {
 
             const { id } = req.params;
 
-            const contratoUpdated = await contratoService.update(id, req.body);
+            const detalleTarjetaUpdated = await detalleTarjetaService.update(id, req.body);
 
-            if (!contratoUpdated) {
+            if (!detalleTarjetaUpdated) {
                 return res.status(404).json({
-                    error: "No se ha encontrado el contrato."
+                    error: "No se ha encontrado el detalle de Tarjeta buscado."
                 });
             }
 
             return res.status(200).json({
-                mensaje: "Contrato actualizado correctamente.",
-                contrato: contratoUpdated
+                mensaje: "Detalle de Tarjeta actualizado correctamente.",
+                detalleT: detalleTarjetaUpdated
             });
 
         } catch (error) {
@@ -87,16 +93,16 @@ class detalleTarjetaController {
 
             const { id } = req.params;
 
-            const contratoDeleted = await contratoService.delete(id);
+            const detalleTarjetaDeleted = await detalleTaretaService.delete(id);
 
-            if (!contratoDeleted) {
+            if (!detalleTarjetaDeleted) {
                 return res.status(404).json({
-                    error: "No se ha encontrado el contrato."
+                    error: "No se ha encontrado el detalle de Tarjeta."
                 });
             }
 
             return res.status(200).json({
-                mensaje: "Contrato eliminado correctamente."
+                mensaje: "Detalle de Tarjeta eliminado correctamente."
             });
 
         } catch (error) {
@@ -108,4 +114,4 @@ class detalleTarjetaController {
 
 }
 
-export default new ContratoController();
+export default new detalleTarjetaController();
