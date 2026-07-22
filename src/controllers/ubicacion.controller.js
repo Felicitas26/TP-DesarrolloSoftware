@@ -2,7 +2,6 @@ import ubicacionService from "../services/ubicacion.service.js";
 
 class UbicacionController {
 
-    // Trae todas las ubicaciones
     async getAll(req, res) {
 
         const lista = await ubicacionService.getAll();
@@ -11,7 +10,6 @@ class UbicacionController {
 
     }
 
-    // Trae una ubicación por ID
     async getById(req, res) {
 
         const { id } = req.params;
@@ -28,7 +26,6 @@ class UbicacionController {
 
     }
 
-    // Crear una ubicación
     async create(req, res) {
 
         const { localidad, codigoPostal } = req.body;
@@ -45,7 +42,6 @@ class UbicacionController {
 
     }
 
-    // Modificar una ubicación
     async update(req, res) {
 
         const { id } = req.params;
@@ -62,7 +58,6 @@ class UbicacionController {
 
     }
 
-    // Eliminar una ubicación
     async delete(req, res) {
 
         const { id } = req.params;
