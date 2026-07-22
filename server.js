@@ -2,6 +2,9 @@ import db from './db.js';
 import express from 'express';
 import tiposalonRoutes from './src/routes/tiposalon.routes.js';
 import clienteRoutes from './src/routes/cliente.routes.js';
+import servicioExtraRoutes from "./routes/servicioExtra.routes.js";
+import contratoRoutes from "./routes/contrato.routes.js";
+import detalleTarjetaRoutes from "./routes/detalleTarjeta.routes.js";
 
 const app = express();
 
@@ -24,9 +27,13 @@ app.get('/clientes', async (req, res) => {
   }
 });
 
-// Conectamos las rutas de salones. Ahora todas las URL van a empezar con /api/salones
+// Conectamos las rutas. Ahora todas las URL van a empezar con /api/salones
 app.use('/api/tiposalones', tiposalonRoutes);
 app.use('/api/clientes', clienteRoutes);
+app.use("/servicioExtra", servicioExtraRoutes);
+app.use("/contrato", contratoRoutes);
+app.use("/detalleTarjeta", detalleTarjetaRoutes);
+
 
 // Mensaje de encendido en la terminal
 app.listen(3000, () => {
