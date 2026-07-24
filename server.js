@@ -8,15 +8,11 @@ import detalleTarjetaRoutes from "./routes/detalleTarjeta.routes.js";
 
 const app = express();
 
-// Middleware obligatorio para que el servidor entienda cuando le enviamos datos en formato JSON
 app.use(express.json());
-// Ruta para traer los clientes de la base de datos
 app.get('/clientes', async (req, res) => {
   try {
-    // Hacemos la consulta a la tabla usando promesas
     const [filas] = await db.query('SELECT * FROM clientes');
     
-    // Devolvemos los datos que encontramos
     res.json({
       mensaje: "¡Clientes cargados con éxito!",
       clientes: filas
@@ -27,7 +23,6 @@ app.get('/clientes', async (req, res) => {
   }
 });
 
-// Conectamos las rutas. Ahora todas las URL van a empezar con /api/salones
 app.use('/api/tiposalones', tiposalonRoutes);
 app.use('/api/clientes', clienteRoutes);
 app.use("/servicioExtra", servicioExtraRoutes);
