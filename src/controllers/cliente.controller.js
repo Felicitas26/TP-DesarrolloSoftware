@@ -66,7 +66,7 @@ class ClienteController {
                 });
 
     }
-
+}
     async update(req, res) {
 
         try {
@@ -77,7 +77,6 @@ class ClienteController {
                 return res.status(404).json({
                    error: "No se ha encontrado al cliente."
                 });
-
             }
             return res.status(200).json({
                 mensaje: "Cliente actualizado correctamente.",
@@ -89,7 +88,7 @@ class ClienteController {
                 error: error.message
                 });
     }
-
+}
     async delete(req, res) {
         try {
 
