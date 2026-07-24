@@ -30,7 +30,6 @@ app.use("/contrato", contratoRoutes);
 app.use("/detalleTarjeta", detalleTarjetaRoutes);
 
 
-// Mensaje de encendido en la terminal
 app.listen(3000, () => {
   console.log('¡Servidor del TP encendido y escuchando en el puerto 3000!');
 }); 
