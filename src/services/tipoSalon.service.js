@@ -4,17 +4,14 @@ let salones = [
 ];
 
 class SalonService {
-  // 1. Leer todos los salones (GET)
   getAll() {
     return salones;
   }
 
-  // 2. Buscar un salón por su ID único (GET con ID)
   getById(id) {
     return salones.find(s => s.id === parseInt(id));
   }
 
-  // 3. Crear un nuevo salón (POST)
   create(datos) {
     const nuevoSalon = {
       id: proximoId++,
@@ -27,12 +24,10 @@ class SalonService {
     return nuevoSalon;
   }
 
-  // 4. Modificar un salón existente (PUT)
   update(id, datos) {
     const index = salones.findIndex(s => s.id === parseInt(id));
-    if (index === -1) return null; // Si no lo encuentra, devuelve "nada"
+    if (index === -1) return null; 
 
-    // Reemplazamos los datos viejos por los nuevos que vengan
     salones[index] = {
       ...salones[index],
       nombre: datos.nombre !== undefined ? datos.nombre : salones[index].nombre,
@@ -44,12 +39,11 @@ class SalonService {
     return salones[index];
   }
 
-  // 5. Borrar un salón (DELETE)
   delete(id) {
     const index = salones.findIndex(s => s.id === parseInt(id));
     if (index === -1) return false;
 
-    salones.splice(index, 1); // Borra el elemento de la lista
+    salones.splice(index, 1); 
     return true;
   }
 }
