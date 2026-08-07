@@ -1,18 +1,18 @@
-import salonService from "../services/salon.service.js";
+import loungeService from "../services/lounge.service.js";
 
-class SalonController {
+class LoungeController {
 
   async getAll(req, res) {
-    const lista = await salonService.getAll();
+    const lista = await loungeService.getAll();
     return res.status(200).json(lista);
   }
 
   async getById(req, res) {
     const { id } = req.params;
 
-    const salon = await salonService.getById(id);
+    const lounge = await loungeService.getById(id);
 
-    if (!salon) {
+    if (!lounge) {
       return res.status(404).json({
         error: `Salón con ID ${id} no encontrado.`
       });
@@ -24,44 +24,44 @@ class SalonController {
   async create(req, res) {
 
     const {
-      nombre,
-      direccionSalon,
-      tipoSalonId
+      name,
+      LoungeAdress,
+      typeLoungeId
     } = req.body;
 
-    if (!nombre || !direccionSalon || !tipoSalonId) {
+    if (!name || !LoungeAdress || !typeLoungeId) {
       return res.status(400).json({
         error: "Todos los campos (nombre, direccionSalon y tipoSalonId) son obligatorios."
       });
     }
 
-    const nuevoSalon = await salonService.create(req.body);
+    const newLounge = await loungeService.create(req.body);
 
-    return res.status(201).json(nuevoSalon);
+    return res.status(201).json(newLounge);
   }
 
   async update(req, res) {
 
     const { id } = req.params;
 
-    const salonActualizado = await salonService.update(id, req.body);
+    const UpdatedLounge = await loungeService.update(id, req.body);
 
-    if (!salonActualizado) {
+    if (!UpdatedLounge) {
       return res.status(404).json({
         error: `No se encontró el salón con ID ${id} para actualizar.`
       });
     }
 
-    return res.status(200).json(salonActualizado);
+    return res.status(200).json(UpdatedLounge);
   }
 
   async delete(req, res) {
 
     const { id } = req.params;
 
-    const eliminado = await salonService.delete(id);
+    const deleted = await loungeService.delete(id);
 
-    if (!eliminado) {
+    if (!deleted) {
       return res.status(404).json({
         error: `No se encontró el salón con ID ${id} para eliminar.`
       });
@@ -74,4 +74,4 @@ class SalonController {
 
 }
 
-export default new SalonController();
+export default new LoungeController();
