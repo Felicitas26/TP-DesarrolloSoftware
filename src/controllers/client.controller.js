@@ -1,11 +1,11 @@
-import customerService from "../services/customer.service.js";
+import clientService from "../services/client.service.js";
 
-class CustomerController {
+class ClientController {
 
     async getAll(req, res) {
         try { 
-            const customer = await customerService.getAll();
-            return res.status(200).json(customers);
+            const client = await clientService.getAll();
+            return res.status(200).json(clients);
             }
         catch (error) {
             return res.status(500).json ({
@@ -17,13 +17,13 @@ class CustomerController {
     async getById(req, res) {
        const { id }  = req.params;
         try {
-            const customer = await customerService.getById(id);
-            if (!customer) {
+            const cient = await clientService.getById(id);
+            if (!client) {
                 return res.status(404).json({ 
                     error: `Cliente con ID ${id} no encontrado.`
                        });
                  }
-            return res.status(200).json(customer);
+            return res.status(200).json(client);
         }
         catch (error) {
             return res.status(500).json ({
@@ -34,30 +34,30 @@ class CustomerController {
     
     async create(req, res) {
         const {
-            nameCus, lastNameCus, phoneCus, dniCus, emailCus, adressCus, localityCus } = req.body;
+            nameCli, lastNameCli, phoneCli, dniCli, emailCli, adressCli, localityCli } = req.body;
 
         try {
         
-            if ( !nameCus || !lastNameCus || !phoneCus || !dniCus || !emailCus || !adressCus || !localityCus) {
+            if ( !nameCli || !lastNameCli || !phoneCli || !dniCli || !emailCli || !adressCli || !localityCli) {
                 return res.status(400).json ({
                     error: "Todos los campos son obligatorios."
                 });
                 }
            
-            if (!/^\d+$/.test(dniCus)) {
+            if (!/^\d+$/.test(dniCli)) {
                return res.status(400).json({
                     error: "El DNI solo puede contener números."
                 });
             }
            
-            if (!/^\d+$/.test(phoneCus)) {
+            if (!/^\d+$/.test(phoneCli)) {
                return res.status(400).json({
                    error: "El teléfono solo puede contener números."
                 });
             }
             
-            const newCustomer = await customerService.create(req.body);
-            return res.status(201).json(newCustomer);
+            const newClient = await clientService.create(req.body);
+            return res.status(201).json(newClient);
             }
         
             catch (error) {
@@ -71,16 +71,16 @@ class CustomerController {
 
         try {
             const { id } = req.params;
-            const customerUpdated = await customerService.update(id, req.body);
+            const clientUpdated = await clientService.update(id, req.body);
            
-            if (!customerUpdated) {
+            if (!clientUpdated) {
                 return res.status(404).json({
                    error: "No se ha encontrado al cliente."
                 });
             }
             return res.status(200).json({
-                mensaje: "Cliente actualizado correctamente.",
-                customer: customerUpdated
+                message: "Cliente actualizado correctamente.",
+                client: clientUpdated
         });
         }
             catch (error) {
@@ -93,16 +93,16 @@ class CustomerController {
         try {
 
             const { id } = req.params;
-            const customerDeleted = await customerService.delete(id);
+            const clientDeleted = await clientService.delete(id);
     
-            if (!customerDeleted) {
+            if (!clientDeleted) {
                 return res.status(404).json({
                     error: "No se ha encontrado al cliente."
                 });
         }
 
         return res.status(200).json({
-            mensaje: "Cliente eliminado correctamente."
+            message: "Cliente eliminado correctamente."
         });
 
     } catch (error) {
