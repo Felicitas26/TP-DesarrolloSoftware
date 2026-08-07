@@ -113,4 +113,4 @@ function editClient() {
     );
 }
 
-export default EditClient;
+export default editClient;
