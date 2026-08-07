@@ -3,8 +3,8 @@ import loungeService from "../services/lounge.service.js";
 class LoungeController {
 
   async getAll(req, res) {
-    const lista = await loungeService.getAll();
-    return res.status(200).json(lista);
+    const list = await loungeService.getAll();
+    return res.status(200).json(list);
   }
 
   async getById(req, res) {
@@ -18,7 +18,7 @@ class LoungeController {
       });
     }
 
-    return res.status(200).json(salon);
+    return res.status(200).json(lounge);
   }
 
   async create(req, res) {
