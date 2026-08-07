@@ -28,9 +28,9 @@ class LocationController {
 
     async create(req, res) {
 
-        const { location, zipCode } = req.body;
+        const { locality, zipCode } = req.body;
 
-        if (!location || !zipCode) {
+        if (!locality || !zipCode) {
             return res.status(400).json({
                 error: "Todos los campos (localidad y codigoPostal) son obligatorios."
             });
