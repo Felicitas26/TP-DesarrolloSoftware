@@ -1,12 +1,12 @@
-import detalleTarjetaService from "../services/detalleTarjeta.service.js";
+import cardDetailService from "../services/cardDetail.service.js";
 
-class DetalleTarjetaController {
+class cardDetailController {
 
     async getAll(req, res) {
         try {
-            const detallesTarjeta = await detalleTarjetaService.getAll();
+            const cardDetail = await cardDetailService.getAll();
 
-            return res.status(200).json(detallesTarjeta);
+            return res.status(200).json(cardDetail);
 
         } catch (error) {
             return res.status(500).json({
@@ -19,15 +19,15 @@ class DetalleTarjetaController {
         const { id } = req.params;
 
         try {
-            const detalleTarjeta = await detalleTarjetaService.getById(id);
+            const cardDetail = await cardDetailService.getById(id);
 
-            if (!detalleTarjeta) {
+            if (!cardDetail) {
                 return res.status(404).json({
                     error: `Detalle de Tarjeta con ID ${id} no encontrado.`
                 });
             }
 
-            return res.status(200).json(detalleTarjeta);
+            return res.status(200).json(cardDetail);
 
         } catch (error) {
             return res.status(500).json({
@@ -37,26 +37,26 @@ class DetalleTarjetaController {
     }
 
     async create(req, res) {
-        const { etapaMenu, detalle, presupuesto, idContrato } = req.body;
+        const { MenuStage, detail, budget, idAgreement } = req.body;
 
         try {
 
-            if (!etapaMenu || !detalle || !presupuesto || !idContrato) {
+            if (!MenuStage || !detail || !budget || !idAgreement) {
                 return res.status(400).json({
                     error: "Todos los campos son obligatorios."
                 });
             }
 
-            if (typeof presupuesto !== "number" || presupuesto <= 0) {
+            if (typeof budget !== "number" || budget <= 0) {
                 return res.status(400).json({
                     error: "El presupuesto debe ser un número positivo."
                 });
             }
 
-            const nuevoDetalleTarjeta =
-                await detalleTarjetaService.create(req.body);
+            const newcardDetail =
+                await cardDetailService.create(req.body);
 
-            return res.status(201).json(nuevoDetalleTarjeta);
+            return res.status(201).json(newcardDetail);
 
         } catch (error) {
             return res.status(500).json({
@@ -70,10 +70,10 @@ class DetalleTarjetaController {
 
             const { id } = req.params;
 
-            const detalleTarjetaUpdated =
-                await detalleTarjetaService.update(id, req.body);
+            const cardDetailUpdated =
+                await cardDetailService.update(id, req.body);
 
-            if (!detalleTarjetaUpdated) {
+            if (!cardDetailUpdated) {
                 return res.status(404).json({
                     error: "No se ha encontrado el detalle de Tarjeta buscado."
                 });
@@ -81,7 +81,7 @@ class DetalleTarjetaController {
 
             return res.status(200).json({
                 mensaje: "Detalle de Tarjeta actualizado correctamente.",
-                detalleT: detalleTarjetaUpdated
+                detalleT: cardDetailUpdated
             });
 
         } catch (error) {
@@ -96,10 +96,10 @@ class DetalleTarjetaController {
 
             const { id } = req.params;
 
-            const detalleTarjetaDeleted =
-                await detalleTarjetaService.delete(id);
+            const cardDetailDeleted =
+                await cardDetailService.delete(id);
 
-            if (!detalleTarjetaDeleted) {
+            if (!cardDetailDeleted) {
                 return res.status(404).json({
                     error: "No se ha encontrado el detalle de Tarjeta."
                 });
@@ -118,4 +118,4 @@ class DetalleTarjetaController {
 
 }
 
-export default new DetalleTarjetaController();
+export default new cardDetailController();
