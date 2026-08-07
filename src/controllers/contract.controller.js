@@ -1,11 +1,11 @@
-import agreementService from "../services/agreement.service.js";
+import contractService from "../services/contract.service.js";
 
-class AgreementController {
+class ContractController {
 
     async getAll(req, res) {
         try {
-            const agreements = await agreementService.getAll();
-            return res.status(200).json(agreements);
+            const contracts = await contractService.getAll();
+            return res.status(200).json(contracts);
 
         } catch (error) {
             return res.status(500).json({
@@ -18,15 +18,15 @@ class AgreementController {
         const { id } = req.params;
 
         try {
-            const agreement = await agreementService.getById(id);
+            const contract = await contractService.getById(id);
 
-            if (!agreement) {
+            if (!contract) {
                 return res.status(404).json({
                     error: `Contrato con ID ${id} no encontrado.`
                 });
             }
 
-            return res.status(200).json(agreement);
+            return res.status(200).json(contract);
 
         } catch (error) {
             return res.status(500).json({
@@ -37,21 +37,21 @@ class AgreementController {
 
     async create(req, res) {
         const {
-            EventStartTime,
-            EventEndTime
+            eventStartTime,
+            eventEndTime
         } = req.body;
 
         try {
 
-            if (!EventStartTime || !EventEndTime) {
+            if (!eventStartTime || !eventEndTime) {
                 return res.status(400).json({
                     error: "Todos los campos son obligatorios."
                 });
             }
 
-            const newAgreement = await agreementService.create(req.body);
+            const newContract = await contractService.create(req.body);
 
-            return res.status(201).json(newAgreement);
+            return res.status(201).json(newContract);
 
         } catch (error) {
             return res.status(500).json({
@@ -65,9 +65,9 @@ class AgreementController {
 
             const { id } = req.params;
 
-            const agreementUpdated = await agreementService.update(id, req.body);
+            const contractUpdated = await contractService.update(id, req.body);
 
-            if (!agreementUpdated) {
+            if (!contractUpdated) {
                 return res.status(404).json({
                     error: "No se ha encontrado el contrato."
                 });
@@ -75,7 +75,7 @@ class AgreementController {
 
             return res.status(200).json({
                 message: "Contrato actualizado correctamente.",
-                agreement: agreementUpdated
+                contract: contractUpdated
             });
 
         } catch (error) {
@@ -90,9 +90,9 @@ class AgreementController {
 
             const { id } = req.params;
 
-            const agreementDeleted = await agreementService.delete(id);
+            const contractDeleted = await contractService.delete(id);
 
-            if (!agreementDeleted) {
+            if (!contractDeleted) {
                 return res.status(404).json({
                     error: "No se ha encontrado el contrato."
                 });
@@ -111,4 +111,4 @@ class AgreementController {
 
 }
 
-export default new AgreementController();
+export default new ContractController();
