@@ -80,8 +80,8 @@ class cardDetailController {
             }
 
             return res.status(200).json({
-                mensaje: "Detalle de Tarjeta actualizado correctamente.",
-                detalleT: cardDetailUpdated
+                message: "Detalle de Tarjeta actualizado correctamente.",
+                datailC: cardDetailUpdated
             });
 
         } catch (error) {
@@ -106,7 +106,7 @@ class cardDetailController {
             }
 
             return res.status(200).json({
-                mensaje: "Detalle de Tarjeta eliminado correctamente."
+                message: "Detalle de Tarjeta eliminado correctamente."
             });
 
         } catch (error) {
