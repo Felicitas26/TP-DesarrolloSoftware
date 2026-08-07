@@ -7,6 +7,6 @@ router.get("/", cardDetailController.getAll);
 router.get("/:id", cardDetailController.getById);
 router.post("/", cardDetailController.create);
 router.put("/:id", cardDetailController.update);
-router.delete("/:id", cradDetailController.delete);
+router.delete("/:id", cardDetailController.delete);
 
 export default router;
