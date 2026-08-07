@@ -78,7 +78,7 @@ class LoungeTypeController {
 
     async delete(req, res) {
 
-        const deleted = await loungeStyleService.delete(req.params.id);
+        const deleted = await loungeTypeService.delete(req.params.id);
 
         if (!deleted) {
             return res.status(404).json({
@@ -94,5 +94,5 @@ class LoungeTypeController {
 
 }
 
-export default new loungeTypeController();
+export default new LoungeTypeController();
 
