@@ -1,12 +1,12 @@
-import servicioExtraService from "../services/servicioExtra.service.js";
+import extraServiceService from "../services/extraService.service.js";
 
-class ServicioExtraController {
+class extraServiceController {
 
     async getAll(req, res) {
         try {
-            const serviciosExtra = await servicioExtraService.getAll();
+            const extraService = await extraServiceService.getAll();
 
-            return res.status(200).json(serviciosExtra);
+            return res.status(200).json(extraService);
 
         } catch (error) {
             return res.status(500).json({
@@ -19,15 +19,15 @@ class ServicioExtraController {
         const { id } = req.params;
 
         try {
-            const servicioExtra = await servicioExtraService.getById(id);
+            const extraService = await extraServiceService.getById(id);
 
-            if (!servicioExtra) {
+            if (!extraService) {
                 return res.status(404).json({
                     error: `Servicio Extra con ID ${id} no encontrado.`
                 });
             }
 
-            return res.status(200).json(servicioExtra);
+            return res.status(200).json(extraService);
 
         } catch (error) {
             return res.status(500).json({
@@ -37,26 +37,26 @@ class ServicioExtraController {
     }
 
     async create(req, res) {
-        const { nombreServicio, detalleServicio, costo } = req.body;
+        const { nameService, detailService, cost } = req.body;
 
         try {
 
-            if (!nombreServicio || !detalleServicio || !costo) {
+            if (!nameService || !detailService || !cost) {
                 return res.status(400).json({
                     error: "Todos los campos son obligatorios."
                 });
             }
 
-            if (typeof costo !== "number" || costo < 0) {
+            if (typeof cost !== "number" || cost < 0) {
                 return res.status(400).json({
                     error: "El costo solo puede contener números."
                 });
             }
 
-            const nuevoServicioExtra =
-                await servicioExtraService.create(req.body);
+            const newextraService =
+                await extraServiceService.create(req.body);
 
-            return res.status(201).json(nuevoServicioExtra);
+            return res.status(201).json(newextraService);
 
         } catch (error) {
             return res.status(500).json({
@@ -70,18 +70,18 @@ class ServicioExtraController {
 
             const { id } = req.params;
 
-            const servicioExtraUpdated =
-                await servicioExtraService.update(id, req.body);
+            const extraServiceUpdated =
+                await extraServiceService.update(id, req.body);
 
-            if (!servicioExtraUpdated) {
+            if (!extraServiceUpdated) {
                 return res.status(404).json({
                     error: "No se ha encontrado el Servicio Extra buscado."
                 });
             }
 
             return res.status(200).json({
-                mensaje: "Servicio Extra actualizado correctamente.",
-                servicioExtra: servicioExtraUpdated
+                message: "Servicio Extra actualizado correctamente.",
+                extraService: extraServiceUpdated
             });
 
         } catch (error) {
@@ -96,17 +96,17 @@ class ServicioExtraController {
 
             const { id } = req.params;
 
-            const servicioExtraDeleted =
-                await servicioExtraService.delete(id);
+            const extraServiceDeleted =
+                await extraServiceService.delete(id);
 
-            if (!servicioExtraDeleted) {
+            if (!extraServiceDeleted) {
                 return res.status(404).json({
                     error: "No se ha encontrado el Servicio Extra."
                 });
             }
 
             return res.status(200).json({
-                mensaje: "Servicio Extra eliminado correctamente."
+                message: "Servicio Extra eliminado correctamente."
             });
 
         } catch (error) {
@@ -118,4 +118,4 @@ class ServicioExtraController {
 
 }
 
-export default new ServicioExtraController();
+export default new extraServiceController();
