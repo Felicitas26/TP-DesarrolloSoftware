@@ -25,11 +25,11 @@ class LoungeController {
 
     const {
       name,
-      LoungeAdress,
+      LoungeAddress,
       typeLoungeId
     } = req.body;
 
-    if (!name || !LoungeAdress || !typeLoungeId) {
+    if (!name || !LoungeAddress || !typeLoungeId) {
       return res.status(400).json({
         error: "Todos los campos (nombre, direccionSalon y tipoSalonId) son obligatorios."
       });
