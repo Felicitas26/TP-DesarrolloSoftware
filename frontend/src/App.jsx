@@ -1,9 +1,9 @@
-import newClient from "./pages/clientes/newClient";
+import NewClient from "./pages/clientes/newClient";
 import "./App.css";
 
 function App() {
   return (
-    <newClient />
+    <NewClient />
   );
 }
 
