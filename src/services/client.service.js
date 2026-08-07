@@ -1,6 +1,6 @@
 import db from "../../db.js";
 
-class ClienteService {
+class ClientService {
 
     async getAll() {
 
@@ -10,11 +10,11 @@ class ClienteService {
 
     }
 
-    async create(cliente) {
+    async create(client) {
 
     }
 
-    async update(id, cliente) {
+    async update(id, client) {
 
     }
 
@@ -24,4 +24,4 @@ class ClienteService {
 
 }
 
-export default new ClienteService();
+export default new ClientService();
