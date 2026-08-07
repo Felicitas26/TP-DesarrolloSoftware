@@ -49,7 +49,7 @@ class AgreementController {
                 });
             }
 
-            const newAagreement = await agreementService.create(req.body);
+            const newAgreement = await agreementService.create(req.body);
 
             return res.status(201).json(newAgreement);
 
@@ -74,8 +74,8 @@ class AgreementController {
             }
 
             return res.status(200).json({
-                mensaje: "Contrato actualizado correctamente.",
-                contrato: agreementUpdated
+                message: "Contrato actualizado correctamente.",
+                agreement: agreementUpdated
             });
 
         } catch (error) {
@@ -99,7 +99,7 @@ class AgreementController {
             }
 
             return res.status(200).json({
-                mensaje: "Contrato eliminado correctamente."
+                message: "Contrato eliminado correctamente."
             });
 
         } catch (error) {
