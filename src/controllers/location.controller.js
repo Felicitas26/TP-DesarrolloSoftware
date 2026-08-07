@@ -1,12 +1,12 @@
-import ubicacionService from "../services/ubicacion.service.js";
+import locationService from "../services/location.service.js";
 
-class UbicacionController {
+class LocationController {
 
     async getAll(req, res) {
 
-        const lista = await ubicacionService.getAll();
+        const list = await locationService.getAll();
 
-        return res.status(200).json(lista);
+        return res.status(200).json(list);
 
     }
 
@@ -14,31 +14,31 @@ class UbicacionController {
 
         const { id } = req.params;
 
-        const ubicacion = await ubicacionService.getById(id);
+        const location = await locationService.getById(id);
 
-        if (!ubicacion) {
+        if (!location) {
             return res.status(404).json({
                 error: `Ubicación con ID ${id} no encontrada.`
             });
         }
 
-        return res.status(200).json(ubicacion);
+        return res.status(200).json(location);
 
     }
 
     async create(req, res) {
 
-        const { localidad, codigoPostal } = req.body;
+        const { location, zipCode } = req.body;
 
-        if (!localidad || !codigoPostal) {
+        if (!location || !zipCode) {
             return res.status(400).json({
                 error: "Todos los campos (localidad y codigoPostal) son obligatorios."
             });
         }
 
-        const nuevaUbicacion = await ubicacionService.create(req.body);
+        const newLocation = await locationService.create(req.body);
 
-        return res.status(201).json(nuevaUbicacion);
+        return res.status(201).json(newLocation);
 
     }
 
@@ -46,15 +46,15 @@ class UbicacionController {
 
         const { id } = req.params;
 
-        const ubicacionActualizada = await ubicacionService.update(id, req.body);
+        const UpdatedLocation = await locationService.update(id, req.body);
 
-        if (!ubicacionActualizada) {
+        if (!UpdatedLocation) {
             return res.status(404).json({
                 error: `No se encontró la ubicación con ID ${id} para actualizar.`
             });
         }
 
-        return res.status(200).json(ubicacionActualizada);
+        return res.status(200).json(UpdatedLocation);
 
     }
 
@@ -62,9 +62,9 @@ class UbicacionController {
 
         const { id } = req.params;
 
-        const eliminado = await ubicacionService.delete(id);
+        const deleted = await locationService.delete(id);
 
-        if (!eliminado) {
+        if (!deleted) {
             return res.status(404).json({
                 error: `No se encontró la ubicación con ID ${id} para eliminar.`
             });
@@ -78,4 +78,4 @@ class UbicacionController {
 
 }
 
-export default new UbicacionController();
+export default new LocationController();
