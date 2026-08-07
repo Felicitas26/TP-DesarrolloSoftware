@@ -1,7 +1,7 @@
 import { DataTypes } from "sequelize";
 import sequelize from "../config/database.js";
 
-const Ubicacion = sequelize.define("Ubicacion", {
+const Location = sequelize.define("Location", {
 
     id: {
         type: DataTypes.INTEGER,
@@ -9,16 +9,16 @@ const Ubicacion = sequelize.define("Ubicacion", {
         primaryKey: true
     },
 
-    localidad: {
+    locality: {
         type: DataTypes.STRING,
         allowNull: false
     },
 
-    codigoPostal: {
+    zipCode: {
         type: DataTypes.STRING,
         allowNull: false
     }
 
 });
 
-export default Ubicacion;
+export default Location;
