@@ -1,50 +1,84 @@
-let lounges = [
-  { id: 1, name: "Salón Pequeño", loungeAddress: "Av. Pellegrini 3135", minQuantity: 60, maxQuantity: 89 },
-  { id: 2, name: "Salón Grande", loungeAddress: "Pellegrini 3135", minQuantity: 90, maxQuantity: 130 }
-];
+import db from "../../db.js";
 
-class LoungeService {
-  getAll() {
-    return lounges;
-  }
+class LoungeTypeService {
 
-  getById(id) {
-    return lounges.find(s => s.id === parseInt(id));
-  }
+    async getAll() {
+        const [rows] = await db.execute(
+            "SELECT * FROM LoungeType"
+        );
 
-  create(data) {
-    const newLounge = {
-      id: nextId++,
-      nombre: data.nombre,
-      direccionSalon: data.direccionSalon,
-      cantMinima: parseInt(data.cantMinima),
-      cantMaxima: parseInt(data.cantMaxima)
-    };
-    lounges.push(newLounge);
-    return newLounge;
-  }
+        return rows;
+    }
 
-  update(id, data) {
-    const index = lounges.findIndex(s => s.id === parseInt(id));
-    if (index === -1) return null; 
+    async getById(id) {
+        const [rows] = await db.execute(
+            "SELECT * FROM LoungeType WHERE idLoungeType = ?",
+            [id]
+        );
 
-    lounges[index] = {
-      ...lounges[index],
-      name: data.name !== undefined ? data.name : lounges[index].name,
-      loungeAddress: data.loungeAddress !== undefined ? data.loungeAddress : lounges[index].loungeAddress,
-      minQuantity: data.minQuantity !== undefined ? parseInt(data.minQuantity) : lounges[index].minQuantity,
-      maxQuantity: data.maxQuantity !== undefined ? parseInt(data.maxQuantity) : lounges[index].maxQuantity
-    };
+        return rows[0];
+    }
 
-    return lounges[index];
-  }
+    async create(loungeType) {
+        const {
+            minQuantity,
+            maxQuantity
+        } = loungeType;
 
-  delete(id) {
-    const index = lounges.findIndex(s => s.id === parseInt(id));
-    if (index === -1) return false;
+        const [result] = await db.execute(
+            `INSERT INTO LoungeType
+            (minQuantity, maxQuantity)
+            VALUES (?, ?)`,
+            [
+                minQuantity,
+                maxQuantity
+            ]
+        );
 
-    lounges.splice(index, 1); 
-    return true;
-  }
+        return {
+            idLoungeType: result.insertId,
+            minQuantity,
+            maxQuantity
+        };
+    }
+
+    async update(id, loungeType) {
+        const {
+            minQuantity,
+            maxQuantity
+        } = loungeType;
+
+        const [result] = await db.execute(
+            `UPDATE LoungeType
+            SET minQuantity = ?,
+                maxQuantity = ?
+            WHERE idLoungeType = ?`,
+            [
+                minQuantity,
+                maxQuantity,
+                id
+            ]
+        );
+
+        if (result.affectedRows === 0) {
+            return null;
+        }
+
+        return this.getById(id);
+    }
+
+    async delete(id) {
+        const [result] = await db.execute(
+            "DELETE FROM LoungeType WHERE idLoungeType = ?",
+            [id]
+        );
+
+        if (result.affectedRows === 0) {
+            return null;
+        }
+
+        return true;
+    }
 }
-export default new LoungeService();
+
+export default new LoungeTypeService();
