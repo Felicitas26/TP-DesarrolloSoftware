@@ -1,90 +1,28 @@
-import db from "../../db.js";
+import loungeModel from "../models/lounge.model.js";
 
 class LoungeService {
 
     async getAll() {
-        const [rows] = await db.execute(
-            "SELECT * FROM Lounge"
-        );
-
-        return rows;
+        return await loungeModel.getAll();
     }
 
     async getById(id) {
-        const [rows] = await db.execute(
-            "SELECT * FROM Lounge WHERE idLounge = ?",
-            [id]
-        );
-
-        return rows[0];
+        return await loungeModel.getById(id);
     }
 
     async create(lounge) {
-        const {
-            name,
-            loungeAddress,
-            idLocation
-        } = lounge;
-
-        const [result] = await db.execute(
-            `INSERT INTO Lounge
-            (name, loungeAddress, idLocation)
-            VALUES (?, ?, ?)`,
-            [
-                name,
-                loungeAddress,
-                idLocation
-            ]
-        );
-
-        return {
-            idLounge: result.insertId,
-            name,
-            loungeAddress,
-            idLocation
-        };
+        return await loungeModel.create(lounge);
     }
 
     async update(id, lounge) {
-        const {
-            name,
-            loungeAddress,
-            idLocation
-        } = lounge;
-
-        const [result] = await db.execute(
-            `UPDATE Lounge
-            SET name = ?,
-                loungeAddress = ?,
-                idLocation = ?
-            WHERE idLounge = ?`,
-            [
-                name,
-                loungeAddress,
-                idLocation,
-                id
-            ]
-        );
-
-        if (result.affectedRows === 0) {
-            return null;
-        }
-
-        return this.getById(id);
+        return await loungeModel.update(id, lounge);
     }
 
     async delete(id) {
-        const [result] = await db.execute(
-            "DELETE FROM Lounge WHERE idLounge = ?",
-            [id]
-        );
-
-        if (result.affectedRows === 0) {
-            return null;
-        }
-
-        return true;
+        return await loungeModel.delete(id);
     }
 }
 
 export default new LoungeService();
+
+
