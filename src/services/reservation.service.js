@@ -1,4 +1,3 @@
-```js
 import db from "../../db.js";
 
 class ReservationService {
@@ -89,4 +88,3 @@ class ReservationService {
 }
 
 export default new ReservationService();
-```
