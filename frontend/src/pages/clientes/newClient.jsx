@@ -4,15 +4,14 @@ import "./newClient.css";
 function NewClient() {
 
     const [client, setClient] = useState({
-        nombre: "",
-        apellido: "",
-        dni: "",
-        telefono: "",
-        email: "",
-        direccion: "",
-        localidad: ""
+        nameCli: "",
+        lastNameCli: "",
+        dniCli: "",
+        phoneCli: "",
+        emailCli: "",
+        addressCli: "",
+        localityCli: ""
     });
-
 
     const handleChange = (e) => {
         setClient({
@@ -21,13 +20,12 @@ function NewClient() {
         });
     };
 
-
     const handleSubmit = async (e) => {
         e.preventDefault();
 
         try {
 
-            const response = await fetch("http://localhost:3000/clientes", {
+            const response = await fetch("http://localhost:3000/api/client", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
@@ -35,105 +33,110 @@ function NewClient() {
                 body: JSON.stringify(client)
             });
 
-
             const data = await response.json();
+
+            if (!response.ok) {
+                alert(data.error || "Error creating client");
+                return;
+            }
 
             console.log(data);
 
-            alert("Cliente creado correctamente");
+            alert("Client created successfully");
 
+            setClient({
+                nameCli: "",
+                lastNameCli: "",
+                dniCli: "",
+                phoneCli: "",
+                emailCli: "",
+                addressCli: "",
+                localityCli: ""
+            });
 
         } catch (error) {
 
             console.log("Error:", error);
-            alert("Error al crear cliente");
+            alert("Error creating client");
 
         }
     };
 
-
     return (
         <div className="client-container">
 
-            <h1>Registro de Cliente</h1>
+            <h1>Client Registration</h1>
 
-            <form 
+            <form
                 className="client-form"
                 onSubmit={handleSubmit}
             >
 
-                <label>Nombre</label>
+                <label>Name</label>
                 <input
                     type="text"
-                    name="nombre"
-                    value={client.nombre}
+                    name="nameCli"
+                    value={client.nameCli}
                     onChange={handleChange}
-                    placeholder="Ingrese el nombre"
+                    placeholder="Enter the name"
                 />
 
-
-                <label>Apellido</label>
+                <label>Last Name</label>
                 <input
                     type="text"
-                    name="apellido"
-                    value={client.apellido}
+                    name="lastNameCli"
+                    value={client.lastNameCli}
                     onChange={handleChange}
-                    placeholder="Ingrese el apellido"
+                    placeholder="Enter the last name"
                 />
-
 
                 <label>DNI</label>
                 <input
                     type="number"
-                    name="dni"
-                    value={client.dni}
+                    name="dniCli"
+                    value={client.dniCli}
                     onChange={handleChange}
-                    placeholder="Ingrese el DNI"
+                    placeholder="Enter the DNI"
                 />
 
-
-                <label>Teléfono</label>
+                <label>Phone</label>
                 <input
                     type="text"
-                    name="telefono"
-                    value={client.telefono}
+                    name="phoneCli"
+                    value={client.phoneCli}
                     onChange={handleChange}
-                    placeholder="Ingrese el teléfono"
+                    placeholder="Enter the phone number"
                 />
-
 
                 <label>Email</label>
                 <input
                     type="email"
-                    name="email"
-                    value={client.email}
+                    name="emailCli"
+                    value={client.emailCli}
                     onChange={handleChange}
-                    placeholder="Ingrese el email"
+                    placeholder="Enter the email"
                 />
 
-
-                <label>Dirección</label>
+                <label>Address</label>
                 <input
                     type="text"
-                    name="direccion"
-                    value={client.direccion}
+                    name="addressCli"
+                    value={client.addressCli}
                     onChange={handleChange}
-                    placeholder="Ingrese la dirección"
+                    placeholder="Enter the address"
                 />
 
-
-                <label>Localidad</label>
+                <label>Locality</label>
                 <input
                     type="text"
-                    name="localidad"
-                    value={client.localidad}
+                    name="localityCli"
+                    value={client.localityCli}
                     onChange={handleChange}
-                    placeholder="Ingrese la localidad"
+                    placeholder="Enter the locality"
                 />
-
 
                 <button type="submit">
-                    Guardar Cliente
+                    Save Client
                 </button>
 
             </form>
@@ -141,6 +144,5 @@ function NewClient() {
         </div>
     );
 }
-
 
 export default NewClient;
