@@ -1,40 +1,70 @@
+import { useEffect, useState } from "react";
 import "./clientList.css";
 
 function ClientList() {
 
-    const handleEdit = (id) => {
-        console.log("Editar cliente:", id);
-    };
+    const [clients, setClients] = useState([]);
 
+    useEffect(() => {
+        fetch("http://localhost:3000/api/client")
+            .then(response => response.json())
+            .then(data => {
+                setClients(data);
+            })
+            .catch(error => {
+                console.error("Error loading clients:", error);
+            });
+    }, []);
+
+    const handleEdit = (id) => {
+        console.log("Edit client:", id);
+    };
 
     const handleDelete = (id) => {
-        console.log("Eliminar cliente:", id);
-        alert("Cliente eliminado");
+        console.log("Delete client:", id);
     };
-
 
     return (
         <div className="client-list-container">
 
-            <h1>Clientes</h1>
+            <h1>Clients</h1>
 
             <table className="client-table">
 
                 <thead>
                     <tr>
-                        <th>Nombre</th>
-                        <th>Apellido</th>
+                        <th>Name</th>
+                        <th>Last Name</th>
                         <th>DNI</th>
-                        <th>Teléfono</th>
+                        <th>Phone</th>
                         <th>Email</th>
-                        <th>Acciones</th>
+                        <th>Actions</th>
                     </tr>
                 </thead>
 
-
                 <tbody>
 
-                    {/* Acá después van los clientes desde la API */}
+                    {clients.map((client) => (
+                        <tr key={client.idCli}>
+
+                            <td>{client.nameCli}</td>
+                            <td>{client.lastNameCli}</td>
+                            <td>{client.dniCli}</td>
+                            <td>{client.phoneCli}</td>
+                            <td>{client.emailCli}</td>
+
+                            <td>
+                                <button onClick={() => handleEdit(client.idCli)}>
+                                    Edit
+                                </button>
+
+                                <button onClick={() => handleDelete(client.idCli)}>
+                                    Delete
+                                </button>
+                            </td>
+
+                        </tr>
+                    ))}
 
                 </tbody>
 
