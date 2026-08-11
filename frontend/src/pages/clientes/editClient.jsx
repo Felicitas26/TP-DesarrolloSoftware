@@ -1,18 +1,50 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
 import "./editClient.css";
 
-function editClient() {
+function EditClient() {
+
+    const { id } = useParams();
 
     const [client, setClient] = useState({
-        name: "",
-        surname: "",
-        dni: "",
-        phoneNumber: "",
-        email: "",
-        direccion: "",
-        localidad: ""
+        nameCli: "",
+        lastNameCli: "",
+        dniCli: "",
+        phoneCli: "",
+        emailCli: "",
+        addressCli: "",
+        localityCli: ""
     });
 
+    useEffect(() => {
+        const getClient = async () => {
+
+            try {
+
+                const response = await fetch(
+                    `http://localhost:3000/api/client/${id}`
+                );
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    alert(data.error || "Error loading client");
+                    return;
+                }
+
+                setClient(data);
+
+            } catch (error) {
+
+                console.log("Error:", error);
+                alert("Error loading client");
+
+            }
+        };
+
+        getClient();
+
+    }, [id]);
 
     const handleChange = (e) => {
         setClient({
@@ -21,90 +53,109 @@ function editClient() {
         });
     };
 
-
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
 
-        console.log(client);
-        alert("Cliente modificado correctamente");
-    };
+        try {
 
+            const response = await fetch(
+                `http://localhost:3000/api/client/${id}`,
+                {
+                    method: "PUT",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(client)
+                }
+            );
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                alert(data.error || "Error updating client");
+                return;
+            }
+
+            console.log(data);
+
+            alert("Client updated successfully");
+
+        } catch (error) {
+
+            console.log("Error:", error);
+            alert("Error updating client");
+
+        }
+    };
 
     return (
         <div className="client-container">
 
-            <h1>Editar Cliente</h1>
+            <h1>Edit Client</h1>
 
-            <form 
+            <form
                 className="client-form"
                 onSubmit={handleSubmit}
             >
 
-                <label>Nombre</label>
+                <label>Name</label>
                 <input
                     type="text"
-                    name="nombre"
-                    value={client.name}
+                    name="nameCli"
+                    value={client.nameCli}
                     onChange={handleChange}
                 />
 
-
-                <label>Apellido</label>
+                <label>Last Name</label>
                 <input
                     type="text"
-                    name="apellido"
-                    value={client.surname}
+                    name="lastNameCli"
+                    value={client.lastNameCli}
                     onChange={handleChange}
                 />
-
 
                 <label>DNI</label>
                 <input
                     type="number"
-                    name="dni"
-                    value={client.dni}
+                    name="dniCli"
+                    value={client.dniCli}
                     onChange={handleChange}
                 />
 
-
-                <label>Teléfono</label>
+                <label>Phone</label>
                 <input
                     type="text"
-                    name="telefono"
-                    value={client.phoneNumber}
+                    name="phoneCli"
+                    value={client.phoneCli}
                     onChange={handleChange}
                 />
-
 
                 <label>Email</label>
                 <input
                     type="email"
-                    name="email"
-                    value={client.email}
+                    name="emailCli"
+                    value={client.emailCli}
                     onChange={handleChange}
                 />
 
-
-                <label>Dirección</label>
+                <label>Address</label>
                 <input
                     type="text"
-                    name="direccion"
-                    value={client.direccion}
+                    name="addressCli"
+                    value={client.addressCli}
                     onChange={handleChange}
                 />
 
-
-                <label>Localidad</label>
+                <label>Locality</label>
                 <input
                     type="text"
-                    name="localidad"
-                    value={client.localidad}
+                    name="localityCli"
+                    value={client.localityCli}
                     onChange={handleChange}
                 />
-
 
                 <button type="submit">
-                    Guardar cambios
+                    Save Changes
                 </button>
 
             </form>
@@ -113,4 +164,5 @@ function editClient() {
     );
 }
 
-export default editClient;
+export default EditClient;
+
