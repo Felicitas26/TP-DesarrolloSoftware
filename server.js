@@ -1,17 +1,17 @@
 import db from './db.js';
 import express from 'express';
-import tiposalonRoutes from './src/routes/tiposalon.routes.js';
+import loungeTypeRoutes from './src/routes/loungeType.routes.js';
 import clientRoutes from './src/routes/client.routes.js';
-import servicioExtraRoutes from "./routes/servicioExtra.routes.js";
-import contratoRoutes from "./routes/contrato.routes.js";
-import detalleTarjetaRoutes from "./routes/detalleTarjeta.routes.js";
+import extraServiceRoutes from "./routes/extraService.routes.js";
+import contractRoutes from "./routes/contract.routes.js";
+import cardDetailRoutes from "./routes/cardDetail.routes.js";
 
 const app = express();
 
 app.use(express.json());
-app.get('/clientes', async (req, res) => {
+app.get('/client', async (req, res) => {
   try {
-    const [filas] = await db.query('SELECT * FROM clientes');
+    const [filas] = await db.query('SELECT * FROM client');
     
     res.json({
       mensaje: "¡Clientes cargados con éxito!",
@@ -23,11 +23,11 @@ app.get('/clientes', async (req, res) => {
   }
 });
 
-app.use('/api/tiposalones', tiposalonRoutes);
-app.use('/api/clients', clientRoutes);
-app.use("/servicioExtra", servicioExtraRoutes);
-app.use("/contrato", contratoRoutes);
-app.use("/detalleTarjeta", detalleTarjetaRoutes);
+app.use('/api/loungeType', loungeTypeRoutes);
+app.use('/api/client', clientRoutes);
+app.use("/extraService", extraServiceRoutes);
+app.use("/contract", contractRoutes);
+app.use("/cardDetail", cardDetailRoutes);
 
 
 app.listen(3000, () => {
