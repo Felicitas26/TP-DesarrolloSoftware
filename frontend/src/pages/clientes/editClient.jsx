@@ -4,10 +4,10 @@ import "./editClient.css";
 function editClient() {
 
     const [client, setClient] = useState({
-        nombre: "",
-        apellido: "",
+        name: "",
+        surname: "",
         dni: "",
-        telefono: "",
+        phoneNumber: "",
         email: "",
         direccion: "",
         localidad: ""
@@ -44,7 +44,7 @@ function editClient() {
                 <input
                     type="text"
                     name="nombre"
-                    value={client.nombre}
+                    value={client.name}
                     onChange={handleChange}
                 />
 
@@ -53,7 +53,7 @@ function editClient() {
                 <input
                     type="text"
                     name="apellido"
-                    value={client.apellido}
+                    value={client.surname}
                     onChange={handleChange}
                 />
 
@@ -71,7 +71,7 @@ function editClient() {
                 <input
                     type="text"
                     name="telefono"
-                    value={client.telefono}
+                    value={client.phoneNumber}
                     onChange={handleChange}
                 />
 
