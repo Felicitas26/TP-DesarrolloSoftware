@@ -1,4 +1,4 @@
-import extraServiceService from "../services/extraService.service.js";
+import extraService from "../services/extraService.service.js";
 
 class extraServiceController {
 
