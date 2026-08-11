@@ -1,85 +1,26 @@
-import db from "../../db.js";
+import locationModel from "../models/location.model.js";
 
 class LocationService {
 
     async getAll() {
-        const [rows] = await db.execute(
-            "SELECT * FROM Location"
-        );
-
-        return rows;
+        return await locationModel.getAll();
     }
 
     async getById(id) {
-        const [rows] = await db.execute(
-            "SELECT * FROM Location WHERE idLocation = ?",
-            [id]
-        );
-
-        return rows[0];
+        return await locationModel.getById(id);
     }
 
     async create(location) {
-        const {
-            locality,
-            zipCode
-        } = location;
-
-        const [result] = await db.execute(
-            `INSERT INTO Location
-            (locality, zipCode)
-            VALUES (?, ?)`,
-            [
-                locality,
-                zipCode
-            ]
-        );
-
-        return {
-            idLocation: result.insertId,
-            locality,
-            zipCode
-        };
+        return await locationModel.create(location);
     }
 
     async update(id, location) {
-        const {
-            locality,
-            zipCode
-        } = location;
-
-        const [result] = await db.execute(
-            `UPDATE Location
-            SET locality = ?,
-                zipCode = ?
-            WHERE idLocation = ?`,
-            [
-                locality,
-                zipCode,
-                id
-            ]
-        );
-
-        if (result.affectedRows === 0) {
-            return null;
-        }
-
-        return this.getById(id);
+        return await locationModel.update(id, location);
     }
 
     async delete(id) {
-        const [result] = await db.execute(
-            "DELETE FROM Location WHERE idLocation = ?",
-            [id]
-        );
-
-        if (result.affectedRows === 0) {
-            return null;
-        }
-
-        return true;
+        return await locationModel.delete(id);
     }
 }
 
 export default new LocationService();
-
