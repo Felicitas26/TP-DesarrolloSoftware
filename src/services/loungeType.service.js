@@ -1,83 +1,25 @@
-import db from "../../db.js";
+import loungeTypeModel from "../models/loungeType.model.js";
 
 class LoungeTypeService {
 
     async getAll() {
-        const [rows] = await db.execute(
-            "SELECT * FROM LoungeType"
-        );
-
-        return rows;
+        return await loungeTypeModel.getAll();
     }
 
     async getById(id) {
-        const [rows] = await db.execute(
-            "SELECT * FROM LoungeType WHERE idLoungeType = ?",
-            [id]
-        );
-
-        return rows[0];
+        return await loungeTypeModel.getById(id);
     }
 
     async create(loungeType) {
-        const {
-            minQuantity,
-            maxQuantity
-        } = loungeType;
-
-        const [result] = await db.execute(
-            `INSERT INTO LoungeType
-            (minQuantity, maxQuantity)
-            VALUES (?, ?)`,
-            [
-                minQuantity,
-                maxQuantity
-            ]
-        );
-
-        return {
-            idLoungeType: result.insertId,
-            minQuantity,
-            maxQuantity
-        };
+        return await loungeTypeModel.create(loungeType);
     }
 
     async update(id, loungeType) {
-        const {
-            minQuantity,
-            maxQuantity
-        } = loungeType;
-
-        const [result] = await db.execute(
-            `UPDATE LoungeType
-            SET minQuantity = ?,
-                maxQuantity = ?
-            WHERE idLoungeType = ?`,
-            [
-                minQuantity,
-                maxQuantity,
-                id
-            ]
-        );
-
-        if (result.affectedRows === 0) {
-            return null;
-        }
-
-        return this.getById(id);
+        return await loungeTypeModel.update(id, loungeType);
     }
 
     async delete(id) {
-        const [result] = await db.execute(
-            "DELETE FROM LoungeType WHERE idLoungeType = ?",
-            [id]
-        );
-
-        if (result.affectedRows === 0) {
-            return null;
-        }
-
-        return true;
+        return await loungeTypeModel.delete(id);
     }
 }
 
