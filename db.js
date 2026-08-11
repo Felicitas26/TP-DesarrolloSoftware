@@ -26,4 +26,3 @@ pool.getConnection((err, connection) => {
 });
 
 export default promisePool;
-```
