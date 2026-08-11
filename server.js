@@ -1,7 +1,7 @@
 import db from './db.js';
 import express from 'express';
 import tiposalonRoutes from './src/routes/tiposalon.routes.js';
-import clienteRoutes from './src/routes/cliente.routes.js';
+import clientRoutes from './src/routes/client.routes.js';
 import servicioExtraRoutes from "./routes/servicioExtra.routes.js";
 import contratoRoutes from "./routes/contrato.routes.js";
 import detalleTarjetaRoutes from "./routes/detalleTarjeta.routes.js";
@@ -24,7 +24,7 @@ app.get('/clientes', async (req, res) => {
 });
 
 app.use('/api/tiposalones', tiposalonRoutes);
-app.use('/api/clientes', clienteRoutes);
+app.use('/api/clients', clientRoutes);
 app.use("/servicioExtra", servicioExtraRoutes);
 app.use("/contrato", contratoRoutes);
 app.use("/detalleTarjeta", detalleTarjetaRoutes);
