@@ -1,0 +1,28 @@
+.client-list-container {
+    width: 90%;
+    margin: 40px auto;
+}
+
+.client-list-container h1 {
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+.client-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.client-table th,
+.client-table td {
+    padding: 10px;
+    border: 1px solid #ccc;
+    text-align: center;
+}
+
+.client-table button {
+    margin: 0 5px;
+    padding: 6px 10px;
+    cursor: pointer;
+}
+
