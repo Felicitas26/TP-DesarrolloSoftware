@@ -21,7 +21,9 @@ function ClientList() {
                 const data = await response.json();
 
                 if (!response.ok) {
-                    console.error(data.error || "Error loading clients");
+                    console.error(
+                        data.error || "Error loading clients"
+                    );
                     return;
                 }
 
@@ -29,7 +31,10 @@ function ClientList() {
 
             } catch (error) {
 
-                console.error("Error loading clients:", error);
+                console.error(
+                    "Error loading clients:",
+                    error
+                );
 
             }
         };
@@ -42,8 +47,52 @@ function ClientList() {
         navigate(`/client/edit/${id}`);
     };
 
-    const handleDelete = (id) => {
-        console.log("Delete client:", id);
+    const handleDelete = async (id) => {
+
+        const confirmDelete = window.confirm(
+            "Are you sure you want to delete this client?"
+        );
+
+        if (!confirmDelete) {
+            return;
+        }
+
+        try {
+
+            const response = await fetch(
+                `http://localhost:3000/api/client/${id}`,
+                {
+                    method: "DELETE"
+                }
+            );
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                alert(
+                    data.error || "Error deleting client"
+                );
+                return;
+            }
+
+            alert("Client deleted successfully");
+
+            setClients(
+                clients.filter(
+                    (client) => client.idCli !== id
+                )
+            );
+
+        } catch (error) {
+
+            console.error(
+                "Error deleting client:",
+                error
+            );
+
+            alert("Error deleting client");
+
+        }
     };
 
     return (
@@ -51,13 +100,16 @@ function ClientList() {
 
             <h1>Clients</h1>
 
-            <button onClick={() => navigate("/client/new")}>
+            <button
+                onClick={() => navigate("/client/new")}
+            >
                 New Client
             </button>
 
             <table className="client-table">
 
                 <thead>
+
                     <tr>
                         <th>Name</th>
                         <th>Last Name</th>
@@ -66,6 +118,7 @@ function ClientList() {
                         <th>Email</th>
                         <th>Actions</th>
                     </tr>
+
                 </thead>
 
                 <tbody>
@@ -74,26 +127,40 @@ function ClientList() {
 
                         <tr key={client.idCli}>
 
-                            <td>{client.nameCli}</td>
+                            <td>
+                                {client.nameCli}
+                            </td>
 
-                            <td>{client.lastNameCli}</td>
+                            <td>
+                                {client.lastNameCli}
+                            </td>
 
-                            <td>{client.dniCli}</td>
+                            <td>
+                                {client.dniCli}
+                            </td>
 
-                            <td>{client.phoneCli}</td>
+                            <td>
+                                {client.phoneCli}
+                            </td>
 
-                            <td>{client.emailCli}</td>
+                            <td>
+                                {client.emailCli}
+                            </td>
 
                             <td>
 
                                 <button
-                                    onClick={() => handleEdit(client.idCli)}
+                                    onClick={() =>
+                                        handleEdit(client.idCli)
+                                    }
                                 >
                                     Edit
                                 </button>
 
                                 <button
-                                    onClick={() => handleDelete(client.idCli)}
+                                    onClick={() =>
+                                        handleDelete(client.idCli)
+                                    }
                                 >
                                     Delete
                                 </button>
@@ -113,4 +180,3 @@ function ClientList() {
 }
 
 export default ClientList;
-
