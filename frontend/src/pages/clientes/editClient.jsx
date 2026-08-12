@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import "./editClient.css";
 
 function EditClient() {
 
     const { id } = useParams();
+    const navigate = useNavigate();
 
     const [client, setClient] = useState({
         nameCli: "",
@@ -17,6 +18,7 @@ function EditClient() {
     });
 
     useEffect(() => {
+
         const getClient = async () => {
 
             try {
@@ -36,7 +38,7 @@ function EditClient() {
 
             } catch (error) {
 
-                console.log("Error:", error);
+                console.error("Error loading client:", error);
                 alert("Error loading client");
 
             }
@@ -47,13 +49,16 @@ function EditClient() {
     }, [id]);
 
     const handleChange = (e) => {
+
         setClient({
             ...client,
             [e.target.name]: e.target.value
         });
+
     };
 
     const handleSubmit = async (e) => {
+
         e.preventDefault();
 
         try {
@@ -72,17 +77,20 @@ function EditClient() {
             const data = await response.json();
 
             if (!response.ok) {
+
                 alert(data.error || "Error updating client");
                 return;
-            }
 
-            console.log(data);
+            }
 
             alert("Client updated successfully");
 
+            navigate("/client");
+
         } catch (error) {
 
-            console.log("Error:", error);
+            console.error("Error updating client:", error);
+
             alert("Error updating client");
 
         }
@@ -99,6 +107,7 @@ function EditClient() {
             >
 
                 <label>Name</label>
+
                 <input
                     type="text"
                     name="nameCli"
@@ -107,6 +116,7 @@ function EditClient() {
                 />
 
                 <label>Last Name</label>
+
                 <input
                     type="text"
                     name="lastNameCli"
@@ -115,6 +125,7 @@ function EditClient() {
                 />
 
                 <label>DNI</label>
+
                 <input
                     type="number"
                     name="dniCli"
@@ -123,6 +134,7 @@ function EditClient() {
                 />
 
                 <label>Phone</label>
+
                 <input
                     type="text"
                     name="phoneCli"
@@ -131,6 +143,7 @@ function EditClient() {
                 />
 
                 <label>Email</label>
+
                 <input
                     type="email"
                     name="emailCli"
@@ -139,6 +152,7 @@ function EditClient() {
                 />
 
                 <label>Address</label>
+
                 <input
                     type="text"
                     name="addressCli"
@@ -147,6 +161,7 @@ function EditClient() {
                 />
 
                 <label>Locality</label>
+
                 <input
                     type="text"
                     name="localityCli"
@@ -165,4 +180,3 @@ function EditClient() {
 }
 
 export default EditClient;
-
