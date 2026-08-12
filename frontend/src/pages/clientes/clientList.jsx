@@ -1,23 +1,45 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import "./clientList.css";
 
 function ClientList() {
 
     const [clients, setClients] = useState([]);
 
+    const navigate = useNavigate();
+
     useEffect(() => {
-        fetch("http://localhost:3000/api/client")
-            .then(response => response.json())
-            .then(data => {
+
+        const getClients = async () => {
+
+            try {
+
+                const response = await fetch(
+                    "http://localhost:3000/api/client"
+                );
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    console.error(data.error || "Error loading clients");
+                    return;
+                }
+
                 setClients(data);
-            })
-            .catch(error => {
+
+            } catch (error) {
+
                 console.error("Error loading clients:", error);
-            });
+
+            }
+        };
+
+        getClients();
+
     }, []);
 
     const handleEdit = (id) => {
-        console.log("Edit client:", id);
+        navigate(`/client/edit/${id}`);
     };
 
     const handleDelete = (id) => {
@@ -28,6 +50,10 @@ function ClientList() {
         <div className="client-list-container">
 
             <h1>Clients</h1>
+
+            <button onClick={() => navigate("/client/new")}>
+                New Client
+            </button>
 
             <table className="client-table">
 
@@ -45,25 +71,37 @@ function ClientList() {
                 <tbody>
 
                     {clients.map((client) => (
+
                         <tr key={client.idCli}>
 
                             <td>{client.nameCli}</td>
+
                             <td>{client.lastNameCli}</td>
+
                             <td>{client.dniCli}</td>
+
                             <td>{client.phoneCli}</td>
+
                             <td>{client.emailCli}</td>
 
                             <td>
-                                <button onClick={() => handleEdit(client.idCli)}>
+
+                                <button
+                                    onClick={() => handleEdit(client.idCli)}
+                                >
                                     Edit
                                 </button>
 
-                                <button onClick={() => handleDelete(client.idCli)}>
+                                <button
+                                    onClick={() => handleDelete(client.idCli)}
+                                >
                                     Delete
                                 </button>
+
                             </td>
 
                         </tr>
+
                     ))}
 
                 </tbody>
@@ -75,3 +113,4 @@ function ClientList() {
 }
 
 export default ClientList;
+
