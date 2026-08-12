@@ -1,9 +1,12 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import "./newClient.css";
 
 function NewClient() {
 
-    const [client, setClient] = useState({
+    const navigate = useNavigate();
+
+    const emptyClient = {
         nameCli: "",
         lastNameCli: "",
         dniCli: "",
@@ -11,7 +14,9 @@ function NewClient() {
         emailCli: "",
         addressCli: "",
         localityCli: ""
-    });
+    };
+
+    const [client, setClient] = useState(emptyClient);
 
     const handleChange = (e) => {
 
@@ -48,19 +53,19 @@ function NewClient() {
 
             }
 
-            console.log(data);
+            const createAnother = window.confirm(
+                "Client created successfully.\n\nDo you want to create another client?"
+            );
 
-            alert("Client created successfully");
+            if (createAnother) {
 
-            setClient({
-                nameCli: "",
-                lastNameCli: "",
-                dniCli: "",
-                phoneCli: "",
-                emailCli: "",
-                addressCli: "",
-                localityCli: ""
-            });
+                setClient(emptyClient);
+
+            } else {
+
+                navigate("/client");
+
+            }
 
         } catch (error) {
 
