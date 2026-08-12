@@ -14,30 +14,38 @@ function NewClient() {
     });
 
     const handleChange = (e) => {
+
         setClient({
             ...client,
             [e.target.name]: e.target.value
         });
+
     };
 
     const handleSubmit = async (e) => {
+
         e.preventDefault();
 
         try {
 
-            const response = await fetch("http://localhost:3000/api/client", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(client)
-            });
+            const response = await fetch(
+                "http://localhost:3000/api/client",
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(client)
+                }
+            );
 
             const data = await response.json();
 
             if (!response.ok) {
+
                 alert(data.error || "Error creating client");
                 return;
+
             }
 
             console.log(data);
@@ -56,7 +64,8 @@ function NewClient() {
 
         } catch (error) {
 
-            console.log("Error:", error);
+            console.error("Error creating client:", error);
+
             alert("Error creating client");
 
         }
@@ -65,7 +74,7 @@ function NewClient() {
     return (
         <div className="client-container">
 
-            <h1>Client Registration</h1>
+            <h1>New Client</h1>
 
             <form
                 className="client-form"
@@ -73,66 +82,73 @@ function NewClient() {
             >
 
                 <label>Name</label>
+
                 <input
                     type="text"
                     name="nameCli"
                     value={client.nameCli}
                     onChange={handleChange}
-                    placeholder="Enter the name"
+                    placeholder="Enter name"
                 />
 
                 <label>Last Name</label>
+
                 <input
                     type="text"
                     name="lastNameCli"
                     value={client.lastNameCli}
                     onChange={handleChange}
-                    placeholder="Enter the last name"
+                    placeholder="Enter last name"
                 />
 
                 <label>DNI</label>
+
                 <input
                     type="number"
                     name="dniCli"
                     value={client.dniCli}
                     onChange={handleChange}
-                    placeholder="Enter the DNI"
+                    placeholder="Enter DNI"
                 />
 
                 <label>Phone</label>
+
                 <input
                     type="text"
                     name="phoneCli"
                     value={client.phoneCli}
                     onChange={handleChange}
-                    placeholder="Enter the phone number"
+                    placeholder="Enter phone"
                 />
 
                 <label>Email</label>
+
                 <input
                     type="email"
                     name="emailCli"
                     value={client.emailCli}
                     onChange={handleChange}
-                    placeholder="Enter the email"
+                    placeholder="Enter email"
                 />
 
                 <label>Address</label>
+
                 <input
                     type="text"
                     name="addressCli"
                     value={client.addressCli}
                     onChange={handleChange}
-                    placeholder="Enter the address"
+                    placeholder="Enter address"
                 />
 
                 <label>Locality</label>
+
                 <input
                     type="text"
                     name="localityCli"
                     value={client.localityCli}
                     onChange={handleChange}
-                    placeholder="Enter the locality"
+                    placeholder="Enter locality"
                 />
 
                 <button type="submit">
