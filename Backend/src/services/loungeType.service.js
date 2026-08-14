@@ -1,4 +1,4 @@
-import loungeTypeModel from "../models/loungeType.model.js";
+import loungeTypeModel from "../../Backend/src/models/loungeType.model.js";
 
 class LoungeTypeService {
 
