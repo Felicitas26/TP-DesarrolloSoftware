@@ -13,7 +13,7 @@ function NewClient() {
         phoneCli: "",
         emailCli: "",
         addressCli: "",
-        localityCli: ""
+        lcityCli: ""
     };
 
     const [client, setClient] = useState(emptyClient);
@@ -146,14 +146,14 @@ function NewClient() {
                     placeholder="Enter address"
                 />
 
-                <label>Locality</label>
+                <label>City</label>
 
                 <input
                     type="text"
-                    name="localityCli"
-                    value={client.localityCli}
+                    name="cityCli"
+                    value={client.cityCli}
                     onChange={handleChange}
-                    placeholder="Enter locality"
+                    placeholder="Enter city"
                 />
 
                 <button type="submit">
