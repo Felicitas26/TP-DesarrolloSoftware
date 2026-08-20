@@ -9,7 +9,7 @@ function NewClient() {
     const emptyClient = {
         nameCli: "",
         lastNameCli: "",
-        dniCli: "",
+        idCli: "",
         phoneCli: "",
         emailCli: "",
         addressCli: "",
@@ -96,24 +96,24 @@ function NewClient() {
                     placeholder="Enter name"
                 />
 
-                <label>Last Name</label>
+                <label>Surname</label>
 
                 <input
                     type="text"
                     name="lastNameCli"
                     value={client.lastNameCli}
                     onChange={handleChange}
-                    placeholder="Enter last name"
+                    placeholder="Enter surname"
                 />
 
-                <label>DNI</label>
+                <label>ID</label>
 
                 <input
                     type="number"
-                    name="dniCli"
-                    value={client.dniCli}
+                    name="idCli"
+                    value={client.idCli}
                     onChange={handleChange}
-                    placeholder="Enter DNI"
+                    placeholder="Enter id"
                 />
 
                 <label>Phone</label>
