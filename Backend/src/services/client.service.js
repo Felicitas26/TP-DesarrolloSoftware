@@ -1,4 +1,4 @@
-import clientModel from "../../Backend/src/models/client.model.js";
+import clientModel from "../../src/models/client.model.js";
 
 class ClientService {
 

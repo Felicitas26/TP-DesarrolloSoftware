@@ -22,70 +22,70 @@ class ClientModel {
     async create(client) {
         const {
             nameCli,
-            lastNameCli,
+            surnameCli,
             phoneCli,
             dniCli,
             emailCli,
             addressCli,
-            localityCli
+            cityCli
         } = client;
 
         const [result] = await db.execute(
             `INSERT INTO Client
-            (nameCli, lastNameCli, phoneCli, dniCli, emailCli, addressCli, localityCli)
+            (nameCli, surnameCli, phoneCli, dniCli, emailCli, addressCli, cityCli)
             VALUES (?, ?, ?, ?, ?, ?, ?)`,
             [
                 nameCli,
-                lastNameCli,
+                surnameCli,
                 phoneCli,
                 dniCli,
                 emailCli,
                 addressCli,
-                localityCli
+                cityCli
             ]
         );
 
         return {
-            idCli: result.insertId,
+            dniCli: result.insertId,
             nameCli,
-            lastNameCli,
+            surnameCli,
             phoneCli,
             dniCli,
             emailCli,
             addressCli,
-            localityCli
+            cityCli
         };
     }
 
     async update(id, client) {
         const {
             nameCli,
-            lastNameCli,
+            surnameCli,
             phoneCli,
             dniCli,
             emailCli,
             addressCli,
-            localityCli
+            cityCli
         } = client;
 
         const [result] = await db.execute(
             `UPDATE Client
             SET nameCli = ?,
-                lastNameCli = ?,
+                surnameCli = ?,
                 phoneCli = ?,
                 dniCli = ?,
                 emailCli = ?,
                 addressCli = ?,
-                localityCli = ?
+                cityCli = ?
             WHERE idCli = ?`,
             [
                 nameCli,
-                lastNameCli,
+                surnameCli,
                 phoneCli,
                 dniCli,
                 emailCli,
                 addressCli,
-                localityCli,
+                cityCli,
                 id
             ]
         );

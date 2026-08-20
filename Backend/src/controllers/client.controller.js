@@ -38,24 +38,24 @@ class ClientController {
     async create(req, res) {
         const {
             nameCli,
-            lastNameCli,
+            surnameCli,
             phoneCli,
             dniCli,
             emailCli,
             addressCli,
-            localityCli
+            cityCli
         } = req.body;
 
         try {
 
             if (
                 !nameCli ||
-                !lastNameCli ||
+                !surnameCli ||
                 !phoneCli ||
                 !dniCli ||
                 !emailCli ||
                 !addressCli ||
-                !localityCli
+                !cityCli
             ) {
                 return res.status(400).json({
                     error: "Todos los campos son obligatorios."
