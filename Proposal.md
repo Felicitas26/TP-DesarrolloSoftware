@@ -13,7 +13,8 @@ el cliente accede al contrato y debe firmarlo para continuar con el pago.Desde e
 
 ### Modelo
 
-<img width="672" height="800" alt="MD - Desarrollo drawio" src="https://github.com/user-attachments/assets/ea8c0479-1d15-45f8-90ed-edba9a949988" />
+<img width="641" height="800" alt="MD - Desarrollo drawio (1)" src="https://github.com/user-attachments/assets/0ef8a672-7595-4a84-925e-77c9815e2792" />
+
 
 
 
