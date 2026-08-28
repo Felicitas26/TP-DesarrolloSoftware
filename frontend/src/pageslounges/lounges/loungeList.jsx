@@ -172,14 +172,14 @@ function LoungeList() {
                     <th>Dirección</th>
                     <th>Localidad</th>
                     <th>Salón (ID)</th>
-                    <th style={{ textAlign: "center" }}>Acciones</th>
+                    <th style={{ textAlign: "center" }}>Gestiones</th>
                   </tr>
                 </thead>
                 <tbody>
                   {lounges.length > 0 ? (
                     lounges.map((lounge) => {
                       const idKey = lounge.id_lounge || lounge.idLounge || lounge.id;
-                      // Buscamos el nombre de la localidad si viene como ID o si el backend ya lo trae jointeado
+                     
                       const locationName = lounge.cityName || lounge.city || locations.find(loc => String(loc.idLocation || loc.id) === String(lounge.idLocation || lounge.id_location))?.city || "No asignada";
 
                       return (
