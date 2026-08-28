@@ -22,27 +22,31 @@ class LoungeController {
   }
 
   async create(req, res) {
+    const { name, loungeAddress, idLocation } = req.body;
 
-    const {
-      name,
-      loungeAddress,
-      idtypeLounge
-    } = req.body;
-
-    if (!name || !loungeAddress || !idtypeLounge) {
+    if (!name || !loungeAddress || idLocation == undefined || idLocation === "") {
       return res.status(400).json({
-        error: "Todos los campos (nombre, direccionSalon y tipoSalonId) son obligatorios."
+        error: "Todos los campos (name, loungeAddress, idLocation) son obligatorios."
       });
     }
 
-    const newLounge = await loungeService.create(req.body);
-
-    return res.status(201).json(newLounge);
+    try {
+      const newLounge = await loungeService.create(req.body);
+      return res.status(201).json(newLounge);
+    } catch (error) {
+      return res.status(500).json({ error: error.message });
+    }
   }
 
   async update(req, res) {
-
     const { id } = req.params;
+    const { name, loungeAddress, idLocation } = req.body;
+
+    if (!name || !loungeAddress || idLocation == undefined || idLocation === "") {
+      return res.status(400).json({
+        error: "Todos los campos (name, loungeAddress, idLocation) son obligatorios."
+      });
+    }
 
     const UpdatedLounge = await loungeService.update(id, req.body);
 
@@ -56,7 +60,6 @@ class LoungeController {
   }
 
   async delete(req, res) {
-
     const { id } = req.params;
 
     const deleted = await loungeService.delete(id);
@@ -73,5 +76,5 @@ class LoungeController {
   }
 
 }
-
+ 
 export default new LoungeController();

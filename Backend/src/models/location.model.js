@@ -1,24 +1,30 @@
-import { DataTypes } from "sequelize";
-import sequelize from "../config/database.js";
+import db from "../../db.js";
 
-const Location = sequelize.define("Location", {
+class LocationModel {
 
-    id: {
-        type: DataTypes.INTEGER,
-        autoIncrement: true,
-        primaryKey: true
-    },
-
-    locality: {
-        type: DataTypes.STRING,
-        allowNull: false
-    },
-
-    zipCode: {
-        type: DataTypes.STRING,
-        allowNull: false
+    async findAll() {
+        const [rows] = await db.execute(
+            "SELECT * FROM location"
+        );
+        return rows;
     }
 
-});
+    async findByPk(id) {
+        const [rows] = await db.execute(
+            "SELECT * FROM location WHERE idLocation = ?",
+            [id]
+        );
+        return rows[0];
+    }
 
-export default Location;
+    async create(locationData) {
+        const { city, zipCode } = locationData;
+        const [result] = await db.execute(
+            "INSERT INTO location (city, zipCode) VALUES (?, ?)",
+            [city, zipCode]
+        );
+        return { idLocation: result.insertId, city, zipCode };
+    }
+}
+
+export default new LocationModel();

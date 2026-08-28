@@ -4,14 +4,14 @@ class LoungeModel {
 
     async getAll() {
         const [rows] = await db.execute(
-            "SELECT * FROM Lounge"
+            "SELECT * FROM lounge"
         );
         return rows;
     }
 
     async getById(id) {
         const [rows] = await db.execute(
-            "SELECT * FROM Lounge WHERE idLounge = ?",
+            "SELECT * FROM lounge WHERE idLounge = ?",
             [id]
         );
         return rows[0];
@@ -21,17 +21,17 @@ class LoungeModel {
         const {
             name,
             loungeAddress,
-            idtypeLounge
+            idLocation
         } = lounge;
 
         const [result] = await db.execute(
-            `INSERT INTO Lounge
-            (name, loungeAddress, idtypeLounge)
+            `INSERT INTO lounge
+            (name, loungeAddress, idLocation)
             VALUES (?, ?, ?)`,
             [
                 name,
                 loungeAddress,
-                idtypeLounge
+                idLocation
             ]
         );
 
@@ -39,7 +39,7 @@ class LoungeModel {
             idLounge: result.insertId,
             name,
             loungeAddress,
-            idtypeLounge
+            idLocation
         };
     }
 
@@ -47,19 +47,19 @@ class LoungeModel {
         const {
             name,
             loungeAddress,
-            idtypeLounge
+            idLocation
         } = lounge;
 
         const [result] = await db.execute(
-            `UPDATE Lounge
+            `UPDATE lounge
             SET name = ?,
                 loungeAddress = ?,
-                idtypeLounge = ?
+                idLocation = ?
             WHERE idLounge = ?`,
             [
                 name,
                 loungeAddress,
-                idtypeLounge,
+                idLocation,
                 id
             ]
         );
@@ -73,7 +73,7 @@ class LoungeModel {
 
     async delete(id) {
         const [result] = await db.execute(
-            "DELETE FROM Lounge WHERE idLounge = ?",
+            "DELETE FROM lounge WHERE idLounge = ?",
             [id]
         );
 

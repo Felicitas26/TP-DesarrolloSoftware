@@ -3,15 +3,11 @@ import locationService from "../services/location.service.js";
 class LocationController {
 
     async getAll(req, res) {
-
         const list = await locationService.getAll();
-
         return res.status(200).json(list);
-
     }
 
     async getById(req, res) {
-
         const { id } = req.params;
 
         const location = await locationService.getById(id);
@@ -23,28 +19,34 @@ class LocationController {
         }
 
         return res.status(200).json(location);
-
     }
 
     async create(req, res) {
+        const { city, zipCode } = req.body;
 
-        const { locality, zipCode } = req.body;
-
-        if (!locality || !zipCode) {
+        if (!city || !zipCode) {
             return res.status(400).json({
-                error: "Todos los campos (localidad y codigoPostal) son obligatorios."
+                error: "Todos los campos (ciudad y código postal) son obligatorios."
             });
         }
 
-        const newLocation = await locationService.create(req.body);
-
-        return res.status(201).json(newLocation);
-
+        try {
+            const newLocation = await locationService.create(req.body);
+            return res.status(201).json(newLocation);
+        } catch (error) {
+            return res.status(500).json({ error: error.message });
+        }
     }
 
     async update(req, res) {
-
         const { id } = req.params;
+        const { city, zipCode } = req.body;
+
+        if (!city || !zipCode) {
+            return res.status(400).json({
+                error: "Todos los campos (ciudad y código postal) son obligatorios."
+            });
+        }
 
         const UpdatedLocation = await locationService.update(id, req.body);
 
@@ -55,11 +57,9 @@ class LocationController {
         }
 
         return res.status(200).json(UpdatedLocation);
-
     }
 
     async delete(req, res) {
-
         const { id } = req.params;
 
         const deleted = await locationService.delete(id);
@@ -73,7 +73,6 @@ class LocationController {
         return res.status(200).json({
             message: `Ubicación con ID ${id} eliminada exitosamente.`
         });
-
     }
 
 }
