@@ -143,6 +143,12 @@
   border-color: #ef4444;
 }
 
+.form-group input.input-complete {
+  background-color: #f1f5f9;
+  color: #1e293b;
+  caret-color: #1e293b;
+}
+
 .error-message {
   font-size: 0.775rem;
   color: #ef4444;

@@ -109,6 +109,11 @@ const emptyClient = {
     }
   };
 
+  const isFieldComplete = (name) => {
+    const value = name === "cityInput" ? cityInput : name === "postalCode" ? postalCode : client[name];
+    return Boolean(value && String(value).trim());
+  };
+
   const validateForm = () => {
     if (locationsLoading) {
       setFieldErrors({});
@@ -253,6 +258,7 @@ const emptyClient = {
                     value={client.nameCli}
                     onChange={handleChange}
                     placeholder="Ej: Luisina"
+                    className={isFieldComplete("nameCli") ? "input-complete" : ""}
                   />
                   {fieldErrors.nameCli && <span className="error-message">{fieldErrors.nameCli}</span>}
                 </div>
@@ -266,6 +272,7 @@ const emptyClient = {
                     value={client.surnameCli}
                     onChange={handleChange}
                     placeholder="Ej: Movio"
+                    className={isFieldComplete("surnameCli") ? "input-complete" : ""}
                   />
                   {fieldErrors.surnameCli && <span className="error-message">{fieldErrors.surnameCli}</span>}
                 </div>
@@ -279,6 +286,7 @@ const emptyClient = {
                     value={client.dniCli}
                     onChange={handleChange}
                     placeholder="Ej: 38123456"
+                    className={isFieldComplete("dniCli") ? "input-complete" : ""}
                   />
                   {fieldErrors.dniCli && <span className="error-message">{fieldErrors.dniCli}</span>}
                 </div>
@@ -300,6 +308,7 @@ const emptyClient = {
                     value={client.phoneCli}
                     onChange={handleChange}
                     placeholder="(011) 1234-5678"
+                    className={isFieldComplete("phoneCli") ? "input-complete" : ""}
                   />
                   {fieldErrors.phoneCli && <span className="error-message">{fieldErrors.phoneCli}</span>}
                 </div>
@@ -313,6 +322,7 @@ const emptyClient = {
                     value={client.emailCli}
                     onChange={handleChange}
                     placeholder="ejemplo@mail.com"
+                    className={isFieldComplete("emailCli") ? "input-complete" : ""}
                   />
                   {fieldErrors.emailCli && <span className="error-message">{fieldErrors.emailCli}</span>}
                 </div>
@@ -334,6 +344,7 @@ const emptyClient = {
                     value={client.addressCli}
                     onChange={handleChange}
                     placeholder="Ej: Av. Pellegrini 1234"
+                    className={isFieldComplete("addressCli") ? "input-complete" : ""}
                   />
                   {fieldErrors.addressCli && <span className="error-message">{fieldErrors.addressCli}</span>}
                 </div>
@@ -346,13 +357,22 @@ const emptyClient = {
                     name="cityInput"
                     value={cityInput}
                     onChange={(e) => {
-                      setCityInput(e.target.value);
+                      const value = e.target.value;
+                      setCityInput(value);
                       if (fieldErrors.city) {
                         setFieldErrors((prev) => ({ ...prev, city: null }));
+                      }
+                      const match = locations.find(
+                        (loc) => normalizeText(loc.city) === normalizeText(value)
+                      );
+                      if (match) {
+                        setPostalCode(match.zipCode);
+                        setFieldErrors((prev) => ({ ...prev, postalCode: null }));
                       }
                     }}
                     placeholder="Ej: Rosario"
                     autoComplete="off"
+                    className={isFieldComplete("cityInput") ? "input-complete" : ""}
                   />
                   {fieldErrors.city && <span className="error-message">{fieldErrors.city}</span>}
                 </div>
@@ -371,6 +391,7 @@ const emptyClient = {
                       }
                     }}
                     placeholder="Ej: 2000"
+                    className={isFieldComplete("postalCode") ? "input-complete" : ""}
                   />
                   {fieldErrors.postalCode && <span className="error-message">{fieldErrors.postalCode}</span>}
                 </div>

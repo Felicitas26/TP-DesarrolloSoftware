@@ -46,6 +46,13 @@
   background-color: #ffffff;
 }
 
+.form-group input.input-complete,
+.form-group select.input-complete {
+  background-color: #f1f5f9;
+  color: #1e293b;
+  caret-color: #1e293b;
+}
+
 .form-group input:focus {
   border-color: #2563eb;
   outline: none;

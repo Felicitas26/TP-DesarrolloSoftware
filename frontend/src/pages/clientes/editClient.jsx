@@ -64,6 +64,11 @@ function EditClient() {
     }));
   };
 
+  const isFieldComplete = (name) => {
+    const value = client[name];
+    return Boolean(value && String(value).trim() && String(value) !== "0");
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSubmitting(true);
@@ -121,6 +126,7 @@ function EditClient() {
             value={client.nameCli || ""}
             onChange={handleChange}
             required
+            className={isFieldComplete("nameCli") ? "input-complete" : ""}
           />
         </div>
 
@@ -133,6 +139,7 @@ function EditClient() {
             value={client.surnameCli || ""}
             onChange={handleChange}
             required
+            className={isFieldComplete("surnameCli") ? "input-complete" : ""}
           />
         </div>
 
@@ -147,6 +154,7 @@ function EditClient() {
             value={client.dniCli || ""}
             onChange={handleChange}
             required
+            className={isFieldComplete("dniCli") ? "input-complete" : ""}
           />
         </div>
 
@@ -159,6 +167,7 @@ function EditClient() {
             value={client.phoneCli || ""}
             onChange={handleChange}
             required
+            className={isFieldComplete("phoneCli") ? "input-complete" : ""}
           />
         </div>
 
@@ -171,6 +180,7 @@ function EditClient() {
             value={client.emailCli || ""}
             onChange={handleChange}
             required
+            className={isFieldComplete("emailCli") ? "input-complete" : ""}
           />
         </div>
 
@@ -183,6 +193,7 @@ function EditClient() {
             value={client.addressCli || ""}
             onChange={handleChange}
             required
+            className={isFieldComplete("addressCli") ? "input-complete" : ""}
           />
         </div>
 
@@ -194,6 +205,7 @@ function EditClient() {
             value={client.idLocation || ""}
             onChange={handleChange}
             required
+            className={isFieldComplete("idLocation") ? "input-complete" : ""}
           >
             <option value="" disabled>
               Seleccione una ubicación...
