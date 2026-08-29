@@ -54,7 +54,7 @@ function NewLounge() {
   const [globalError, setGlobalError] = useState(null);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
 
-  // Cargar las locaciones disponibles para el select
+ 
   useEffect(() => {
     fetch("http://localhost:3000/api/locations")
       .then((res) => res.json())
@@ -97,7 +97,7 @@ function NewLounge() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ...lounge,
-          idLocation: Number(lounge.idLocation) // Aseguramos que viaje como número
+          idLocation: Number(lounge.idLocation) 
         })
       });
 

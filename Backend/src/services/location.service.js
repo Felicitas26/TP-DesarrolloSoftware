@@ -23,7 +23,7 @@ class LocationService {
         
         // Si usas el modelo basado en db.execute que armamos antes, implementamos el update acá o en el modelo
         const { city, zipCode } = locationData;
-        const [result] = await locationModel.db.execute( // O directo con db si lo importas
+        const [result] = await locationModel.db.execute( 
             "UPDATE location SET city = ?, zipCode = ? WHERE idLocation = ?",
             [city, zipCode, id]
         );
