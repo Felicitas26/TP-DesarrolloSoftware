@@ -4,7 +4,9 @@ class ClientModel {
 
     async getAll() {
         const [rows] = await db.execute(
-            "SELECT * FROM Client"
+            `SELECT c.*, l.city, l.zipCode
+            FROM Client c
+            LEFT JOIN location l ON c.idLocation = l.idLocation`
         );
 
         return rows;
@@ -12,7 +14,10 @@ class ClientModel {
 
     async getById(id) {
         const [rows] = await db.execute(
-            "SELECT * FROM Client WHERE idCli = ?",
+            `SELECT c.*, l.city, l.zipCode
+            FROM Client c
+            LEFT JOIN location l ON c.idLocation = l.idLocation
+            WHERE c.idCli = ?`,
             [id]
         );
 
@@ -27,12 +32,12 @@ class ClientModel {
             dniCli,
             emailCli,
             addressCli,
-            cityCli
+            idLocation
         } = client;
 
         const [result] = await db.execute(
             `INSERT INTO Client
-            (nameCli, surnameCli, phoneCli, dniCli, emailCli, addressCli, cityCli)
+            (nameCli, surnameCli, phoneCli, dniCli, emailCli, addressCli, idLocation)
             VALUES (?, ?, ?, ?, ?, ?, ?)`,
             [
                 nameCli,
@@ -41,19 +46,19 @@ class ClientModel {
                 dniCli,
                 emailCli,
                 addressCli,
-                cityCli
+                idLocation
             ]
         );
 
         return {
-            dniCli: result.insertId,
+            idCli: result.insertId,
             nameCli,
             surnameCli,
             phoneCli,
             dniCli,
             emailCli,
             addressCli,
-            cityCli
+            idLocation
         };
     }
 
@@ -65,7 +70,7 @@ class ClientModel {
             dniCli,
             emailCli,
             addressCli,
-            cityCli
+            idLocation
         } = client;
 
         const [result] = await db.execute(
@@ -76,7 +81,7 @@ class ClientModel {
                 dniCli = ?,
                 emailCli = ?,
                 addressCli = ?,
-                cityCli = ?
+                idLocation = ?
             WHERE idCli = ?`,
             [
                 nameCli,
@@ -85,7 +90,7 @@ class ClientModel {
                 dniCli,
                 emailCli,
                 addressCli,
-                cityCli,
+                idLocation,
                 id
             ]
         );

@@ -43,7 +43,7 @@ class ClientController {
             dniCli,
             emailCli,
             addressCli,
-            cityCli
+            idLocation
         } = req.body;
 
         try {
@@ -55,7 +55,8 @@ class ClientController {
                 !dniCli ||
                 !emailCli ||
                 !addressCli ||
-                !cityCli
+                idLocation == undefined ||
+                idLocation === ""
             ) {
                 return res.status(400).json({
                     error: "Todos los campos son obligatorios."
@@ -86,8 +87,45 @@ class ClientController {
     }
 
     async update(req, res) {
+        const {
+            nameCli,
+            surnameCli,
+            phoneCli,
+            dniCli,
+            emailCli,
+            addressCli,
+            idLocation
+        } = req.body;
+
         try {
             const { id } = req.params;
+
+            if (
+                !nameCli ||
+                !surnameCli ||
+                !phoneCli ||
+                !dniCli ||
+                !emailCli ||
+                !addressCli ||
+                idLocation == undefined ||
+                idLocation === ""
+            ) {
+                return res.status(400).json({
+                    error: "Todos los campos son obligatorios."
+                });
+            }
+
+            if (!/^\d+$/.test(dniCli)) {
+                return res.status(400).json({
+                    error: "El DNI solo puede contener números."
+                });
+            }
+
+            if (!/^\d+$/.test(phoneCli)) {
+                return res.status(400).json({
+                    error: "El teléfono solo puede contener números."
+                });
+            }
 
             const clientUpdated = await clientService.update(id, req.body);
 

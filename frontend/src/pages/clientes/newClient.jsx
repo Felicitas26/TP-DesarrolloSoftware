@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "./newClient.css";
 
@@ -47,21 +47,59 @@ const IconAlertCircle = () => (
 function NewClient() {
   const navigate = useNavigate();
 
-  const emptyClient = {
+const emptyClient = {
     nameCli: "",
     surnameCli: "",
     dniCli: "",
     phoneCli: "",
     emailCli: "",
-    addressCli: "",
-    cityCli: ""
+    addressCli: ""
   };
 
   const [client, setClient] = useState(emptyClient);
+  const [cityInput, setCityInput] = useState("");
+  const [postalCode, setPostalCode] = useState("");
+  const [locations, setLocations] = useState([]);
+  const [locationsLoading, setLocationsLoading] = useState(true);
+  const [locationsError, setLocationsError] = useState(null);
   const [fieldErrors, setFieldErrors] = useState({});
   const [submitting, setSubmitting] = useState(false);
   const [globalError, setGlobalError] = useState(null);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+
+  // Normaliza mayúsculas y acentos para comparar nombres de ciudades
+  const normalizeText = (value) =>
+    String(value || "")
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .trim();
+
+  // "Failed to fetch" (TypeError) = el backend no fue alcanzable
+  const getErrorMessage = (err) =>
+    err instanceof TypeError
+      ? "No se pudo conectar con el servidor. Verificá que el backend esté corriendo en el puerto 3000."
+      : err.message;
+
+  // Carga las ciudades de Argentina disponibles (tabla location)
+  const fetchLocations = async () => {
+    setLocationsLoading(true);
+    setLocationsError(null);
+    try {
+      const res = await fetch("http://localhost:3000/api/locations");
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "No se pudieron cargar las ciudades.");
+      setLocations(data);
+    } catch (err) {
+      setLocationsError(getErrorMessage(err));
+    } finally {
+      setLocationsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchLocations();
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -72,6 +110,17 @@ function NewClient() {
   };
 
   const validateForm = () => {
+    if (locationsLoading) {
+      setFieldErrors({});
+      setGlobalError("Cargando la base de ciudades. Intentá nuevamente en unos segundos.");
+      return false;
+    }
+    if (locationsError) {
+      setFieldErrors({});
+      setGlobalError(locationsError);
+      return false;
+    }
+
     const errors = {};
     if (!client.nameCli.trim()) errors.nameCli = "El nombre es obligatorio.";
     if (!client.surnameCli.trim()) errors.surnameCli = "El apellido es obligatorio.";
@@ -95,7 +144,29 @@ function NewClient() {
     }
 
     if (!client.addressCli.trim()) errors.addressCli = "La dirección es obligatoria.";
-    if (!client.cityCli.trim()) errors.cityCli = "La ciudad es obligatoria.";
+
+    const cityMatch = locations.find((loc) => normalizeText(loc.city) === normalizeText(cityInput));
+
+    if (!cityInput.trim()) {
+      errors.city = "La ciudad es obligatoria.";
+    } else if (!cityMatch) {
+      errors.city = "La ciudad no existe en la base de ciudades de Argentina.";
+    }
+
+    if (!postalCode.trim()) {
+      errors.postalCode = "El código postal es obligatorio.";
+    } else if (!/^\d+$/.test(postalCode.trim())) {
+      errors.postalCode = "Solo números.";
+    }
+
+    if (
+      cityMatch &&
+      !errors.city &&
+      !errors.postalCode &&
+      String(cityMatch.zipCode) !== String(postalCode.trim())
+    ) {
+      errors.postalCode = `El código postal no coincide. Para ${cityMatch.city} el código es ${cityMatch.zipCode}.`;
+    }
 
     setFieldErrors(errors);
     return Object.keys(errors).length === 0;
@@ -110,10 +181,19 @@ function NewClient() {
     setSubmitting(true);
 
     try {
+      const matchingLocation = locations.find(
+        (loc) =>
+          normalizeText(loc.city) === normalizeText(cityInput) &&
+          String(loc.zipCode) === String(postalCode.trim())
+      );
+
       const response = await fetch("http://localhost:3000/api/client", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(client)
+        body: JSON.stringify({
+          ...client,
+          idLocation: Number(matchingLocation.idLocation) // Aseguramos que viaje como número
+        })
       });
 
       const data = await response.json();
@@ -124,9 +204,11 @@ function NewClient() {
 
       setShowSuccessModal(true);
       setClient(emptyClient);
+      setCityInput("");
+      setPostalCode("");
       setFieldErrors({});
     } catch (err) {
-      setGlobalError(err.message);
+      setGlobalError(getErrorMessage(err));
     } finally {
       setSubmitting(false);
     }
@@ -256,17 +338,41 @@ function NewClient() {
                   {fieldErrors.addressCli && <span className="error-message">{fieldErrors.addressCli}</span>}
                 </div>
 
-                <div className={`form-group ${fieldErrors.cityCli ? "has-error" : ""}`}>
-                  <label htmlFor="cityCli">Ciudad / Localidad *</label>
+                <div className={`form-group ${fieldErrors.city ? "has-error" : ""}`}>
+                  <label htmlFor="cityInput">Ciudad *</label>
                   <input
-                    id="cityCli"
+                    id="cityInput"
                     type="text"
-                    name="cityCli"
-                    value={client.cityCli}
-                    onChange={handleChange}
+                    name="cityInput"
+                    value={cityInput}
+                    onChange={(e) => {
+                      setCityInput(e.target.value);
+                      if (fieldErrors.city) {
+                        setFieldErrors((prev) => ({ ...prev, city: null }));
+                      }
+                    }}
                     placeholder="Ej: Rosario"
+                    autoComplete="off"
                   />
-                  {fieldErrors.cityCli && <span className="error-message">{fieldErrors.cityCli}</span>}
+                  {fieldErrors.city && <span className="error-message">{fieldErrors.city}</span>}
+                </div>
+
+                <div className={`form-group ${fieldErrors.postalCode ? "has-error" : ""}`}>
+                  <label htmlFor="postalCode">Código Postal *</label>
+                  <input
+                    id="postalCode"
+                    type="text"
+                    name="postalCode"
+                    value={postalCode}
+                    onChange={(e) => {
+                      setPostalCode(e.target.value);
+                      if (fieldErrors.postalCode) {
+                        setFieldErrors((prev) => ({ ...prev, postalCode: null }));
+                      }
+                    }}
+                    placeholder="Ej: 2000"
+                  />
+                  {fieldErrors.postalCode && <span className="error-message">{fieldErrors.postalCode}</span>}
                 </div>
               </div>
             </div>

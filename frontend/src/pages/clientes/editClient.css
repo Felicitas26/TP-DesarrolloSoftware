@@ -38,6 +38,14 @@
   border-radius: 4px;
 }
 
+.form-group select {
+  padding: 10px;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background-color: #ffffff;
+}
+
 .form-group input:focus {
   border-color: #2563eb;
   outline: none;

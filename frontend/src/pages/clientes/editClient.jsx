@@ -8,30 +8,44 @@ function EditClient() {
 
   const [client, setClient] = useState({
     nameCli: "",
-    lastNameCli: "",
+    surnameCli: "",
     dniCli: "",
     phoneCli: "",
     emailCli: "",
     addressCli: "",
-    localityCli: ""
+    idLocation: ""
   });
+  const [locations, setLocations] = useState([]);
 
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    const getClient = async () => {
+    const loadData = async () => {
       try {
         setLoading(true);
-        const response = await fetch(`http://localhost:3000/api/client/${id}`);
-        const data = await response.json();
 
-        if (!response.ok) {
-          throw new Error(data.error || "Error al cargar los datos del cliente");
+        const [clientRes, locsRes] = await Promise.all([
+          fetch(`http://localhost:3000/api/client/${id}`),
+          fetch("http://localhost:3000/api/locations")
+        ]);
+
+        const clientData = await clientRes.json();
+        const locsData = await locsRes.json();
+
+        if (!clientRes.ok) {
+          throw new Error(clientData.error || "Error al cargar los datos del cliente");
+        }
+        if (!locsRes.ok) {
+          throw new Error(locsData.error || "Error al cargar las ubicaciones");
         }
 
-        setClient(data);
+        setClient({
+          ...clientData,
+          idLocation: clientData.idLocation || ""
+        });
+        setLocations(locsData);
       } catch (err) {
         setError(err.message);
       } finally {
@@ -39,7 +53,7 @@ function EditClient() {
       }
     };
 
-    getClient();
+    loadData();
   }, [id]);
 
   const handleChange = (e) => {
@@ -55,13 +69,24 @@ function EditClient() {
     setSubmitting(true);
     setError(null);
 
+    if (!client.idLocation) {
+      setError("Debe seleccionar una ciudad.");
+      setSubmitting(false);
+      return;
+    }
+
+    const body = {
+      ...client,
+      idLocation: Number(client.idLocation)
+    };
+
     try {
       const response = await fetch(`http://localhost:3000/api/client/${id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json"
         },
-        body: JSON.stringify(client)
+        body: JSON.stringify(body)
       });
 
       const data = await response.json();
@@ -100,12 +125,12 @@ function EditClient() {
         </div>
 
         <div className="form-group">
-          <label htmlFor="lastNameCli">Apellido *</label>
+          <label htmlFor="surnameCli">Apellido *</label>
           <input
-            id="lastNameCli"
+            id="surnameCli"
             type="text"
-            name="lastNameCli"
-            value={client.lastNameCli || ""}
+            name="surnameCli"
+            value={client.surnameCli || ""}
             onChange={handleChange}
             required
           />
@@ -126,13 +151,14 @@ function EditClient() {
         </div>
 
         <div className="form-group">
-          <label htmlFor="phoneCli">Teléfono</label>
+          <label htmlFor="phoneCli">Teléfono *</label>
           <input
             id="phoneCli"
             type="tel"
             name="phoneCli"
             value={client.phoneCli || ""}
             onChange={handleChange}
+            required
           />
         </div>
 
@@ -149,25 +175,35 @@ function EditClient() {
         </div>
 
         <div className="form-group">
-          <label htmlFor="addressCli">Dirección</label>
+          <label htmlFor="addressCli">Dirección *</label>
           <input
             id="addressCli"
             type="text"
             name="addressCli"
             value={client.addressCli || ""}
             onChange={handleChange}
+            required
           />
         </div>
 
         <div className="form-group">
-          <label htmlFor="localityCli">Localidad</label>
-          <input
-            id="localityCli"
-            type="text"
-            name="localityCli"
-            value={client.localityCli || ""}
+          <label htmlFor="idLocation">Ciudad y Código Postal *</label>
+          <select
+            id="idLocation"
+            name="idLocation"
+            value={client.idLocation || ""}
             onChange={handleChange}
-          />
+            required
+          >
+            <option value="" disabled>
+              Seleccione una ubicación...
+            </option>
+            {locations.map((loc) => (
+              <option key={loc.idLocation} value={loc.idLocation}>
+                {loc.city} - CP: {loc.zipCode}
+              </option>
+            ))}
+          </select>
         </div>
 
         <div className="form-actions">

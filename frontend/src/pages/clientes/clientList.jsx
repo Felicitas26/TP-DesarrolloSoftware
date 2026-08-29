@@ -42,6 +42,7 @@ const IconTrashWarning = () => (
 function ClientList() {
   const navigate = useNavigate();
   const [clients, setClients] = useState([]);
+  const [locations, setLocations] = useState([]);
   const [loading, setLoading] = useState(true);
 
   const [clientToDelete, setClientToDelete] = useState(null);
@@ -50,6 +51,14 @@ function ClientList() {
 
   const [deleting, setDeleting] = useState(false);
   const [savingEdit, setSavingEdit] = useState(false);
+  const [editErrors, setEditErrors] = useState({});
+
+  const normalizeText = (value) =>
+    String(value || "")
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .trim();
 
   const fetchClients = async () => {
     try {
@@ -68,6 +77,19 @@ function ClientList() {
 
   useEffect(() => {
     fetchClients();
+
+    const fetchLocations = async () => {
+      try {
+        const res = await fetch("http://localhost:3000/api/locations");
+        if (res.ok) {
+          setLocations(await res.json());
+        }
+      } catch (err) {
+        console.error("Error al cargar ubicaciones:", err);
+      }
+    };
+
+    fetchLocations();
   }, []);
 
   const handleConfirmDelete = async () => {
@@ -94,24 +116,86 @@ function ClientList() {
   const handleEditChange = (e) => {
     const { name, value } = e.target;
     setClientToEdit((prev) => ({ ...prev, [name]: value }));
+    if (editErrors[name]) {
+      setEditErrors((prev) => ({ ...prev, [name]: null }));
+    }
+  };
+
+  const handleEditCityChange = (e) => {
+    setClientToEdit((prev) => ({ ...prev, cityInput: e.target.value }));
+    setEditErrors((prev) => ({ ...prev, city: null }));
+  };
+
+  const handleEditPostalChange = (e) => {
+    setClientToEdit((prev) => ({ ...prev, postalCode: e.target.value }));
+    setEditErrors((prev) => ({ ...prev, postalCode: null }));
   };
 
   const handleSaveEdit = async (e) => {
     e.preventDefault();
-    setSavingEdit(true);
     const id = clientToEdit.id_client || clientToEdit.idCli || clientToEdit.id;
+
+    const city = clientToEdit.cityInput || "";
+    const postal = clientToEdit.postalCode || "";
+    const cityMatch = locations.find((loc) => normalizeText(loc.city) === normalizeText(city));
+
+    const errors = {};
+    if (!city.trim()) {
+      errors.city = "La ciudad es obligatoria.";
+    } else if (!cityMatch) {
+      errors.city = "La ciudad no existe en la base de ciudades de Argentina.";
+    }
+
+    if (!postal.trim()) {
+      errors.postalCode = "El código postal es obligatorio.";
+    } else if (!/^\d+$/.test(postal.trim())) {
+      errors.postalCode = "Solo números.";
+    }
+
+    if (
+      cityMatch &&
+      !errors.city &&
+      !errors.postalCode &&
+      String(cityMatch.zipCode) !== String(postal.trim())
+    ) {
+      errors.postalCode = `El código postal no coincide. Para ${cityMatch.city} el código es ${cityMatch.zipCode}.`;
+    }
+
+    if (Object.keys(errors).length) {
+      setEditErrors(errors);
+      return;
+    }
+
+    setEditErrors({});
+    const matchingLocation = locations.find(
+      (loc) =>
+        normalizeText(loc.city) === normalizeText(city) &&
+        String(loc.zipCode) === String(postal.trim())
+    );
+
+    const { cityInput, postalCode, ...cleanClient } = clientToEdit;
+    const body = {
+      ...cleanClient,
+      idLocation: Number(matchingLocation.idLocation)
+    };
+
+    setSavingEdit(true);
 
     try {
       const response = await fetch(`http://localhost:3000/api/client/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(clientToEdit)
+        body: JSON.stringify(body)
       });
 
       if (!response.ok) throw new Error("No se pudo actualizar el cliente.");
 
       setClients((prev) =>
-        prev.map((c) => ((c.id_client || c.idCli || c.id) === id ? clientToEdit : c))
+        prev.map((c) =>
+          (c.id_client || c.idCli || c.id) === id
+            ? { ...body, city: matchingLocation.city, zipCode: matchingLocation.zipCode }
+            : c
+        )
       );
       setClientToEdit(null);
     } catch (error) {
@@ -168,7 +252,7 @@ function ClientList() {
                           <td>{cli.dniCli}</td>
                           <td>{cli.phoneCli}</td>
                           <td>{cli.emailCli}</td>
-                          <td>{cli.cityCli}</td>
+                          <td>{cli.city}</td>
                           <td>
                             <div className="actions-cell">
                               <button
@@ -183,7 +267,14 @@ function ClientList() {
                               <button
                                 type="button"
                                 className="btn-action-edit"
-                                onClick={() => setClientToEdit({ ...cli })}
+                                onClick={() => {
+                                  setEditErrors({});
+                                  setClientToEdit({
+                                    ...cli,
+                                    cityInput: cli.city || "",
+                                    postalCode: cli.zipCode || ""
+                                  });
+                                }}
                                 title="Editar"
                               >
                                 <IconEdit />
@@ -230,7 +321,7 @@ function ClientList() {
               <div className="detail-item"><label>Teléfono:</label> <span>{clientToDetail.phoneCli}</span></div>
               <div className="detail-item"><label>Email:</label> <span>{clientToDetail.emailCli}</span></div>
               <div className="detail-item"><label>Dirección:</label> <span>{clientToDetail.addressCli}</span></div>
-              <div className="detail-item"><label>Ciudad:</label> <span>{clientToDetail.cityCli}</span></div>
+              <div className="detail-item"><label>Ciudad:</label> <span>{clientToDetail.city}</span></div>
             </div>
             <div className="modal-footer-right">
               <button className="btn-j-primary" onClick={() => setClientToDetail(null)}>
@@ -274,9 +365,29 @@ function ClientList() {
                   <label>Dirección</label>
                   <input type="text" name="addressCli" value={clientToEdit.addressCli || ""} onChange={handleEditChange} required />
                 </div>
-                <div className="form-group">
-                  <label>Ciudad</label>
-                  <input type="text" name="cityCli" value={clientToEdit.cityCli || ""} onChange={handleEditChange} required />
+                <div className={`form-group ${editErrors.city ? "has-error" : ""}`}>
+                  <label>Ciudad *</label>
+                  <input
+                    type="text"
+                    name="cityInput"
+                    value={clientToEdit.cityInput || ""}
+                    onChange={handleEditCityChange}
+                    placeholder="Ej: Rosario"
+                    autoComplete="off"
+                  />
+                  {editErrors.city && <span className="error-message">{editErrors.city}</span>}
+                </div>
+                <div className={`form-group ${editErrors.postalCode ? "has-error" : ""}`}>
+                  <label>Código Postal *</label>
+                  <input
+                    type="text"
+                    name="postalCode"
+                    value={clientToEdit.postalCode || ""}
+                    onChange={handleEditPostalChange}
+                    placeholder="Ej: 2000"
+                    autoComplete="off"
+                  />
+                  {editErrors.postalCode && <span className="error-message">{editErrors.postalCode}</span>}
                 </div>
               </div>
 
