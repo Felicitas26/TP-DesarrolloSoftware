@@ -50,12 +50,11 @@ CREATE TABLE `loungeType` (
 
 -- 5. Price 
 CREATE TABLE `price` (
-  `idPrice` INT NOT NULL AUTO_INCREMENT,
   `effectiveDate` DATE NOT NULL,
   `endDate` DATE DEFAULT NULL,
   `value` DECIMAL(10,2) NOT NULL,
   `idLoungeType` INT NOT NULL,
-  PRIMARY KEY (`effectiveDate`),
+  PRIMARY KEY (`effectiveDate`, `idLoungeType`),
   KEY `idLoungeType` (`idLoungeType`),
   CONSTRAINT `price_ibfk_1` FOREIGN KEY (`idLoungeType`) REFERENCES `loungetype` (`idLoungeType`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
@@ -133,4 +132,20 @@ CREATE TABLE `contractextraservice` (
   KEY `idService` (`idService`),
   CONSTRAINT `contractextraservice_ibfk_1` FOREIGN KEY (`idContract`) REFERENCES `contract` (`idContract`),
   CONSTRAINT `contractextraservice_ibfk_2` FOREIGN KEY (`idService`) REFERENCES `extraservice` (`idService`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- 12. Usuario (Especialización total y disjunta por rol: administrador | cliente)
+--     El rol actúa como discriminador. El cliente se vincula a su ficha (client) por idCli.
+--     El password se almacena con hash (bcrypt) y passwordTemporal indica si es provisoria.
+CREATE TABLE `usuario` (
+  `idUsuario` INT NOT NULL AUTO_INCREMENT,
+  `username` VARCHAR(150) NOT NULL,
+  `password` VARCHAR(255) NOT NULL,
+  `rol` ENUM('administrador','cliente') NOT NULL,
+  `idCli` INT DEFAULT NULL,
+  `passwordTemporal` TINYINT(1) NOT NULL DEFAULT 1,
+  PRIMARY KEY (`idUsuario`),
+  UNIQUE KEY `username` (`username`),
+  KEY `idCli` (`idCli`),
+  CONSTRAINT `usuario_ibfk_1` FOREIGN KEY (`idCli`) REFERENCES `client` (`idCli`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

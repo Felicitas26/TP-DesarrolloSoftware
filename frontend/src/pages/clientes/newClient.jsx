@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import "./newClient.css";
 
 const IconUser = () => (
@@ -17,12 +17,6 @@ const IconPhone = () => (
 const IconMapPin = () => (
   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/>
-  </svg>
-);
-
-const IconSend = () => (
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
   </svg>
 );
 
@@ -46,6 +40,8 @@ const IconAlertCircle = () => (
 
 function NewClient() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const origin = location.state?.origin || "admin";
 
 const emptyClient = {
     nameCli: "",
@@ -53,7 +49,9 @@ const emptyClient = {
     dniCli: "",
     phoneCli: "",
     emailCli: "",
-    addressCli: ""
+    addressCli: "",
+    username: "",
+    password: ""
   };
 
   const [client, setClient] = useState(emptyClient);
@@ -103,7 +101,19 @@ const emptyClient = {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setClient((prev) => ({ ...prev, [name]: value }));
+    setClient((prev) => {
+      const next = { ...prev, [name]: value };
+
+      if (name === "emailCli" && (!prev.username || prev.username === prev.emailCli)) {
+        next.username = value;
+      }
+
+      if (name === "dniCli" && (!prev.password || prev.password === prev.dniCli)) {
+        next.password = value;
+      }
+
+      return next;
+    });
     if (fieldErrors[name]) {
       setFieldErrors((prev) => ({ ...prev, [name]: null }));
     }
@@ -133,7 +143,9 @@ const emptyClient = {
     if (!client.dniCli.trim()) {
       errors.dniCli = "El DNI es obligatorio.";
     } else if (!/^\d+$/.test(client.dniCli)) {
-      errors.dniCli = "Solo números.";
+      errors.dniCli = "El DNI solo puede contener números.";
+    } else if (client.dniCli.length < 7 || client.dniCli.length > 9) {
+      errors.dniCli = "El DNI debe tener entre 7 y 9 dígitos numéricos.";
     }
 
     if (!client.phoneCli.trim()) {
@@ -171,6 +183,16 @@ const emptyClient = {
       String(cityMatch.zipCode) !== String(postalCode.trim())
     ) {
       errors.postalCode = `El código postal no coincide. Para ${cityMatch.city} el código es ${cityMatch.zipCode}.`;
+    }
+
+    if (!client.username.trim()) {
+      errors.username = "El nombre de usuario es obligatorio.";
+    }
+
+    if (!client.password) {
+      errors.password = "La contraseña es obligatoria.";
+    } else if (client.password.length < 6) {
+      errors.password = "La contraseña debe tener al menos 6 caracteres.";
     }
 
     setFieldErrors(errors);
@@ -397,13 +419,56 @@ const emptyClient = {
                 </div>
               </div>
             </div>
+
+            <div className="form-card full-width">
+              <div className="card-header">
+                <span className="card-icon"><IconUser /></span>
+                <h2>Cuenta de Usuario</h2>
+              </div>
+              <div className="card-body grid-2-cols">
+                <div className={`form-group ${fieldErrors.username ? "has-error" : ""}`}>
+                  <label htmlFor="username">Nombre de Usuario (Email) *</label>
+                  <input
+                    id="username"
+                    type="text"
+                    name="username"
+                    value={client.username}
+                    onChange={handleChange}
+                    placeholder="ejemplo@mail.com"
+                    autoComplete="off"
+                    className={isFieldComplete("username") ? "input-complete" : ""}
+                  />
+                  {fieldErrors.username && <span className="error-message">{fieldErrors.username}</span>}
+                </div>
+
+                <div className={`form-group ${fieldErrors.password ? "has-error" : ""}`}>
+                  <label htmlFor="password">Contraseña Provisonal *</label>
+                  <input
+                    id="password"
+                    type="text"
+                    name="password"
+                    value={client.password}
+                    onChange={handleChange}
+                    placeholder="Provisoria (por defecto el DNI)"
+                    autoComplete="off"
+                    className={isFieldComplete("password") ? "input-complete" : ""}
+                  />
+                  {fieldErrors.password && <span className="error-message">{fieldErrors.password}</span>}
+                </div>
+
+                <p className="account-hint full-width">
+                  El cliente ingresará con su email y esta contraseña provisoria, y deberá
+                  cambiarla al iniciar sesión desde su dispositivo.
+                </p>
+              </div>
+            </div>
           </div>
 
           <div className="form-submit-wrapper">
             <button
               type="button"
               className="btn-secondary-outline"
-              onClick={() => navigate("/client")}
+              onClick={() => navigate(-1)}
             >
               <IconArrowLeft /> Cancelar
             </button>
@@ -413,7 +478,7 @@ const emptyClient = {
               className="btn-submit-cyan"
               disabled={submitting}
             >
-              <IconSend /> {submitting ? "Guardando..." : "Enviar"}
+              {submitting ? "Guardando..." : "Guardar"}
             </button>
           </div>
         </form>
@@ -431,12 +496,16 @@ const emptyClient = {
                   ¡Cliente registrado con éxito en la base de datos!
                 </p>
 
+                <p className="modal-text-account">
+                  Usuario: {client.username || "—"} · Contraseña provisoria: {client.password || "—"}
+                </p>
+
                 <button
                   type="button"
                   className="btn-j-primary"
-                  onClick={() => navigate("/client")}
+                  onClick={() => navigate(origin === "login" ? "/" : "/client")}
                 >
-                  Ir al listado
+                  {origin === "login" ? "Ir a la página principal" : "Ir al listado"}
                 </button>
 
                 <button

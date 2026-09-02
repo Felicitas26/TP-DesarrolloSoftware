@@ -1,0 +1,246 @@
+.login-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: #0b0f19;
+  position: relative;
+  overflow: hidden;
+}
+
+#root:has(> .login-page) {
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+  border-inline: none;
+  min-height: 100vh;
+  display: block;
+  text-align: left;
+  background-color: #0b0f19;
+}
+
+.login-page::before,
+.login-page::after {
+  content: "";
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(100px);
+  z-index: 0;
+}
+
+.login-page::before {
+  width: 480px;
+  height: 480px;
+  background: radial-gradient(circle, rgba(168, 85, 247, 0.45), transparent 65%);
+  top: -120px;
+  left: -80px;
+}
+
+.login-page::after {
+  width: 460px;
+  height: 460px;
+  background: radial-gradient(circle, rgba(0, 229, 255, 0.35), transparent 65%);
+  bottom: -140px;
+  right: -60px;
+}
+
+.login-form-card {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 420px;
+  background: rgba(17, 24, 39, 0.72);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border: 1px solid rgba(34, 211, 238, 0.35);
+  border-radius: 18px;
+  padding: 42px 38px 34px;
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.04),
+    0 24px 60px rgba(0, 0, 0, 0.55),
+    0 0 45px rgba(0, 229, 255, 0.12);
+  text-align: center;
+}
+
+.login-logo {
+  font-family: "Playfair Display", Georgia, serif;
+  font-size: 2rem;
+  font-weight: 800;
+  letter-spacing: 0.24em;
+  color: #ffffff;
+  margin-bottom: 26px;
+  text-shadow: 0 0 22px rgba(0, 229, 255, 0.55);
+}
+
+.login-title {
+  font-family: "Montserrat", system-ui, sans-serif;
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0 0 8px;
+}
+
+.login-subtitle {
+  font-family: "Montserrat", system-ui, sans-serif;
+  font-size: 0.82rem;
+  letter-spacing: 0.08em;
+  color: #9ca3af;
+  margin: 0 0 28px;
+}
+
+.login-error {
+  font-family: "Montserrat", system-ui, sans-serif;
+  font-size: 0.82rem;
+  color: #fca5a5;
+  background: rgba(239, 68, 68, 0.12);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: 8px;
+  padding: 10px 12px;
+  margin-bottom: 18px;
+  text-align: left;
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.login-field {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.login-input-icon {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #6b7280;
+  display: flex;
+  pointer-events: none;
+  transition: color 0.18s ease;
+}
+
+.login-field input {
+  width: 100%;
+  padding: 14px 44px 14px 42px;
+  font-family: "Montserrat", system-ui, sans-serif;
+  font-size: 0.9rem;
+  color: #ffffff;
+  background: rgba(3, 7, 18, 0.75);
+  border: 1px solid #374151;
+  border-radius: 10px;
+  outline: none;
+  transition: border-color 0.18s ease, box-shadow 0.18s ease;
+}
+
+.login-field input::placeholder {
+  color: #6b7280;
+}
+
+.login-field input:-webkit-autofill,
+.login-field input:-webkit-autofill:hover,
+.login-field input:-webkit-autofill:focus,
+.login-field input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 1000px #070b16 inset;
+  -webkit-text-fill-color: #ffffff;
+  caret-color: #ffffff;
+  transition: background-color 9999s ease-in-out 0s;
+}
+
+.login-field input:focus {
+  border-color: #22d3ee;
+  box-shadow: 0 0 0 3px rgba(34, 211, 238, 0.18), 0 0 18px rgba(0, 229, 255, 0.35);
+}
+
+.login-field input:focus ~ .login-input-icon,
+.login-field:focus-within .login-input-icon {
+  color: #22d3ee;
+}
+
+.login-eye {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: #6b7280;
+  cursor: pointer;
+  display: flex;
+  padding: 4px;
+  transition: color 0.18s ease;
+}
+
+.login-eye:hover {
+  color: #22d3ee;
+}
+
+.login-buttons {
+  display: flex;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.login-btn-primary {
+  flex: 1;
+  padding: 13px 16px;
+  font-family: "Montserrat", system-ui, sans-serif;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+  color: #0b0f19;
+  background: linear-gradient(135deg, #22d3ee, #00e5ff);
+  border: none;
+  box-shadow: 0 0 20px rgba(0, 229, 255, 0.4);
+  width: 100%;
+}
+
+.login-btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 30px rgba(0, 229, 255, 0.65);
+}
+
+.login-btn-primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.login-links {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 20px;
+  font-family: "Montserrat", system-ui, sans-serif;
+  font-size: 0.78rem;
+  color: #9ca3af;
+}
+
+.login-links a,
+.login-link-right {
+  color: #9ca3af;
+  text-decoration: none;
+  transition: color 0.18s ease;
+}
+
+.login-links a:hover,
+.login-link-right:hover {
+  color: #22d3ee;
+}
+
+.login-link-right {
+  cursor: pointer;
+}
+
+@media (max-width: 460px) {
+  .login-form-card {
+    padding: 34px 22px 26px;
+  }
+}

@@ -138,8 +138,24 @@
   box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.1);
 }
 
+.form-group input:-webkit-autofill,
+.form-group input:-webkit-autofill:hover,
+.form-group input:-webkit-autofill:focus,
+.form-group input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 1000px #f1f5f9 inset;
+  -webkit-text-fill-color: #1e293b;
+  caret-color: #1e293b;
+  transition: background-color 9999s ease-in-out 0s;
+}
+
 .form-group.has-error input {
   border-color: #ef4444;
+}
+
+.form-group input.input-complete {
+  background-color: #f1f5f9;
+  color: #1e293b;
+  caret-color: #1e293b;
 }
 
 /* Estilos para el selector de ubicación (Ciudad y CP) */
@@ -162,6 +178,11 @@
 
 .form-group.has-error select {
   border-color: #ef4444;
+}
+
+.form-group select.input-complete {
+  background-color: #f1f5f9;
+  color: #1e293b;
 }
 
 .error-message {

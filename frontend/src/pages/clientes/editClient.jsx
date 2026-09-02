@@ -64,11 +64,6 @@ function EditClient() {
     }));
   };
 
-  const isFieldComplete = (name) => {
-    const value = client[name];
-    return Boolean(value && String(value).trim() && String(value) !== "0");
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSubmitting(true);
@@ -76,6 +71,18 @@ function EditClient() {
 
     if (!client.idLocation) {
       setError("Debe seleccionar una ciudad.");
+      setSubmitting(false);
+      return;
+    }
+
+    if (!/^\d+$/.test(client.dniCli)) {
+      setError("El DNI solo puede contener números.");
+      setSubmitting(false);
+      return;
+    }
+
+    if (client.dniCli.length < 7 || client.dniCli.length > 9) {
+      setError("El DNI debe tener entre 7 y 9 dígitos numéricos.");
       setSubmitting(false);
       return;
     }
@@ -126,7 +133,6 @@ function EditClient() {
             value={client.nameCli || ""}
             onChange={handleChange}
             required
-            className={isFieldComplete("nameCli") ? "input-complete" : ""}
           />
         </div>
 
@@ -139,7 +145,6 @@ function EditClient() {
             value={client.surnameCli || ""}
             onChange={handleChange}
             required
-            className={isFieldComplete("surnameCli") ? "input-complete" : ""}
           />
         </div>
 
@@ -149,12 +154,11 @@ function EditClient() {
             id="dniCli"
             type="text"
             name="dniCli"
-            pattern="[0-9]{7,8}"
-            title="Ingrese un DNI válido (7 a 8 dígitos)"
+            pattern="[0-9]{7,9}"
+            title="Ingrese un DNI válido (7 a 9 dígitos)"
             value={client.dniCli || ""}
             onChange={handleChange}
             required
-            className={isFieldComplete("dniCli") ? "input-complete" : ""}
           />
         </div>
 
@@ -167,7 +171,6 @@ function EditClient() {
             value={client.phoneCli || ""}
             onChange={handleChange}
             required
-            className={isFieldComplete("phoneCli") ? "input-complete" : ""}
           />
         </div>
 
@@ -180,7 +183,6 @@ function EditClient() {
             value={client.emailCli || ""}
             onChange={handleChange}
             required
-            className={isFieldComplete("emailCli") ? "input-complete" : ""}
           />
         </div>
 
@@ -193,7 +195,6 @@ function EditClient() {
             value={client.addressCli || ""}
             onChange={handleChange}
             required
-            className={isFieldComplete("addressCli") ? "input-complete" : ""}
           />
         </div>
 
@@ -205,7 +206,6 @@ function EditClient() {
             value={client.idLocation || ""}
             onChange={handleChange}
             required
-            className={isFieldComplete("idLocation") ? "input-complete" : ""}
           >
             <option value="" disabled>
               Seleccione una ubicación...

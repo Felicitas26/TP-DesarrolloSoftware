@@ -3,76 +3,48 @@ import locationService from "../services/location.service.js";
 class LocationController {
 
     async getAll(req, res) {
-        const list = await locationService.getAll();
-        return res.status(200).json(list);
+        try {
+            const list = await locationService.getAll();
+            return res.status(200).json(list);
+        } catch (error) {
+            return res.status(error.statusCode || 500).json({ error: error.message });
+        }
     }
 
     async getById(req, res) {
-        const { id } = req.params;
-
-        const location = await locationService.getById(id);
-
-        if (!location) {
-            return res.status(404).json({
-                error: `Ubicación con ID ${id} no encontrada.`
-            });
+        try {
+            const location = await locationService.getById(req.params.id);
+            return res.status(200).json(location);
+        } catch (error) {
+            return res.status(error.statusCode || 500).json({ error: error.message });
         }
-
-        return res.status(200).json(location);
     }
 
     async create(req, res) {
-        const { city, zipCode } = req.body;
-
-        if (!city || !zipCode) {
-            return res.status(400).json({
-                error: "Todos los campos (ciudad y código postal) son obligatorios."
-            });
-        }
-
         try {
             const newLocation = await locationService.create(req.body);
             return res.status(201).json(newLocation);
         } catch (error) {
-            return res.status(500).json({ error: error.message });
+            return res.status(error.statusCode || 500).json({ error: error.message });
         }
     }
 
     async update(req, res) {
-        const { id } = req.params;
-        const { city, zipCode } = req.body;
-
-        if (!city || !zipCode) {
-            return res.status(400).json({
-                error: "Todos los campos (ciudad y código postal) son obligatorios."
-            });
+        try {
+            const updatedLocation = await locationService.update(req.params.id, req.body);
+            return res.status(200).json(updatedLocation);
+        } catch (error) {
+            return res.status(error.statusCode || 500).json({ error: error.message });
         }
-
-        const UpdatedLocation = await locationService.update(id, req.body);
-
-        if (!UpdatedLocation) {
-            return res.status(404).json({
-                error: `No se encontró la ubicación con ID ${id} para actualizar.`
-            });
-        }
-
-        return res.status(200).json(UpdatedLocation);
     }
 
     async delete(req, res) {
-        const { id } = req.params;
-
-        const deleted = await locationService.delete(id);
-
-        if (!deleted) {
-            return res.status(404).json({
-                error: `No se encontró la ubicación con ID ${id} para eliminar.`
-            });
+        try {
+            await locationService.delete(req.params.id);
+            return res.status(200).json({ message: "Ubicación eliminada exitosamente." });
+        } catch (error) {
+            return res.status(error.statusCode || 500).json({ error: error.message });
         }
-
-        return res.status(200).json({
-            message: `Ubicación con ID ${id} eliminada exitosamente.`
-        });
     }
 
 }

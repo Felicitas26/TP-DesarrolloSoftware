@@ -1,0 +1,38 @@
+.landing {
+  position: relative;
+  min-height: 100vh;
+  background-color: #0b0f19;
+  color: #ffffff;
+  width: 100%;
+  font-family: "Montserrat", system-ui, sans-serif;
+  overflow-x: hidden;
+}
+
+#root:has(> .landing) {
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+  border-inline: none;
+  min-height: 100vh;
+  display: block;
+  text-align: left;
+  background-color: #0b0f19;
+}
+
+.landing *,
+.landing *::before,
+.landing *::after {
+  box-sizing: border-box;
+}
+
+.landing-footer {
+  position: relative;
+  z-index: 1;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 26px 24px;
+  text-align: center;
+  font-size: 0.78rem;
+  letter-spacing: 0.1em;
+  color: rgba(255, 255, 255, 0.5);
+  background: rgba(11, 15, 25, 0.9);
+}

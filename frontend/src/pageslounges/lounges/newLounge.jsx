@@ -14,12 +14,6 @@ const IconMapPin = () => (
   </svg>
 );
 
-const IconSend = () => (
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
-  </svg>
-);
-
 const IconArrowLeft = () => (
   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/>
@@ -68,6 +62,11 @@ function NewLounge() {
     if (fieldErrors[name]) {
       setFieldErrors((prev) => ({ ...prev, [name]: null }));
     }
+  };
+
+  const isFieldComplete = (name) => {
+    const value = lounge[name];
+    return Boolean(value && String(value).trim());
   };
 
   const validateForm = () => {
@@ -156,6 +155,7 @@ function NewLounge() {
                     value={lounge.name}
                     onChange={handleChange}
                     placeholder="Ej: Stylo + (Zona)"
+                    className={isFieldComplete("name") ? "input-complete" : ""}
                   />
                   {fieldErrors.name && <span className="error-message">{fieldErrors.name}</span>}
                 </div>
@@ -177,6 +177,7 @@ function NewLounge() {
                     value={lounge.loungeAddress}
                     onChange={handleChange}
                     placeholder="Ej: Av. Pellegrini 3124"
+                    className={isFieldComplete("loungeAddress") ? "input-complete" : ""}
                   />
                   {fieldErrors.loungeAddress && <span className="error-message">{fieldErrors.loungeAddress}</span>}
                 </div>
@@ -188,7 +189,7 @@ function NewLounge() {
                     name="idLocation"
                     value={lounge.idLocation}
                     onChange={handleChange}
-                    className="form-control"
+                    className={isFieldComplete("idLocation") ? "input-complete form-control" : "form-control"}
                   >
                     <option value="">Seleccione una ubicación...</option>
                     {locations.map((loc) => (
@@ -217,7 +218,7 @@ function NewLounge() {
               className="btn-submit-cyan"
               disabled={submitting}
             >
-              <IconSend /> {submitting ? "Guardando..." : "Enviar"}
+              {submitting ? "Guardando..." : "Guardar"}
             </button>
           </div>
         </form>

@@ -137,11 +137,6 @@ function ClientList() {
     setEditErrors((prev) => ({ ...prev, postalCode: null }));
   };
 
-  const isEditFieldComplete = (name) => {
-    const value = name === "cityInput" ? clientToEdit.cityInput : name === "postalCode" ? clientToEdit.postalCode : clientToEdit[name];
-    return Boolean(value && String(value).trim());
-  };
-
   const handleSaveEdit = async (e) => {
     e.preventDefault();
     const id = clientToEdit.id_client || clientToEdit.idCli || clientToEdit.id;
@@ -155,6 +150,15 @@ function ClientList() {
       errors.city = "La ciudad es obligatoria.";
     } else if (!cityMatch) {
       errors.city = "La ciudad no existe en la base de ciudades de Argentina.";
+    }
+
+    const dni = clientToEdit.dniCli || "";
+    if (!dni.trim()) {
+      errors.dniCli = "El DNI es obligatorio.";
+    } else if (!/^\d+$/.test(dni)) {
+      errors.dniCli = "El DNI solo puede contener números.";
+    } else if (dni.length < 7 || dni.length > 9) {
+      errors.dniCli = "El DNI debe tener entre 7 y 9 dígitos numéricos.";
     }
 
     if (!postal.trim()) {
@@ -354,27 +358,28 @@ function ClientList() {
               <div className="form-grid-2">
                 <div className="form-group">
                   <label>Nombre</label>
-                  <input type="text" name="nameCli" value={clientToEdit.nameCli || ""} onChange={handleEditChange} required className={isEditFieldComplete("nameCli") ? "input-complete" : ""} />
+                  <input type="text" name="nameCli" value={clientToEdit.nameCli || ""} onChange={handleEditChange} required />
                 </div>
                 <div className="form-group">
                   <label>Apellido</label>
-                  <input type="text" name="surnameCli" value={clientToEdit.surnameCli || ""} onChange={handleEditChange} required className={isEditFieldComplete("surnameCli") ? "input-complete" : ""} />
+                  <input type="text" name="surnameCli" value={clientToEdit.surnameCli || ""} onChange={handleEditChange} required />
                 </div>
-                <div className="form-group">
+                <div className={`form-group ${editErrors.dniCli ? "has-error" : ""}`}>
                   <label>DNI</label>
-                  <input type="text" name="dniCli" value={clientToEdit.dniCli || ""} onChange={handleEditChange} required className={isEditFieldComplete("dniCli") ? "input-complete" : ""} />
+                  <input type="text" name="dniCli" value={clientToEdit.dniCli || ""} onChange={handleEditChange} required />
+                  {editErrors.dniCli && <span className="error-message">{editErrors.dniCli}</span>}
                 </div>
                 <div className="form-group">
                   <label>Teléfono</label>
-                  <input type="text" name="phoneCli" value={clientToEdit.phoneCli || ""} onChange={handleEditChange} required className={isEditFieldComplete("phoneCli") ? "input-complete" : ""} />
+                  <input type="text" name="phoneCli" value={clientToEdit.phoneCli || ""} onChange={handleEditChange} required />
                 </div>
-                <div className="form-group full-width">
+                <div className="form-group">
                   <label>Email</label>
-                  <input type="email" name="emailCli" value={clientToEdit.emailCli || ""} onChange={handleEditChange} required className={isEditFieldComplete("emailCli") ? "input-complete" : ""} />
+                  <input type="email" name="emailCli" value={clientToEdit.emailCli || ""} onChange={handleEditChange} required />
                 </div>
                 <div className="form-group">
                   <label>Dirección</label>
-                  <input type="text" name="addressCli" value={clientToEdit.addressCli || ""} onChange={handleEditChange} required className={isEditFieldComplete("addressCli") ? "input-complete" : ""} />
+                  <input type="text" name="addressCli" value={clientToEdit.addressCli || ""} onChange={handleEditChange} required />
                 </div>
                 <div className={`form-group ${editErrors.city ? "has-error" : ""}`}>
                   <label>Ciudad *</label>
@@ -385,7 +390,6 @@ function ClientList() {
                     onChange={handleEditCityChange}
                     placeholder="Ej: Rosario"
                     autoComplete="off"
-                    className={isEditFieldComplete("cityInput") ? "input-complete" : ""}
                   />
                   {editErrors.city && <span className="error-message">{editErrors.city}</span>}
                 </div>
@@ -398,7 +402,6 @@ function ClientList() {
                     onChange={handleEditPostalChange}
                     placeholder="Ej: 2000"
                     autoComplete="off"
-                    className={isEditFieldComplete("postalCode") ? "input-complete" : ""}
                   />
                   {editErrors.postalCode && <span className="error-message">{editErrors.postalCode}</span>}
                 </div>
