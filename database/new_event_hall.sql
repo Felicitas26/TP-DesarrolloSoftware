@@ -55,7 +55,7 @@ CREATE TABLE `price` (
   `endDate` DATE DEFAULT NULL,
   `value` DECIMAL(10,2) NOT NULL,
   `idLoungeType` INT NOT NULL,
-  PRIMARY KEY (`idPrice`),
+  PRIMARY KEY (`effectiveDate`),
   KEY `idLoungeType` (`idLoungeType`),
   CONSTRAINT `price_ibfk_1` FOREIGN KEY (`idLoungeType`) REFERENCES `loungetype` (`idLoungeType`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
