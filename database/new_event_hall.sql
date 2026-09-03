@@ -40,11 +40,13 @@ CREATE TABLE `lounge` (
 -- 4. LoungeType
 CREATE TABLE `loungeType` (
   `idLoungeType` INT NOT NULL AUTO_INCREMENT,
+  `nameLoungeType` VARCHAR(255) NOT NULL,
   `minQuantity` INT NOT NULL,
   `maxQuantity` INT NOT NULL,
   `idLounge` INT NOT NULL,
   PRIMARY KEY (`idLoungeType`),
   KEY `idLounge` (`idLounge`),
+  UNIQUE KEY `uq_loungetype_name` (`idLounge`, `nameLoungeType`),
   CONSTRAINT `loungetype_ibfk_1` FOREIGN KEY (`idLounge`) REFERENCES `lounge` (`idLounge`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 

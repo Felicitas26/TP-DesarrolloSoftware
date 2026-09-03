@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import "./newLoungeType.css";
 
 const IconLayers = () => (
@@ -28,12 +28,21 @@ const IconAlertCircle = () => (
 
 function NewLoungeType() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+
+  const filterLoungeId = searchParams.get("loungeId") || "";
+  const filterLoungeName = searchParams.get("loungeName") || "";
 
   const emptyLoungeType = {
+    nameLoungeType: "",
     minQuantity: "",
     maxQuantity: "",
-    idLounge: ""
+    idLounge: filterLoungeId || ""
   };
+
+  const filteredBackPath = filterLoungeId
+    ? `/loungeType?loungeId=${filterLoungeId}&loungeName=${encodeURIComponent(filterLoungeName)}`
+    : "/loungeType";
 
   const [loungeType, setLoungeType] = useState(emptyLoungeType);
   const [lounges, setLounges] = useState([]);
@@ -64,6 +73,10 @@ function NewLoungeType() {
 
   const validateForm = () => {
     const errors = {};
+
+    if (!loungeType.nameLoungeType || !String(loungeType.nameLoungeType).trim()) {
+      errors.nameLoungeType = "El nombre del tipo de salón es obligatorio.";
+    }
 
     if (!loungeType.idLounge || loungeType.idLounge === "") {
       errors.idLounge = "Debe seleccionar el salón al que pertenece el tipo.";
@@ -108,6 +121,7 @@ function NewLoungeType() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          nameLoungeType: String(loungeType.nameLoungeType).trim(),
           minQuantity: Number(loungeType.minQuantity),
           maxQuantity: Number(loungeType.maxQuantity),
           idLounge: Number(loungeType.idLounge)
@@ -131,110 +145,124 @@ function NewLoungeType() {
   };
 
   return (
-    <div className="page-wrapper">
-      <div className="loungeType-dashboard">
-        <header className="dashboard-header">
-          <div className="header-title-group">
-            <div className="header-icon">
-              <IconLayers />
-            </div>
-            <div>
-              <h1>Nuevo Tipo de Salón</h1>
-              <p>Completá los campos requeridos para dar de alta al tipo de salón en STYLO</p>
-            </div>
-          </div>
-        </header>
+    <div className="gestion-page">
+      <div className="gestion-background" aria-hidden="true">
+        <div className="gestion-glow gestion-glow-purple" />
+        <div className="gestion-glow gestion-glow-cyan" />
+        <div className="gestion-grid-overlay" />
+      </div>
+      <div className="gestion-overlay" />
+
+      <header className="gestion-bar gestion-bar-form">
+        <span className="gestion-logo">NUEVO TIPO DE SALÓN</span>
+        <button type="button" className="gestion-btn-back" onClick={() => navigate(filteredBackPath)}>
+          <IconArrowLeft /> Volver
+        </button>
+      </header>
+
+      <div className="gestion-dashboard gestion-form-wrap">
+        <div className="gestion-panel">
+          <h1>Nuevo Tipo de Salón</h1>
+          <p>Completá los datos para dar de alta un nuevo tipo de salón</p>
+        </div>
 
         {globalError && (
-          <div className="alert-inline alert-error">
+          <div className="gestion-alert-error">
             <IconAlertCircle />
             <span>{globalError}</span>
           </div>
         )}
 
-        <form className="dashboard-form" onSubmit={handleSubmit} noValidate>
-          <div className="cards-grid">
-            <div className="form-card full-width">
-              <div className="card-header">
-                <span className="card-icon"><IconLayers /></span>
-                <h2>Datos del Tipo de Salón</h2>
+        <form className="gestion-form" onSubmit={handleSubmit} noValidate>
+          <div className="gestion-form-card">
+            <div className="gestion-form-card-title">
+              <span className="gestion-form-card-icon"><IconLayers /></span>
+              Datos del Tipo de Salón
+            </div>
+
+            <div className="gestion-form-grid">
+              <div className="gestion-form-group full-width">
+                <label htmlFor="nameLoungeType">Nombre del Tipo de Salón *</label>
+                <input
+                  id="nameLoungeType"
+                  type="text"
+                  name="nameLoungeType"
+                  value={loungeType.nameLoungeType}
+                  onChange={handleChange}
+                  placeholder="Ej: Salón Completo"
+                  className={isFieldComplete("nameLoungeType") ? "input-complete" : ""}
+                />
+                {fieldErrors.nameLoungeType && <span className="error-message">{fieldErrors.nameLoungeType}</span>}
               </div>
-              <div className="card-body">
-                <div className="form-group">
-                  <label htmlFor="idLounge">Salón al que pertenece *</label>
-                  <select
-                    id="idLounge"
-                    name="idLounge"
-                    value={loungeType.idLounge}
-                    onChange={handleChange}
-                    className={isFieldComplete("idLounge") ? "input-complete form-control" : "form-control"}
-                  >
-                    <option value="">Seleccione un salón...</option>
-                    {lounges.map((l) => {
-                      const idLounge = l.id_lounge || l.idLounge || l.id;
-                      return (
-                        <option key={idLounge} value={idLounge}>
-                          {l.name} (ID: {idLounge})
-                        </option>
-                      );
-                    })}
-                  </select>
-                  {fieldErrors.idLounge && <span className="error-message">{fieldErrors.idLounge}</span>}
-                </div>
 
-                <div className="grid-2-cols">
-                  <div className="form-group">
-                    <label htmlFor="minQuantity">Capacidad Mínima *</label>
-                    <input
-                      id="minQuantity"
-                      type="number"
-                      name="minQuantity"
-                      value={loungeType.minQuantity}
-                      onChange={handleChange}
-                      placeholder="Ej: 50"
-                      min="50"
-                      max="200"
-                      className={isFieldComplete("minQuantity") ? "input-complete" : ""}
-                    />
-                    {fieldErrors.minQuantity && <span className="error-message">{fieldErrors.minQuantity}</span>}
-                  </div>
+              <div className="gestion-form-group full-width">
+                <label htmlFor="idLounge">Salón al que pertenece *</label>
+                <select
+                  id="idLounge"
+                  name="idLounge"
+                  value={loungeType.idLounge}
+                  onChange={handleChange}
+                  className={isFieldComplete("idLounge") ? "input-complete form-control" : "form-control"}
+                >
+                  <option value="">Seleccione un salón...</option>
+                  {lounges.map((l) => {
+                    const idLounge = l.id_lounge || l.idLounge || l.id;
+                    return (
+                      <option key={idLounge} value={idLounge}>
+                        {l.name} (ID: {idLounge})
+                      </option>
+                    );
+                  })}
+                </select>
+                {fieldErrors.idLounge && <span className="error-message">{fieldErrors.idLounge}</span>}
+              </div>
 
-                  <div className="form-group">
-                    <label htmlFor="maxQuantity">Capacidad Máxima *</label>
-                    <input
-                      id="maxQuantity"
-                      type="number"
-                      name="maxQuantity"
-                      value={loungeType.maxQuantity}
-                      onChange={handleChange}
-                      placeholder="Ej: 150"
-                      min="50"
-                      max="200"
-                      className={isFieldComplete("maxQuantity") ? "input-complete" : ""}
-                    />
-                    {fieldErrors.maxQuantity && <span className="error-message">{fieldErrors.maxQuantity}</span>}
-                  </div>
-                </div>
+              <div className="gestion-form-group">
+                <label htmlFor="minQuantity">Capacidad Mínima *</label>
+                <input
+                  id="minQuantity"
+                  type="number"
+                  name="minQuantity"
+                  value={loungeType.minQuantity}
+                  onChange={handleChange}
+                  placeholder="Ej: 50"
+                  min="50"
+                  max="200"
+                  className={isFieldComplete("minQuantity") ? "input-complete" : ""}
+                />
+                {fieldErrors.minQuantity && <span className="error-message">{fieldErrors.minQuantity}</span>}
+              </div>
+
+              <div className="gestion-form-group">
+                <label htmlFor="maxQuantity">Capacidad Máxima *</label>
+                <input
+                  id="maxQuantity"
+                  type="number"
+                  name="maxQuantity"
+                  value={loungeType.maxQuantity}
+                  onChange={handleChange}
+                  placeholder="Ej: 150"
+                  min="50"
+                  max="200"
+                  className={isFieldComplete("maxQuantity") ? "input-complete" : ""}
+                />
+                {fieldErrors.maxQuantity && <span className="error-message">{fieldErrors.maxQuantity}</span>}
               </div>
             </div>
-          </div>
 
-          <div className="form-submit-wrapper">
-            <button
-              type="button"
-              className="btn-secondary-outline"
-              onClick={() => navigate("/loungeType")}
-            >
-              <IconArrowLeft /> Cancelar
-            </button>
+            <div className="gestion-form-actions">
+              <button
+                type="button"
+                className="gestion-btn-back"
+                onClick={() => navigate(filteredBackPath)}
+              >
+                <IconArrowLeft /> Cancelar
+              </button>
 
-            <button
-              type="submit"
-              className="btn-submit-cyan"
-              disabled={submitting}
-            >
-              {submitting ? "Guardando..." : "Guardar"}
-            </button>
+              <button type="submit" className="gestion-btn-primary" disabled={submitting}>
+                {submitting ? "Guardando..." : "Guardar"}
+              </button>
+            </div>
           </div>
         </form>
       </div>
@@ -254,7 +282,7 @@ function NewLoungeType() {
                 <button
                   type="button"
                   className="btn-j-primary"
-                  onClick={() => navigate("/loungeType")}
+                  onClick={() => navigate(filteredBackPath)}
                 >
                   Ir al listado
                 </button>

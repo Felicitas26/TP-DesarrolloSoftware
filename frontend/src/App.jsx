@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 import Landing from "./pages/landing/Landing";
+import AdminHome from "./pages/home/AdminHome";
 import Login from "./pages/auth/Login";
 import ChangePassword from "./pages/auth/ChangePassword";
 import ClientList from "./pages/clientes/clientList";
@@ -24,6 +25,7 @@ function App() {
 
                 <Route path="/" element={<Landing />} />
                 <Route path="/home" element={<Landing />} />
+                <Route path="/admin-home" element={<AdminHome />} />
 
                 <Route path="/login" element={<Login />} />
                 <Route path="/cambiar-password" element={<ChangePassword />} />

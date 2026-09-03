@@ -16,10 +16,14 @@ class LoungeTypeService {
     }
 
     async create(loungeType) {
-        const { minQuantity, maxQuantity, idLounge } = loungeType;
+        const { nameLoungeType, minQuantity, maxQuantity, idLounge } = loungeType;
+
+        if (nameLoungeType === undefined || nameLoungeType === "") {
+            throw { statusCode: 400, message: "El nombre del tipo de salón es obligatorio." };
+        }
 
         if (minQuantity === undefined || maxQuantity === undefined || idLounge === undefined || idLounge === "") {
-            throw { statusCode: 400, message: "Todos los campos son obligatorios (minQuantity, maxQuantity e idLounge)." };
+            throw { statusCode: 400, message: "Todos los campos son obligatorios (nameLoungeType, minQuantity, maxQuantity e idLounge)." };
         }
 
         if (isNaN(minQuantity) || isNaN(maxQuantity) || Number(minQuantity) <= 0 || Number(maxQuantity) <= 0) {
@@ -33,16 +37,25 @@ class LoungeTypeService {
         const lounge = await loungeModel.getById(idLounge);
         if (!lounge) {
             throw { statusCode: 404, message: `No existe el salón con ID ${idLounge}.` };
+        }
+
+        const exists = await loungeTypeModel.existsByName(nameLoungeType, idLounge);
+        if (exists) {
+            throw { statusCode: 409, message: `Ya existe un tipo de salón llamado "${nameLoungeType}" en este salón.` };
         }
 
         return await loungeTypeModel.create(loungeType);
     }
 
     async update(id, loungeType) {
-        const { minQuantity, maxQuantity, idLounge } = loungeType;
+        const { nameLoungeType, minQuantity, maxQuantity, idLounge } = loungeType;
+
+        if (nameLoungeType === undefined || nameLoungeType === "") {
+            throw { statusCode: 400, message: "El nombre del tipo de salón es obligatorio." };
+        }
 
         if (minQuantity === undefined || maxQuantity === undefined || idLounge === undefined || idLounge === "") {
-            throw { statusCode: 400, message: "Todos los campos son obligatorios (minQuantity, maxQuantity e idLounge)." };
+            throw { statusCode: 400, message: "Todos los campos son obligatorios (nameLoungeType, minQuantity, maxQuantity e idLounge)." };
         }
 
         if (isNaN(minQuantity) || isNaN(maxQuantity) || Number(minQuantity) <= 0 || Number(maxQuantity) <= 0) {
@@ -56,6 +69,11 @@ class LoungeTypeService {
         const lounge = await loungeModel.getById(idLounge);
         if (!lounge) {
             throw { statusCode: 404, message: `No existe el salón con ID ${idLounge}.` };
+        }
+
+        const exists = await loungeTypeModel.existsByName(nameLoungeType, idLounge, id);
+        if (exists) {
+            throw { statusCode: 409, message: `Ya existe un tipo de salón llamado "${nameLoungeType}" en este salón.` };
         }
 
         const updated = await loungeTypeModel.update(id, loungeType);

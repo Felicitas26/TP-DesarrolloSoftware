@@ -2,21 +2,29 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "./loungeList.css";
 
-const IconBuilding = () => (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <rect x="4" y="2" width="16" height="20" rx="2" ry="2"/><path d="M9 22v-4h6v4"/><path d="M8 6h.01"/><path d="M16 6h.01"/><path d="M12 6h.01"/><path d="M12 10h.01"/><path d="M12 14h.01"/><path d="M16 10h.01"/><path d="M16 14h.01"/><path d="M8 10h.01"/><path d="M8 14h.01"/>
-  </svg>
-);
-
 const IconPlus = () => (
   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
   </svg>
 );
 
-const IconEye = () => (
+const IconArrowLeft = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/>
+  </svg>
+);
+
+const IconLayers = () => (
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+    <polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/>
+  </svg>
+);
+
+const IconLogout = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+    <polyline points="16 17 21 12 16 7"/>
+    <line x1="21" y1="12" x2="9" y2="12"/>
   </svg>
 );
 
@@ -46,11 +54,17 @@ function LoungeList() {
   const [loading, setLoading] = useState(true);
 
   const [loungeToDelete, setLoungeToDelete] = useState(null);
-  const [loungeToDetail, setLoungeToDetail] = useState(null);
   const [loungeToEdit, setLoungeToEdit] = useState(null);
 
   const [deleting, setDeleting] = useState(false);
   const [savingEdit, setSavingEdit] = useState(false);
+
+  const handleLogout = () => {
+    localStorage.removeItem("sty_token");
+    localStorage.removeItem("sty_rol");
+    localStorage.removeItem("sty_idUsuario");
+    navigate("/");
+  };
 
   // Cargar salones y localidades al iniciar
   useEffect(() => {
@@ -140,24 +154,37 @@ function LoungeList() {
   };
 
   return (
-    <div className="page-wrapper">
-      <div className="lounge-dashboard">
-        {/* Header */}
-        <header className="dashboard-header-flex">
-          <div className="header-title-group">
-            <div className="header-icon">
-              <IconBuilding />
-            </div>
-            <div>
-              <h1>Salones Registrados</h1>
-              <p>Gestión y administración de espacios de STYLO</p>
-            </div>
-          </div>
+    <div className="gestion-page">
+      <div className="gestion-background" aria-hidden="true">
+        <div className="gestion-glow gestion-glow-purple" />
+        <div className="gestion-glow gestion-glow-cyan" />
+        <div className="gestion-grid-overlay" />
+      </div>
+      <div className="gestion-overlay" />
 
-          <button className="btn-submit-cyan" onClick={() => navigate("/lounge/new")}>
-            <IconPlus /> Nuevo Salón
-          </button>
-        </header>
+      <header className="gestion-bar">
+        <span className="gestion-logo">GESTIONAR SALONES</span>
+        <button type="button" className="gestion-logout" onClick={handleLogout}>
+          <IconLogout /> Cerrar Sesión
+        </button>
+      </header>
+
+      <div className="gestion-dashboard">
+        <div className="gestion-panel">
+          <h1>Salones Registrados</h1>
+          <p>Gestión y administración de espacios de STYLO</p>
+        </div>
+
+        <div className="gestion-header-flex">
+          <div className="gestion-actions">
+            <button className="gestion-btn-back" onClick={() => navigate("/admin-home")}>
+              <IconArrowLeft /> Volver al Panel
+            </button>
+            <button className="gestion-btn-primary" onClick={() => navigate("/lounge/new")}>
+              <IconPlus /> Nuevo Salón
+            </button>
+          </div>
+        </div>
 
         {/* Tabla */}
         <div className="form-card full-width">
@@ -193,10 +220,12 @@ function LoungeList() {
                               <button
                                 type="button"
                                 className="btn-action-view"
-                                onClick={() => setLoungeToDetail({ ...lounge, resolvedCity: locationName })}
-                                title="Ver Detalle"
+                                onClick={() =>
+                                  navigate(`/loungeType?loungeId=${idKey}&loungeName=${encodeURIComponent(lounge.name)}`)
+                                }
+                                title="Gestionar tipos de salón"
                               >
-                                <IconEye />
+                                <IconLayers />
                               </button>
 
                               <button
@@ -234,29 +263,6 @@ function LoungeList() {
           </div>
         </div>
       </div>
-
-      {/* Modal Detalle */}
-      {loungeToDetail && (
-        <div className="modal-backdrop">
-          <div className="modal-card-form">
-            <div className="modal-header-styled">
-              <h2>Detalles del Salón</h2>
-              <button className="btn-close" onClick={() => setLoungeToDetail(null)}>✕</button>
-            </div>
-            <div className="modal-detail-grid">
-              <div className="detail-item"><label>Nombre:</label> <span>{loungeToDetail.name}</span></div>
-              <div className="detail-item"><label>Dirección:</label> <span>{loungeToDetail.loungeAddress}</span></div>
-              <div className="detail-item"><label>Localidad:</label> <span>{loungeToDetail.resolvedCity}</span></div>
-              <div className="detail-item"><label>Salón (ID):</label> <span>{loungeToDetail.id_lounge || loungeToDetail.idLounge || loungeToDetail.id}</span></div>
-            </div>
-            <div className="modal-footer-right">
-              <button className="btn-j-primary" onClick={() => setLoungeToDetail(null)}>
-                Cerrar
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Modal Editar */}
       {loungeToEdit && (

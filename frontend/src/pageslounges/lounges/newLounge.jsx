@@ -48,13 +48,19 @@ function NewLounge() {
   const [globalError, setGlobalError] = useState(null);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
 
- 
   useEffect(() => {
     fetch("http://localhost:3000/api/locations")
       .then((res) => res.json())
       .then((data) => setLocations(data))
       .catch((err) => console.error("Error al cargar locaciones:", err));
   }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem("sty_token");
+    localStorage.removeItem("sty_rol");
+    localStorage.removeItem("sty_idUsuario");
+    navigate("/");
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -73,7 +79,7 @@ function NewLounge() {
     const errors = {};
     if (!lounge.name.trim()) errors.name = "El nombre del salón es obligatorio.";
     if (!lounge.loungeAddress.trim()) errors.loungeAddress = "La dirección es obligatoria.";
-    
+
     if (!lounge.idLocation.toString().trim()) {
       errors.idLocation = "La ciudad y código postal son obligatorios.";
     }
@@ -96,7 +102,7 @@ function NewLounge() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ...lounge,
-          idLocation: Number(lounge.idLocation) 
+          idLocation: Number(lounge.idLocation)
         })
       });
 
@@ -117,97 +123,104 @@ function NewLounge() {
   };
 
   return (
-    <div className="page-wrapper">
-      <div className="lounge-dashboard">
-        <header className="dashboard-header">
-          <div className="header-title-group">
-            <div className="header-icon">
-              <IconLounge />
-            </div>
-            <div>
-              <h1>Nuevo Salón</h1>
-              <p>Completá los campos requeridos para dar de alta al salón en STYLO</p>
-            </div>
-          </div>
-        </header>
+    <div className="gestion-page">
+      <div className="gestion-background" aria-hidden="true">
+        <div className="gestion-glow gestion-glow-purple" />
+        <div className="gestion-glow gestion-glow-cyan" />
+        <div className="gestion-grid-overlay" />
+      </div>
+      <div className="gestion-overlay" />
+
+      <header className="gestion-bar">
+        <span className="gestion-logo">NUEVO SALÓN</span>
+        <button type="button" className="gestion-logout" onClick={handleLogout}>
+          Cerrar sesión
+        </button>
+      </header>
+
+      <div className="gestion-dashboard gestion-form-wrap">
+        <div className="gestion-panel">
+          <h1>Registrar Nuevo Salón</h1>
+          <p>Completá los campos requeridos para dar de alta al salón en STYLO</p>
+        </div>
 
         {globalError && (
-          <div className="alert-inline alert-error">
+          <div className="gestion-alert-error">
             <IconAlertCircle />
             <span>{globalError}</span>
           </div>
         )}
 
-        <form className="dashboard-form" onSubmit={handleSubmit} noValidate>
-          <div className="cards-grid">
-            <div className="form-card full-width">
-              <div className="card-header">
-                <span className="card-icon"><IconLounge /></span>
-                <h2>Datos del Salón</h2>
-              </div>
-              <div className="card-body">
-                <div className={`form-group ${fieldErrors.name ? "has-error" : ""}`}>
-                  <label htmlFor="name">Nombre del Salón *</label>
-                  <input
-                    id="name"
-                    type="text"
-                    name="name"
-                    value={lounge.name}
-                    onChange={handleChange}
-                    placeholder="Ej: Stylo + (Zona)"
-                    className={isFieldComplete("name") ? "input-complete" : ""}
-                  />
-                  {fieldErrors.name && <span className="error-message">{fieldErrors.name}</span>}
-                </div>
-              </div>
+        <form className="gestion-form" onSubmit={handleSubmit} noValidate>
+          <div className="gestion-form-card">
+            <div className="gestion-form-card-title">
+              <span className="gestion-form-card-icon"><IconLounge /></span>
+              Datos del Salón
             </div>
 
-            <div className="form-card full-width">
-              <div className="card-header">
-                <span className="card-icon"><IconMapPin /></span>
-                <h2>Ubicación</h2>
-              </div>
-              <div className="card-body grid-2-cols">
-                <div className={`form-group ${fieldErrors.loungeAddress ? "has-error" : ""}`}>
-                  <label htmlFor="loungeAddress">Dirección *</label>
-                  <input
-                    id="loungeAddress"
-                    type="text"
-                    name="loungeAddress"
-                    value={lounge.loungeAddress}
-                    onChange={handleChange}
-                    placeholder="Ej: Av. Pellegrini 3124"
-                    className={isFieldComplete("loungeAddress") ? "input-complete" : ""}
-                  />
-                  {fieldErrors.loungeAddress && <span className="error-message">{fieldErrors.loungeAddress}</span>}
-                </div>
-
-                <div className={`form-group ${fieldErrors.idLocation ? "has-error" : ""}`}>
-                  <label htmlFor="idLocation">Ciudad y Código Postal *</label>
-                  <select
-                    id="idLocation"
-                    name="idLocation"
-                    value={lounge.idLocation}
-                    onChange={handleChange}
-                    className={isFieldComplete("idLocation") ? "input-complete form-control" : "form-control"}
-                  >
-                    <option value="">Seleccione una ubicación...</option>
-                    {locations.map((loc) => (
-                      <option key={loc.idLocation} value={loc.idLocation}>
-                        {loc.city} (CP: {loc.zipCode})
-                      </option>
-                    ))}
-                  </select>
-                  {fieldErrors.idLocation && <span className="error-message">{fieldErrors.idLocation}</span>}
-                </div>
+            <div className="gestion-form-grid">
+              <div className="gestion-form-group full-width">
+                <label htmlFor="name">Nombre del Salón *</label>
+                <input
+                  id="name"
+                  type="text"
+                  name="name"
+                  value={lounge.name}
+                  onChange={handleChange}
+                  placeholder="Ej: Stylo + (Zona)"
+                  className={isFieldComplete("name") ? "input-complete" : ""}
+                />
+                {fieldErrors.name && <span className="error-message">{fieldErrors.name}</span>}
               </div>
             </div>
           </div>
 
-          <div className="form-submit-wrapper">
+          <div className="gestion-form-card">
+            <div className="gestion-form-card-title">
+              <span className="gestion-form-card-icon"><IconMapPin /></span>
+              Ubicación
+            </div>
+
+            <div className="gestion-form-grid">
+              <div className="gestion-form-group">
+                <label htmlFor="loungeAddress">Dirección *</label>
+                <input
+                  id="loungeAddress"
+                  type="text"
+                  name="loungeAddress"
+                  value={lounge.loungeAddress}
+                  onChange={handleChange}
+                  placeholder="Ej: Av. Pellegrini 3124"
+                  className={isFieldComplete("loungeAddress") ? "input-complete" : ""}
+                />
+                {fieldErrors.loungeAddress && <span className="error-message">{fieldErrors.loungeAddress}</span>}
+              </div>
+
+              <div className="gestion-form-group">
+                <label htmlFor="idLocation">Ciudad y Código Postal *</label>
+                <select
+                  id="idLocation"
+                  name="idLocation"
+                  value={lounge.idLocation}
+                  onChange={handleChange}
+                  className={isFieldComplete("idLocation") ? "input-complete form-control" : "form-control"}
+                >
+                  <option value="">Seleccione una ubicación...</option>
+                  {locations.map((loc) => (
+                    <option key={loc.idLocation} value={loc.idLocation}>
+                      {loc.city} (CP: {loc.zipCode})
+                    </option>
+                  ))}
+                </select>
+                {fieldErrors.idLocation && <span className="error-message">{fieldErrors.idLocation}</span>}
+              </div>
+            </div>
+          </div>
+
+          <div className="gestion-form-actions">
             <button
               type="button"
-              className="btn-secondary-outline"
+              className="gestion-btn-back"
               onClick={() => navigate("/lounge")}
             >
               <IconArrowLeft /> Cancelar
@@ -215,7 +228,7 @@ function NewLounge() {
 
             <button
               type="submit"
-              className="btn-submit-cyan"
+              className="gestion-btn-primary"
               disabled={submitting}
             >
               {submitting ? "Guardando..." : "Guardar"}

@@ -14,6 +14,12 @@ const IconPlus = () => (
   </svg>
 );
 
+const IconArrowLeft = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/>
+  </svg>
+);
+
 const IconEye = () => (
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
@@ -235,9 +241,14 @@ function ClientList() {
             </div>
           </div>
 
-          <button className="btn-submit-cyan" onClick={() => navigate("/client/new")}>
-            <IconPlus /> Nuevo Cliente
-          </button>
+          <div className="header-actions">
+            <button className="btn-back-panel" onClick={() => navigate("/admin-home")}>
+              <IconArrowLeft /> Volver al Panel
+            </button>
+            <button className="btn-submit-cyan" onClick={() => navigate("/client/new")}>
+              <IconPlus /> Nuevo Cliente
+            </button>
+          </div>
         </header>
 
         {/* Tabla */}

@@ -5,6 +5,7 @@ class LoungeTypeModel {
     async getAll() {
         const [rows] = await db.execute(
             `SELECT lt.idLoungeType,
+                    lt.nameLoungeType,
                     lt.minQuantity,
                     lt.maxQuantity,
                     lt.idLounge,
@@ -18,6 +19,7 @@ class LoungeTypeModel {
     async getById(id) {
         const [rows] = await db.execute(
             `SELECT lt.idLoungeType,
+                    lt.nameLoungeType,
                     lt.minQuantity,
                     lt.maxQuantity,
                     lt.idLounge,
@@ -32,6 +34,7 @@ class LoungeTypeModel {
 
     async create(loungeType) {
         const {
+            nameLoungeType,
             minQuantity,
             maxQuantity,
             idLounge
@@ -39,9 +42,10 @@ class LoungeTypeModel {
 
         const [result] = await db.execute(
             `INSERT INTO loungeType
-            (minQuantity, maxQuantity, idLounge)
-            VALUES (?, ?, ?)`,
+            (nameLoungeType, minQuantity, maxQuantity, idLounge)
+            VALUES (?, ?, ?, ?)`,
             [
+                nameLoungeType,
                 minQuantity,
                 maxQuantity,
                 idLounge
@@ -53,6 +57,7 @@ class LoungeTypeModel {
 
     async update(id, loungeType) {
         const {
+            nameLoungeType,
             minQuantity,
             maxQuantity,
             idLounge
@@ -60,11 +65,13 @@ class LoungeTypeModel {
 
         const [result] = await db.execute(
             `UPDATE loungeType
-            SET minQuantity = ?,
+            SET nameLoungeType = ?,
+                minQuantity = ?,
                 maxQuantity = ?,
                 idLounge = ?
             WHERE idLoungeType = ?`,
             [
+                nameLoungeType,
                 minQuantity,
                 maxQuantity,
                 idLounge,
@@ -90,6 +97,21 @@ class LoungeTypeModel {
         }
 
         return true;
+    }
+
+    async existsByName(nameLoungeType, idLounge, excludeId = null) {
+        if (excludeId === null) {
+            const [rows] = await db.execute(
+                "SELECT idLoungeType FROM loungeType WHERE nameLoungeType = ? AND idLounge = ? LIMIT 1",
+                [nameLoungeType, idLounge]
+            );
+            return rows.length > 0;
+        }
+        const [rows] = await db.execute(
+            "SELECT idLoungeType FROM loungeType WHERE nameLoungeType = ? AND idLounge = ? AND idLoungeType <> ? LIMIT 1",
+            [nameLoungeType, idLounge, excludeId]
+        );
+        return rows.length > 0;
     }
 }
 

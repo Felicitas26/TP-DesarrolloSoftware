@@ -1,10 +1,18 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import "./loungeTypeList.css";
 
-const IconLayers = () => (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/>
+const IconArrowLeft = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/>
+  </svg>
+);
+
+const IconLogout = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+    <polyline points="16 17 21 12 16 7"/>
+    <line x1="21" y1="12" x2="9" y2="12"/>
   </svg>
 );
 
@@ -41,6 +49,11 @@ const IconTrashWarning = () => (
 
 function LoungeTypeList() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+
+  const filterLoungeId = searchParams.get("loungeId") || "";
+  const filterLoungeName = searchParams.get("loungeName") || "";
+
   const [loungeTypes, setLoungeTypes] = useState([]);
   const [lounges, setLounges] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -51,6 +64,14 @@ function LoungeTypeList() {
 
   const [deleting, setDeleting] = useState(false);
   const [savingEdit, setSavingEdit] = useState(false);
+  const [editErrorMsg, setEditErrorMsg] = useState(null);
+
+  const handleLogout = () => {
+    localStorage.removeItem("sty_token");
+    localStorage.removeItem("sty_rol");
+    localStorage.removeItem("sty_idUsuario");
+    navigate("/");
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -84,6 +105,10 @@ function LoungeTypeList() {
     const lounge = lounges.find((l) => String(l.idLounge || l.id || l.id_lounge) === String(lt.idLounge));
     return lounge ? lounge.name : "No asignado";
   };
+
+  const visibleTypes = filterLoungeId
+    ? loungeTypes.filter((lt) => String(lt.idLounge ?? lt.loungeId) === String(filterLoungeId))
+    : loungeTypes;
 
   const handleConfirmDelete = async () => {
     if (!loungeTypeToDelete) return;
@@ -119,6 +144,12 @@ function LoungeTypeList() {
     const minQuantity = Number(loungeTypeToEdit.minQuantity);
     const maxQuantity = Number(loungeTypeToEdit.maxQuantity);
 
+    if (!loungeTypeToEdit.nameLoungeType || !String(loungeTypeToEdit.nameLoungeType).trim()) {
+      alert("El nombre del tipo de salón es obligatorio.");
+      setSavingEdit(false);
+      return;
+    }
+
     if (isNaN(minQuantity) || minQuantity < 50) {
       alert("La capacidad mínima no puede ser inferior a 50 personas.");
       setSavingEdit(false);
@@ -148,13 +179,32 @@ function LoungeTypeList() {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          nameLoungeType: String(loungeTypeToEdit.nameLoungeType).trim(),
           minQuantity,
           maxQuantity,
           idLounge: Number(loungeTypeToEdit.idLounge)
         })
       });
 
-      if (!response.ok) throw new Error("No se pudo actualizar el tipo de salón.");
+      const data = await response.json();
+
+      if (!response.ok) {
+        if (response.status === 409) {
+          const dest = lounges.find(
+            (l) => (l.idLounge || l.id || l.id_lounge) === Number(loungeTypeToEdit.idLounge)
+          );
+          const destName = dest ? dest.name : "";
+          setEditErrorMsg(
+            `No se puede guardar: ya existe un tipo de salón llamado "${loungeTypeToEdit.nameLoungeType}" `
+            + `en el salón ${destName ? `"${destName}"` : `(ID ${loungeTypeToEdit.idLounge})`}. `
+            + "Elegí otro nombre o seleccioná otro salón."
+          );
+        } else {
+          alert(data.error || "No se pudo actualizar el tipo de salón.");
+        }
+        setSavingEdit(false);
+        return;
+      }
 
       const updated = await response.json();
       setLoungeTypes((prev) => prev.map((lt) => (lt.idLoungeType === id ? { ...updated, loungeName: getLoungeName(updated) } : lt)));
@@ -167,23 +217,52 @@ function LoungeTypeList() {
   };
 
   return (
-    <div className="page-wrapper">
-      <div className="loungeType-dashboard">
-        <header className="dashboard-header-flex">
-          <div className="header-title-group">
-            <div className="header-icon">
-              <IconLayers />
-            </div>
-            <div>
-              <h1>Tipos de Salón Registrados</h1>
-              <p>Gestión y administración de tipos de salón de STYLO</p>
-            </div>
-          </div>
+    <div className="gestion-page">
+      <div className="gestion-background" aria-hidden="true">
+        <div className="gestion-glow gestion-glow-purple" />
+        <div className="gestion-glow gestion-glow-cyan" />
+        <div className="gestion-grid-overlay" />
+      </div>
+      <div className="gestion-overlay" />
 
-          <button className="btn-submit-cyan" onClick={() => navigate("/loungeType/new")}>
-            <IconPlus /> Nuevo Tipo de Salón
-          </button>
-        </header>
+      <header className="gestion-bar">
+        <span className="gestion-logo">GESTIONAR TIPOS DE SALÓN</span>
+        <button type="button" className="gestion-logout" onClick={handleLogout}>
+          <IconLogout /> Cerrar Sesión
+        </button>
+      </header>
+
+      <div className="gestion-dashboard">
+        <div className="gestion-panel">
+          <h1>
+            {filterLoungeId ? `Tipos de Salón — ${filterLoungeName}` : "Tipos de Salón Registrados"}
+          </h1>
+          <p>
+            {filterLoungeId
+              ? "GESTIONAR TIPOS DE SALÓN"
+              : "Gestión y administración de tipos de salón de STYLO"}
+          </p>
+        </div>
+
+        <div className="gestion-header-flex">
+          <div className="gestion-actions">
+            <button className="gestion-btn-back" onClick={() => navigate("/lounge")}>
+              <IconArrowLeft /> Volver a la gestión de salones
+            </button>
+            <button
+              className="gestion-btn-primary"
+              onClick={() =>
+                navigate(
+                  filterLoungeId
+                    ? `/loungeType/new?loungeId=${filterLoungeId}&loungeName=${encodeURIComponent(filterLoungeName)}`
+                    : "/loungeType/new"
+                )
+              }
+            >
+              <IconPlus /> Nuevo Tipo de Salón
+            </button>
+          </div>
+        </div>
 
         <div className="form-card full-width">
           <div className="card-body-table">
@@ -194,6 +273,7 @@ function LoungeTypeList() {
                 <thead>
                   <tr>
                     <th>Salón</th>
+                    <th>Nombre del Tipo</th>
                     <th>Capacidad Mínima</th>
                     <th>Capacidad Máxima</th>
                     <th>Tipo (ID)</th>
@@ -201,14 +281,15 @@ function LoungeTypeList() {
                   </tr>
                 </thead>
                 <tbody>
-                  {loungeTypes.length > 0 ? (
-                    loungeTypes.map((lt) => {
+                  {visibleTypes.length > 0 ? (
+                    visibleTypes.map((lt) => {
                       const idKey = lt.idLoungeType || lt.id;
                       const loungeName = getLoungeName(lt);
 
                       return (
                         <tr key={idKey}>
                           <td className="font-semibold">{loungeName}</td>
+                          <td>{lt.nameLoungeType}</td>
                           <td>{lt.minQuantity}</td>
                           <td>{lt.maxQuantity}</td>
                           <td>{idKey}</td>
@@ -247,7 +328,7 @@ function LoungeTypeList() {
                     })
                   ) : (
                     <tr>
-                      <td colSpan="5" className="empty-table">
+                      <td colSpan="6" className="empty-table">
                         No hay tipos de salón registrados en la base de datos.
                       </td>
                     </tr>
@@ -268,6 +349,7 @@ function LoungeTypeList() {
             </div>
             <div className="modal-detail-grid">
               <div className="detail-item"><label>Salón:</label> <span>{loungeTypeToDetail.resolvedLounge}</span></div>
+              <div className="detail-item"><label>Nombre:</label> <span>{loungeTypeToDetail.nameLoungeType}</span></div>
               <div className="detail-item"><label>Capacidad Mínima:</label> <span>{loungeTypeToDetail.minQuantity}</span></div>
               <div className="detail-item"><label>Capacidad Máxima:</label> <span>{loungeTypeToDetail.maxQuantity}</span></div>
               <div className="detail-item"><label>Tipo (ID):</label> <span>{loungeTypeToDetail.idLoungeType || loungeTypeToDetail.id}</span></div>
@@ -290,6 +372,10 @@ function LoungeTypeList() {
             </div>
             <form onSubmit={handleSaveEdit} className="modal-edit-form">
               <div className="form-grid-2">
+                <div className="form-group full-width">
+                  <label>Nombre del Tipo de Salón *</label>
+                  <input type="text" name="nameLoungeType" value={loungeTypeToEdit.nameLoungeType || ""} onChange={handleEditChange} required />
+                </div>
                 <div className="form-group full-width">
                   <label>Salón al que pertenece</label>
                   <select
@@ -362,6 +448,30 @@ function LoungeTypeList() {
                   disabled={deleting}
                 >
                   Cancelar
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {editErrorMsg && (
+        <div className="modal-backdrop">
+          <div className="modal-card-j">
+            <div className="modal-body-j">
+              <div className="modal-icon-circle danger">
+                <IconTrashWarning />
+              </div>
+
+              <div className="modal-content-j">
+                <p className="modal-text-j">{editErrorMsg}</p>
+
+                <button
+                  type="button"
+                  className="btn-j-primary"
+                  onClick={() => setEditErrorMsg(null)}
+                >
+                  Entendido
                 </button>
               </div>
             </div>

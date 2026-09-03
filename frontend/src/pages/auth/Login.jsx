@@ -32,6 +32,12 @@ const IconEyeOff = () => (
   </svg>
 );
 
+const IconArrowLeft = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/>
+  </svg>
+);
+
 function Login() {
   const navigate = useNavigate();
 
@@ -84,6 +90,8 @@ function Login() {
 
       if (data.passwordTemporal) {
         navigate("/cambiar-password");
+      } else if (data.rol === "administrador") {
+        navigate("/admin-home");
       } else {
         navigate("/client");
       }
@@ -96,6 +104,9 @@ function Login() {
 
   return (
     <div className="login-page">
+      <button type="button" className="login-back" onClick={() => navigate("/")}>
+        <IconArrowLeft /> Volver al inicio
+      </button>
       <div className="login-form-card">
         <div className="login-logo">STYLO</div>
         <h1 className="login-title">Iniciar Sesión</h1>
