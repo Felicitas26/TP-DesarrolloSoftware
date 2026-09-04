@@ -86,6 +86,66 @@ class ClientService {
         return updated;
     }
 
+    async updateMe(idCli, client) {
+        const {
+            nameCli,
+            surnameCli,
+            phoneCli,
+            dniCli,
+            emailCli,
+            addressCli,
+            idLocation
+        } = client;
+
+        if (
+            !nameCli ||
+            !surnameCli ||
+            !phoneCli ||
+            !dniCli ||
+            !emailCli ||
+            !addressCli ||
+            idLocation == undefined ||
+            idLocation === ""
+        ) {
+            throw {
+                statusCode: 400,
+                message: "Todos los campos son obligatorios."
+            };
+        }
+
+        if (!/^\d+$/.test(dniCli)) {
+            throw {
+                statusCode: 400,
+                message: "El DNI solo puede contener números."
+            };
+        }
+
+        if (dniCli.length < 7 || dniCli.length > 9) {
+            throw {
+                statusCode: 400,
+                message: "El DNI debe tener entre 7 y 9 dígitos numéricos."
+            };
+        }
+
+        if (!/^\d+$/.test(phoneCli)) {
+            throw {
+                statusCode: 400,
+                message: "El teléfono solo puede contener números."
+            };
+        }
+
+        const updated = await clientModel.updateMe(idCli, client);
+
+        if (!updated) {
+            throw {
+                statusCode: 404,
+                message: "No se ha encontrado al cliente."
+            };
+        }
+
+        return updated;
+    }
+
     async delete(id) {
         const deleted = await clientModel.delete(id);
         if (!deleted) {

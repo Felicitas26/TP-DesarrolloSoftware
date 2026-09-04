@@ -86,6 +86,7 @@ function Login() {
         localStorage.setItem("sty_token", data.token);
         localStorage.setItem("sty_rol", data.rol || "");
         localStorage.setItem("sty_idUsuario", data.idUsuario || "");
+        localStorage.setItem("sty_idCli", data.idCli || "");
       }
 
       if (data.passwordTemporal) {
@@ -93,7 +94,7 @@ function Login() {
       } else if (data.rol === "administrador") {
         navigate("/admin-home");
       } else {
-        navigate("/client");
+        navigate("/client-home");
       }
     } catch (err) {
       setError(err.message);

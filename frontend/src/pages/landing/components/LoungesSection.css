@@ -1,0 +1,146 @@
+.lounges-section {
+    position: relative;
+    padding: 100px 24px;
+    background-color: #0b0f19;
+    color: #ffffff;
+}
+
+.lounges-header {
+    max-width: 900px;
+    margin: 0 auto 55px;
+    text-align: center;
+}
+
+.lounges-eyebrow {
+    display: block;
+    margin-bottom: 12px;
+    color: #22d3ee;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+}
+
+.lounges-header h2 {
+    margin: 0;
+    font-family: "Playfair Display", serif;
+    font-size: 2.5rem;
+    letter-spacing: 0.08em;
+}
+
+.lounges-header p {
+    margin: 16px auto 0;
+    max-width: 600px;
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.95rem;
+    letter-spacing: 0.03em;
+}
+
+.lounges-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 28px;
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+.lounge-card {
+    position: relative;
+    min-height: 300px;
+    padding: 36px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 18px;
+    background: rgba(255, 255, 255, 0.035);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
+    overflow: hidden;
+    transition: transform 0.3s ease, border-color 0.3s ease;
+}
+
+.lounge-card::before {
+    content: "";
+    position: absolute;
+    width: 180px;
+    height: 180px;
+    top: -90px;
+    right: -60px;
+    border-radius: 50%;
+    background: rgba(34, 211, 238, 0.08);
+    filter: blur(10px);
+}
+
+.lounge-card:hover {
+    transform: translateY(-5px);
+    border-color: rgba(34, 211, 238, 0.35);
+}
+
+.lounge-card-content {
+    position: relative;
+    z-index: 1;
+}
+
+.lounge-number {
+    display: block;
+    margin-bottom: 28px;
+    color: rgba(255, 255, 255, 0.3);
+    font-size: 0.75rem;
+    letter-spacing: 0.15em;
+}
+
+.lounge-card h3 {
+    margin: 0 0 20px;
+    font-family: "Playfair Display", serif;
+    font-size: 1.7rem;
+    letter-spacing: 0.04em;
+}
+
+.lounge-info {
+    margin-bottom: 30px;
+}
+
+.lounge-info p {
+    margin: 5px 0;
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.9rem;
+}
+
+.lounge-capacity {
+    display: flex;
+    align-items: baseline;
+    gap: 9px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.lounge-capacity span {
+    color: rgba(255, 255, 255, 0.4);
+    font-size: 0.68rem;
+    letter-spacing: 0.12em;
+}
+
+.lounge-capacity strong {
+    color: #22d3ee;
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.lounges-loading {
+    text-align: center;
+    color: rgba(255, 255, 255, 0.5);
+}
+
+@media (max-width: 700px) {
+    .lounges-section {
+        padding: 75px 20px;
+    }
+
+    .lounges-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .lounges-header h2 {
+        font-size: 2rem;
+    }
+
+    .lounge-card {
+        padding: 28px;
+    }
+}

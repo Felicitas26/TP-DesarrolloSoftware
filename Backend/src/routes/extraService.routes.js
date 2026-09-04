@@ -1,12 +1,13 @@
-import express from "express";
+import { Router } from "express";
 import extraServiceController from "../controllers/extraService.controller.js";
+import { authenticate, requireRole } from "../middlewares/auth.middleware.js";
 
-const router = express.Router();
+const router = Router();
 
 router.get("/", extraServiceController.getAll);
-router.get("/:id", extraServiceController.getById);
-router.post("/", extraServiceController.create);
-router.put("/:id", extraServiceController.update);
-router.delete("/:id", extraServiceController.delete);
+router.get("/:id", authenticate, requireRole(["administrador"]), extraServiceController.getById);
+router.post("/", authenticate, requireRole(["administrador"]), extraServiceController.create);
+router.put("/:id", authenticate, requireRole(["administrador"]), extraServiceController.update);
+router.delete("/:id", authenticate, requireRole(["administrador"]), extraServiceController.delete);
 
 export default router;

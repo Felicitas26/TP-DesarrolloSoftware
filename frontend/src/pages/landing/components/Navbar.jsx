@@ -4,7 +4,9 @@ import "./Navbar.css";
 const NAV_LINKS = [
   { label: "INICIO", href: "#inicio", active: true },
   { label: "EVENTOS", href: "#eventos", active: false },
-  { label: "RESERVAS", href: "#reservas", active: false },
+  { label: "SALONES", href: "#salones", active: false },
+  { label: "MENÚS", href: "#menues", active: false },
+  { label: "SERVICIOS EXTRA", href: "#servicios-extra", active: false },
   { label: "CONTACTO", href: "#contacto", active: false }
 ];
 

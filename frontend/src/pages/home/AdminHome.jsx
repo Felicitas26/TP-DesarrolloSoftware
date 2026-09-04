@@ -81,24 +81,24 @@ function AdminHome() {
     },
     {
       title: "Gestionar Reservas",
-      description: "Próximamente",
-      route: "/reservas",
+      description: "Listado y gestión de reservas pendientes",
+      route: "/reservation",
       icon: <IconCalendar />,
-      enabled: false
+      enabled: true
     },
     {
       title: "Gestionar Servicios Extras",
-      description: "Próximamente",
-      route: "/extras",
+      description: "Listado, alta y edición de servicios extras",
+      route: "/extraservice",
       icon: <IconSparkles />,
-      enabled: false
+      enabled: true
     },
     {
-      title: "Gestionar Menues",
-      description: "Próximamente",
-      route: "/menues",
+      title: "Gestionar Menús",
+      description: "Listado, alta y edición de menúes",
+      route: "/cardDetail",
       icon: <IconMenu />,
-      enabled: false
+      enabled: true
     }
   ];
 

@@ -102,6 +102,46 @@ class ClientModel {
         return this.getById(id);
     }
 
+    async updateMe(idCli, client) {
+        const {
+            nameCli,
+            surnameCli,
+            phoneCli,
+            dniCli,
+            emailCli,
+            addressCli,
+            idLocation
+        } = client;
+
+        const [result] = await db.execute(
+            `UPDATE Client
+            SET nameCli = ?,
+                surnameCli = ?,
+                phoneCli = ?,
+                dniCli = ?,
+                emailCli = ?,
+                addressCli = ?,
+                idLocation = ?
+            WHERE idCli = ?`,
+            [
+                nameCli,
+                surnameCli,
+                phoneCli,
+                dniCli,
+                emailCli,
+                addressCli,
+                idLocation,
+                idCli
+            ]
+        );
+
+        if (result.affectedRows === 0) {
+            return null;
+        }
+
+        return this.getById(idCli);
+    }
+    
     async delete(id) {
         const [result] = await db.execute(
             "DELETE FROM Client WHERE idCli = ?",

@@ -1,10 +1,13 @@
 import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useLocation } from "react-router-dom";
 import "./editClient.css";
 
 function EditClient() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const isMyProfile = location.pathname === "/client/edit/me";
 
   const [client, setClient] = useState({
     nameCli: "",
@@ -15,6 +18,7 @@ function EditClient() {
     addressCli: "",
     idLocation: ""
   });
+
   const [locations, setLocations] = useState([]);
 
   const [loading, setLoading] = useState(true);
@@ -26,26 +30,49 @@ function EditClient() {
       try {
         setLoading(true);
 
-        const [clientRes, locsRes] = await Promise.all([
-          fetch(`http://localhost:3000/api/client/${id}`),
-          fetch("http://localhost:3000/api/locations")
-        ]);
+        const token = localStorage.getItem("sty_token");
+
+        const clientRes = await fetch(
+          isMyProfile
+            ? "http://localhost:3000/api/client/me"
+            : `http://localhost:3000/api/client/${id}`,
+          isMyProfile
+            ? {
+                headers: {
+                  Authorization: `Bearer ${token}`
+                }
+              }
+            : {}
+        );
+
+        const locsRes = await fetch(
+          "http://localhost:3000/api/locations"
+        );
 
         const clientData = await clientRes.json();
         const locsData = await locsRes.json();
 
         if (!clientRes.ok) {
-          throw new Error(clientData.error || "Error al cargar los datos del cliente");
+          throw new Error(
+            clientData.error ||
+              "Error al cargar los datos del cliente"
+          );
         }
+
         if (!locsRes.ok) {
-          throw new Error(locsData.error || "Error al cargar las ubicaciones");
+          throw new Error(
+            locsData.error ||
+              "Error al cargar las ubicaciones"
+          );
         }
 
         setClient({
           ...clientData,
           idLocation: clientData.idLocation || ""
         });
+
         setLocations(locsData);
+
       } catch (err) {
         setError(err.message);
       } finally {
@@ -54,10 +81,12 @@ function EditClient() {
     };
 
     loadData();
-  }, [id]);
+
+  }, [id, isMyProfile]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+
     setClient((prev) => ({
       ...prev,
       [name]: value
@@ -66,6 +95,7 @@ function EditClient() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     setSubmitting(true);
     setError(null);
 
@@ -81,8 +111,13 @@ function EditClient() {
       return;
     }
 
-    if (client.dniCli.length < 7 || client.dniCli.length > 9) {
-      setError("El DNI debe tener entre 7 y 9 dígitos numéricos.");
+    if (
+      client.dniCli.length < 7 ||
+      client.dniCli.length > 9
+    ) {
+      setError(
+        "El DNI debe tener entre 7 y 9 dígitos numéricos."
+      );
       setSubmitting(false);
       return;
     }
@@ -93,21 +128,38 @@ function EditClient() {
     };
 
     try {
-      const response = await fetch(`http://localhost:3000/api/client/${id}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify(body)
-      });
+      const token = localStorage.getItem("sty_token");
+
+      const response = await fetch(
+        isMyProfile
+          ? "http://localhost:3000/api/client/me"
+          : `http://localhost:3000/api/client/${id}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            ...(isMyProfile && {
+              Authorization: `Bearer ${token}`
+            })
+          },
+          body: JSON.stringify(body)
+        }
+      );
 
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || "Error al actualizar el cliente");
+        throw new Error(
+          data.error || "Error al actualizar el cliente"
+        );
       }
 
-      navigate("/client");
+      if (isMyProfile) {
+        navigate("/my-profile");
+      } else {
+        navigate("/client");
+      }
+
     } catch (err) {
       setError(err.message);
     } finally {
@@ -115,17 +167,39 @@ function EditClient() {
     }
   };
 
-  if (loading) return <div className="client-container"><p className="state-msg">Cargando cliente...</p></div>;
+  if (loading) {
+    return (
+      <div className="client-container">
+        <p className="state-msg">
+          Cargando cliente...
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="client-container">
-      <h1>Editar Cliente</h1>
 
-      {error && <div className="alert-error">{error}</div>}
+      <h1>
+        {isMyProfile ? "Editar mi perfil" : "Editar Cliente"}
+      </h1>
 
-      <form className="client-form" onSubmit={handleSubmit}>
+      {error && (
+        <div className="alert-error">
+          {error}
+        </div>
+      )}
+
+      <form
+        className="client-form"
+        onSubmit={handleSubmit}
+      >
+
         <div className="form-group">
-          <label htmlFor="nameCli">Nombre *</label>
+          <label htmlFor="nameCli">
+            Nombre *
+          </label>
+
           <input
             id="nameCli"
             type="text"
@@ -137,7 +211,10 @@ function EditClient() {
         </div>
 
         <div className="form-group">
-          <label htmlFor="surnameCli">Apellido *</label>
+          <label htmlFor="surnameCli">
+            Apellido *
+          </label>
+
           <input
             id="surnameCli"
             type="text"
@@ -149,7 +226,10 @@ function EditClient() {
         </div>
 
         <div className="form-group">
-          <label htmlFor="dniCli">DNI *</label>
+          <label htmlFor="dniCli">
+            DNI *
+          </label>
+
           <input
             id="dniCli"
             type="text"
@@ -163,7 +243,10 @@ function EditClient() {
         </div>
 
         <div className="form-group">
-          <label htmlFor="phoneCli">Teléfono *</label>
+          <label htmlFor="phoneCli">
+            Teléfono *
+          </label>
+
           <input
             id="phoneCli"
             type="tel"
@@ -175,7 +258,10 @@ function EditClient() {
         </div>
 
         <div className="form-group">
-          <label htmlFor="emailCli">Email *</label>
+          <label htmlFor="emailCli">
+            Email *
+          </label>
+
           <input
             id="emailCli"
             type="email"
@@ -187,7 +273,10 @@ function EditClient() {
         </div>
 
         <div className="form-group">
-          <label htmlFor="addressCli">Dirección *</label>
+          <label htmlFor="addressCli">
+            Dirección *
+          </label>
+
           <input
             id="addressCli"
             type="text"
@@ -199,7 +288,10 @@ function EditClient() {
         </div>
 
         <div className="form-group">
-          <label htmlFor="idLocation">Ciudad y Código Postal *</label>
+          <label htmlFor="idLocation">
+            Ciudad y Código Postal *
+          </label>
+
           <select
             id="idLocation"
             name="idLocation"
@@ -210,8 +302,12 @@ function EditClient() {
             <option value="" disabled>
               Seleccione una ubicación...
             </option>
+
             {locations.map((loc) => (
-              <option key={loc.idLocation} value={loc.idLocation}>
+              <option
+                key={loc.idLocation}
+                value={loc.idLocation}
+              >
                 {loc.city} - CP: {loc.zipCode}
               </option>
             ))}
@@ -219,22 +315,35 @@ function EditClient() {
         </div>
 
         <div className="form-actions">
+
           <button
             type="button"
             className="btn btn-secondary"
-            onClick={() => navigate("/client")}
+            onClick={() =>
+              navigate(
+                isMyProfile
+                  ? "/my-profile"
+                  : "/client"
+              )
+            }
           >
             Cancelar
           </button>
+
           <button
             type="submit"
             className="btn btn-primary"
             disabled={submitting}
           >
-            {submitting ? "Guardando..." : "Guardar Cambios"}
+            {submitting
+              ? "Guardando..."
+              : "Guardar Cambios"}
           </button>
+
         </div>
+
       </form>
+
     </div>
   );
 }

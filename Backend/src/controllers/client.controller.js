@@ -20,6 +20,34 @@ class ClientController {
         }
     }
 
+    async getMyProfile(req, res) {
+        try {
+            const client = await clientService.getById(req.usuario.idCli);
+            return res.status(200).json(client);
+        } catch (error) {
+            return res.status(error.statusCode || 500).json({ error: error.message });
+        }
+    }
+
+    async updateMyProfile(req, res) {
+        try {
+            const clientUpdated = await clientService.updateMe(
+                req.usuario.idCli,
+                req.body
+            );
+
+            return res.status(200).json({
+                message: "Perfil actualizado correctamente.",
+                client: clientUpdated
+            });
+
+        } catch (error) {
+            return res.status(error.statusCode || 500).json({
+                error: error.message
+            });
+        }
+    }
+
     async create(req, res) {
         try {
             const newClient = await clientService.create(req.body);

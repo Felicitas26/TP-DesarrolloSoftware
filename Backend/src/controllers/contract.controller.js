@@ -1,11 +1,11 @@
-import contractService from "../services/contract.service.js";
+import contratoService from "../services/contrato.service.js";
 
-class ContractController {
+class ContratoController {
 
     async getAll(req, res) {
         try {
-            const contracts = await contractService.getAll();
-            return res.status(200).json(contracts);
+            const contratos = await contratoService.getAll();
+            return res.status(200).json(contratos);
         } catch (error) {
             return res.status(error.statusCode || 500).json({ error: error.message });
         }
@@ -13,8 +13,8 @@ class ContractController {
 
     async getById(req, res) {
         try {
-            const contract = await contractService.getById(req.params.id);
-            return res.status(200).json(contract);
+            const contrato = await contratoService.getById(req.params.id);
+            return res.status(200).json(contrato);
         } catch (error) {
             return res.status(error.statusCode || 500).json({ error: error.message });
         }
@@ -22,8 +22,8 @@ class ContractController {
 
     async create(req, res) {
         try {
-            const newContract = await contractService.create(req.body);
-            return res.status(201).json(newContract);
+            const newContrato = await contratoService.create(req.body);
+            return res.status(201).json(newContrato);
         } catch (error) {
             return res.status(error.statusCode || 500).json({ error: error.message });
         }
@@ -31,10 +31,10 @@ class ContractController {
 
     async update(req, res) {
         try {
-            const contractUpdated = await contractService.update(req.params.id, req.body);
+            const contratoUpdated = await contratoService.update(req.params.id, req.body);
             return res.status(200).json({
                 message: "Contrato actualizado correctamente.",
-                contract: contractUpdated
+                contrato: contratoUpdated
             });
         } catch (error) {
             return res.status(error.statusCode || 500).json({ error: error.message });
@@ -43,13 +43,12 @@ class ContractController {
 
     async delete(req, res) {
         try {
-            await contractService.delete(req.params.id);
+            await contratoService.delete(req.params.id);
             return res.status(200).json({ message: "Contrato eliminado correctamente." });
         } catch (error) {
             return res.status(error.statusCode || 500).json({ error: error.message });
         }
     }
-
 }
 
-export default new ContractController();
+export default new ContratoController();

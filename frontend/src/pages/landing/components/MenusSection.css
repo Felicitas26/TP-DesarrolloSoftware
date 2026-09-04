@@ -1,0 +1,151 @@
+.menus-section {
+    position: relative;
+    padding: 100px 24px;
+    background-color: #0b0f19;
+    color: #ffffff;
+}
+
+.menus-header {
+    max-width: 900px;
+    margin: 0 auto 55px;
+    text-align: center;
+}
+
+.menus-eyebrow {
+    display: block;
+    margin-bottom: 12px;
+    color: #22d3ee;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+}
+
+.menus-header h2 {
+    margin: 0;
+    font-family: "Playfair Display", serif;
+    font-size: 2.5rem;
+    letter-spacing: 0.08em;
+}
+
+.menus-header p {
+    margin: 16px auto 0;
+    max-width: 600px;
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.95rem;
+    letter-spacing: 0.03em;
+}
+
+.menus-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 28px;
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
+.menu-card {
+    position: relative;
+    min-height: 310px;
+    padding: 36px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 18px;
+    background: rgba(255, 255, 255, 0.035);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
+    overflow: hidden;
+    transition: transform 0.3s ease, border-color 0.3s ease;
+}
+
+.menu-card::before {
+    content: "";
+    position: absolute;
+    width: 180px;
+    height: 180px;
+    top: -90px;
+    right: -60px;
+    border-radius: 50%;
+    background: rgba(168, 85, 247, 0.08);
+    filter: blur(10px);
+}
+
+.menu-card:hover {
+    transform: translateY(-5px);
+    border-color: rgba(168, 85, 247, 0.35);
+}
+
+.menu-number {
+    position: relative;
+    z-index: 1;
+    display: block;
+    margin-bottom: 28px;
+    color: rgba(255, 255, 255, 0.3);
+    font-size: 0.75rem;
+    letter-spacing: 0.15em;
+}
+
+.menu-card h3 {
+    position: relative;
+    z-index: 1;
+    margin: 0 0 18px;
+    font-family: "Playfair Display", serif;
+    font-size: 1.6rem;
+    letter-spacing: 0.04em;
+}
+
+.menu-detail {
+    position: relative;
+    z-index: 1;
+    min-height: 50px;
+    margin: 0;
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.9rem;
+    line-height: 1.6;
+}
+
+.menu-price {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.menu-price span {
+    color: rgba(255, 255, 255, 0.4);
+    font-size: 0.68rem;
+    letter-spacing: 0.12em;
+}
+
+.menu-price strong {
+    color: #22d3ee;
+    font-size: 1.15rem;
+    font-weight: 600;
+}
+
+.menus-loading {
+    text-align: center;
+    color: rgba(255, 255, 255, 0.5);
+}
+
+@media (max-width: 850px) {
+    .menus-grid {
+        grid-template-columns: 1fr;
+        max-width: 600px;
+    }
+}
+
+@media (max-width: 700px) {
+    .menus-section {
+        padding: 75px 20px;
+    }
+
+    .menus-header h2 {
+        font-size: 2rem;
+    }
+
+    .menu-card {
+        padding: 28px;
+    }
+}

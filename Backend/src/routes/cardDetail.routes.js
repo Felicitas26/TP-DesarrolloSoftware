@@ -1,7 +1,7 @@
-import express from "express";
+import { Router } from "express";
 import cardDetailController from "../controllers/cardDetail.controller.js";
 
-const router = express.Router();
+const router = Router();
 
 router.get("/", cardDetailController.getAll);
 router.get("/:id", cardDetailController.getById);

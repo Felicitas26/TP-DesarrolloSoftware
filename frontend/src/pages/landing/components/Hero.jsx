@@ -1,6 +1,9 @@
+import { useNavigate } from "react-router-dom";
 import "./Hero.css";
 
 function Hero() {
+  const navigate = useNavigate();
+
   return (
     <section id="inicio" className="hero">
       <div className="hero-background" aria-hidden="true">
@@ -13,13 +16,22 @@ function Hero() {
 
       <div className="hero-content">
         <h1 className="hero-title">BIENVENIDOS A STYLO</h1>
-        <p className="hero-subtitle">CELEBRA TUS MOMENTOS INOLVIDABLES</p>
-        <a href="#reservas" className="hero-cta">
+
+        <p className="hero-subtitle">
+          CELEBRA TUS MOMENTOS INOLVIDABLES
+        </p>
+
+        <button
+          type="button"
+          className="hero-cta"
+          onClick={() => navigate("/login")}
+        >
           EMPIEZA TU RESERVA
-        </a>
+        </button>
       </div>
     </section>
   );
 }
 
 export default Hero;
+

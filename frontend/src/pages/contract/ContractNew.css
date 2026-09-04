@@ -1,0 +1,67 @@
+.contract-new-container {
+    max-width: 700px;
+    margin: 0 auto;
+    padding: 32px;
+    background-color: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.contract-new-container h1 {
+    margin: 0;
+    color: #0f172a;
+    font-size: 1.5rem;
+}
+
+.contract-new-container > p {
+    margin: 6px 0 24px;
+    color: #64748b;
+    font-size: 0.9rem;
+}
+
+.contract-new-container form {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.contract-new-field {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+}
+
+.contract-new-field label {
+    color: #334155;
+    font-size: 0.82rem;
+    font-weight: 600;
+}
+
+.contract-new-field input {
+    padding: 11px 12px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    outline: none;
+}
+
+.contract-new-field input:focus {
+    border-color: #0284c7;
+    box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.1);
+}
+
+.contract-new-container button {
+    margin-top: 5px;
+    padding: 11px;
+    border: none;
+    border-radius: 8px;
+    background-color: #0284c7;
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.contract-new-container button:hover {
+    background-color: #0369a1;
+}

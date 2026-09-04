@@ -7,37 +7,19 @@ class ContractService {
     }
 
     async getById(id) {
-        const contract = await contractModel.getById(id);
-        if (!contract) {
-            throw { statusCode: 404, message: `Contrato con ID ${id} no encontrado.` };
-        }
-        return contract;
+        return await contractModel.getById(id);
     }
 
     async create(contract) {
-        const { eventStartTime, eventEndTime } = contract;
-
-        if (!eventStartTime || !eventEndTime) {
-            throw { statusCode: 400, message: "Todos los campos son obligatorios." };
-        }
-
         return await contractModel.create(contract);
     }
 
     async update(id, contract) {
-        const updated = await contractModel.update(id, contract);
-        if (!updated) {
-            throw { statusCode: 404, message: "No se ha encontrado el contrato." };
-        }
-        return updated;
+        return await contractModel.update(id, contract);
     }
 
     async delete(id) {
-        const deleted = await contractModel.delete(id);
-        if (!deleted) {
-            throw { statusCode: 404, message: "No se ha encontrado el contrato." };
-        }
-        return deleted;
+        return await contractModel.delete(id);
     }
 }
 

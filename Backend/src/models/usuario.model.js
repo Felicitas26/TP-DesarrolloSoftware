@@ -21,6 +21,7 @@ class UsuarioModel {
              WHERE u.idUsuario = ?`,
             [id]
         );
+
         return rows[0];
     }
 
@@ -29,6 +30,7 @@ class UsuarioModel {
             "SELECT * FROM usuario WHERE username = ?",
             [username]
         );
+
         return rows[0];
     }
 
@@ -37,6 +39,7 @@ class UsuarioModel {
             "SELECT * FROM client WHERE dniCli = ?",
             [dni]
         );
+
         return rows[0];
     }
 
@@ -45,23 +48,35 @@ class UsuarioModel {
             "SELECT * FROM usuario WHERE idCli = ?",
             [idCli]
         );
+
         return rows[0];
     }
 
     async create({ username, password, rol, idCli, passwordTemporal }) {
         const [result] = await db.execute(
-            `INSERT INTO usuario (username, password, rol, idCli, passwordTemporal)
-             VALUES (?, ?, ?, ?, ?)`,
-            [username, password, rol, idCli ?? null, passwordTemporal === undefined ? 1 : passwordTemporal]
+            `INSERT INTO usuario
+            (username, password, rol, idCli, passwordTemporal)
+            VALUES (?, ?, ?, ?, ?)`,
+            [
+                username,
+                password,
+                rol,
+                idCli ?? null,
+                passwordTemporal === undefined ? 1 : passwordTemporal
+            ]
         );
+
         return this.findById(result.insertId);
     }
 
     async updatePassword(id, passwordHash) {
         await db.execute(
-            "UPDATE usuario SET password = ?, passwordTemporal = 0 WHERE idUsuario = ?",
+            `UPDATE usuario
+             SET password = ?, passwordTemporal = 0
+             WHERE idUsuario = ?`,
             [passwordHash, id]
         );
+
         return this.findById(id);
     }
 
@@ -74,7 +89,55 @@ class UsuarioModel {
         if (result.affectedRows === 0) {
             return null;
         }
+
         return true;
+    }
+
+    // ADMINISTRADORES
+
+    async getAllAdministradores() {
+        const [rows] = await db.execute(
+            `SELECT idUsuario,
+                    username,
+                    rol,
+                    passwordTemporal
+             FROM usuario
+             WHERE rol = 'administrador'`
+        );
+
+        return rows;
+    }
+
+    async updateAdministrador(id, { username, password }) {
+
+        if (password) {
+            const [result] = await db.execute(
+                `UPDATE usuario
+                 SET username = ?,
+                     password = ?
+                 WHERE idUsuario = ?
+                 AND rol = 'administrador'`,
+                [username, password, id]
+            );
+
+            if (result.affectedRows === 0) {
+                return null;
+            }
+        } else {
+            const [result] = await db.execute(
+                `UPDATE usuario
+                 SET username = ?
+                 WHERE idUsuario = ?
+                 AND rol = 'administrador'`,
+                [username, id]
+            );
+
+            if (result.affectedRows === 0) {
+                return null;
+            }
+        }
+
+        return this.findById(id);
     }
 }
 

@@ -7,19 +7,29 @@ class UsuarioService {
 
     async getPerfil(idUsuario) {
         const usuario = await usuarioModel.findById(idUsuario);
+
         if (!usuario) {
-            throw { statusCode: 404, message: "Usuario no encontrado." };
+            throw {
+                statusCode: 404,
+                message: "Usuario no encontrado."
+            };
         }
+
         const { password, ...perfil } = usuario;
+
         return perfil;
     }
 
     async registerCliente({ dniCli, passwordNueva }) {
         if (!dniCli || !passwordNueva) {
-            throw { statusCode: 400, message: "El DNI y la contraseña son obligatorios." };
+            throw {
+                statusCode: 400,
+                message: "El DNI y la contraseña son obligatorios."
+            };
         }
 
         const client = await usuarioModel.findByDni(dniCli);
+
         if (!client) {
             throw {
                 statusCode: 404,
@@ -28,6 +38,7 @@ class UsuarioService {
         }
 
         const existing = await usuarioModel.findByCli(client.idCli);
+
         if (existing) {
             throw {
                 statusCode: 409,
@@ -36,7 +47,10 @@ class UsuarioService {
         }
 
         const email = client.emailCli;
-        const usernameExists = await usuarioModel.findByUsername(email);
+
+        const usernameExists =
+            await usuarioModel.findByUsername(email);
+
         if (usernameExists) {
             throw {
                 statusCode: 409,
@@ -44,7 +58,8 @@ class UsuarioService {
             };
         }
 
-        const passwordHash = await bcrypt.hash(passwordNueva, SALT_ROUNDS);
+        const passwordHash =
+            await bcrypt.hash(passwordNueva, SALT_ROUNDS);
 
         return usuarioModel.create({
             username: email,
@@ -57,6 +72,7 @@ class UsuarioService {
 
     async registerClienteAdmin({ idCli, passwordProvisoria }) {
         const usuario = await usuarioModel.findByCli(idCli);
+
         if (usuario) {
             throw {
                 statusCode: 409,
@@ -64,7 +80,8 @@ class UsuarioService {
             };
         }
 
-        const passwordHash = await bcrypt.hash(passwordProvisoria, SALT_ROUNDS);
+        const passwordHash =
+            await bcrypt.hash(passwordProvisoria, SALT_ROUNDS);
 
         return usuarioModel.create({
             username: null,
@@ -77,30 +94,177 @@ class UsuarioService {
 
     async cambiarPassword(idUsuario, { passwordActual, passwordNueva }) {
         if (!passwordActual || !passwordNueva) {
-            throw { statusCode: 400, message: "Debe ingresar la contraseña actual y la nueva." };
+            throw {
+                statusCode: 400,
+                message: "Debe ingresar la contraseña actual y la nueva."
+            };
         }
 
         const usuario = await usuarioModel.findById(idUsuario);
+
         if (!usuario) {
-            throw { statusCode: 404, message: "Usuario no encontrado." };
+            throw {
+                statusCode: 404,
+                message: "Usuario no encontrado."
+            };
         }
 
-        const match = await bcrypt.compare(passwordActual, usuario.password);
+        const match =
+            await bcrypt.compare(passwordActual, usuario.password);
+
         if (!match) {
-            throw { statusCode: 400, message: "La contraseña actual es incorrecta." };
+            throw {
+                statusCode: 400,
+                message: "La contraseña actual es incorrecta."
+            };
         }
 
-        const passwordHash = await bcrypt.hash(passwordNueva, SALT_ROUNDS);
-        const updated = await usuarioModel.updatePassword(idUsuario, passwordHash);
+        const passwordHash =
+            await bcrypt.hash(passwordNueva, SALT_ROUNDS);
+
+        const updated =
+            await usuarioModel.updatePassword(
+                idUsuario,
+                passwordHash
+            );
+
         const { password, ...perfil } = updated;
+
         return perfil;
     }
 
     async darDeBaja(idUsuario) {
-        const deleted = await usuarioModel.delete(idUsuario);
+        const deleted =
+            await usuarioModel.delete(idUsuario);
+
         if (!deleted) {
-            throw { statusCode: 404, message: "No se ha encontrado la cuenta." };
+            throw {
+                statusCode: 404,
+                message: "No se ha encontrado la cuenta."
+            };
         }
+
+        return deleted;
+    }
+
+    // ADMINISTRADORES
+
+    async getAllAdministradores() {
+        return await usuarioModel.getAllAdministradores();
+    }
+
+    async createAdministrador({ username, password }) {
+
+        if (!username || !password) {
+            throw {
+                statusCode: 400,
+                message: "El usuario y la contraseña son obligatorios."
+            };
+        }
+
+        const existing =
+            await usuarioModel.findByUsername(username);
+
+        if (existing) {
+            throw {
+                statusCode: 409,
+                message: "Ya existe un usuario con ese nombre."
+            };
+        }
+
+        const passwordHash =
+            await bcrypt.hash(password, SALT_ROUNDS);
+
+        return usuarioModel.create({
+            username,
+            password: passwordHash,
+            rol: "administrador",
+            idCli: null,
+            passwordTemporal: 0
+        });
+    }
+
+    async updateAdministrador(id, { username, password }) {
+
+        if (!username) {
+            throw {
+                statusCode: 400,
+                message: "El usuario es obligatorio."
+            };
+        }
+
+        const administrador =
+            await usuarioModel.findById(id);
+
+        if (
+            !administrador ||
+            administrador.rol !== "administrador"
+        ) {
+            throw {
+                statusCode: 404,
+                message: "Administrador no encontrado."
+            };
+        }
+
+        const existing =
+            await usuarioModel.findByUsername(username);
+
+        if (
+            existing &&
+            existing.idUsuario !== Number(id)
+        ) {
+            throw {
+                statusCode: 409,
+                message: "Ya existe un usuario con ese nombre."
+            };
+        }
+
+        let passwordHash = null;
+
+        if (password) {
+            passwordHash =
+                await bcrypt.hash(password, SALT_ROUNDS);
+        }
+
+        const updated =
+            await usuarioModel.updateAdministrador(
+                id,
+                {
+                    username,
+                    password: passwordHash
+                }
+            );
+
+        const { password: _, ...perfil } = updated;
+
+        return perfil;
+    }
+
+    async deleteAdministrador(id) {
+
+        const administrador =
+            await usuarioModel.findById(id);
+
+        if (
+            !administrador ||
+            administrador.rol !== "administrador"
+        ) {
+            throw {
+                statusCode: 404,
+                message: "Administrador no encontrado."
+            };
+        }
+
+        const deleted =
+            await usuarioModel.delete(id);
+
+        if (!deleted) {
+            throw {
+                statusCode: 404,
+                message: "Administrador no encontrado."
+            };
+        }
+
         return deleted;
     }
 }

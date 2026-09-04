@@ -55,6 +55,13 @@ function Home() {
       route: "/loungeType",
       icon: <IconLayers />,
       accent: "indigo"
+    },
+    {
+    title: "Reservas",
+    description: "Administración de reservas registradas",
+    route: "/reservation",
+    icon: <IconReservation />,
+    accent: "indigo"
     }
   ];
 

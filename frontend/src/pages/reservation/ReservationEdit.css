@@ -1,0 +1,91 @@
+.reservation-edit-container {
+    max-width: 700px;
+    margin: 0 auto;
+    padding: 32px;
+    background-color: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.reservation-edit-container h1 {
+    margin: 0;
+    color: #0f172a;
+    font-size: 1.5rem;
+}
+
+.reservation-edit-container > p {
+    margin: 6px 0 24px;
+    color: #64748b;
+    font-size: 0.9rem;
+}
+
+.reservation-edit-container form {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    margin-top: 24px;
+}
+
+.reservation-edit-field {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+}
+
+.reservation-edit-field label {
+    color: #334155;
+    font-size: 0.82rem;
+    font-weight: 600;
+}
+
+.reservation-edit-field input,
+.reservation-edit-field select {
+    padding: 11px 12px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    background-color: #ffffff;
+    color: #0f172a;
+    font-size: 0.9rem;
+    outline: none;
+}
+
+.reservation-edit-field input:focus,
+.reservation-edit-field select:focus {
+    border-color: #0284c7;
+    box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.1);
+}
+
+.reservation-edit-buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 5px;
+}
+
+.reservation-update-button,
+.reservation-delete-button {
+    padding: 11px 18px;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.reservation-update-button {
+    background-color: #0284c7;
+    color: #ffffff;
+}
+
+.reservation-update-button:hover {
+    background-color: #0369a1;
+}
+
+.reservation-delete-button {
+    background-color: #fee2e2;
+    color: #dc2626;
+}
+
+.reservation-delete-button:hover {
+    background-color: #fecaca;
+}
