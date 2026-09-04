@@ -24,9 +24,14 @@ function NewCardDetail() {
     const [form, setForm] = useState({
         menuStage: "",
         detail: "",
-        budget: ""
+        budget: "",
+        entrada: "",
+        platoPrincipal: "",
+        postre: ""
     });
 
+    const [imageFile, setImageFile] = useState(null);
+    const [imagePreview, setImagePreview] = useState(null);
     const [saving, setSaving] = useState(false);
 
     const handleChange = (e) => {
@@ -39,6 +44,18 @@ function NewCardDetail() {
         }));
     };
 
+    const handleImageChange = (e) => {
+
+        const file = e.target.files[0];
+
+        if (!file) {
+            return;
+        }
+
+        setImageFile(file);
+        setImagePreview(URL.createObjectURL(file));
+    };
+
     const handleSubmit = async (e) => {
 
         e.preventDefault();
@@ -47,19 +64,27 @@ function NewCardDetail() {
 
         try {
 
+            const formData = new FormData();
+
+            formData.append("menuStage", form.menuStage);
+            formData.append("detail", form.detail);
+            formData.append("budget", form.budget);
+            formData.append("entrada", form.entrada);
+            formData.append("platoPrincipal", form.platoPrincipal);
+            formData.append("postre", form.postre);
+
+            if (imageFile) {
+                formData.append("image", imageFile);
+            }
+
             const response = await fetch(
                 "http://localhost:3000/api/cardDetail",
                 {
                     method: "POST",
                     headers: {
-                        "Content-Type": "application/json",
                         Authorization: `Bearer ${localStorage.getItem("sty_token")}`
                     },
-                    body: JSON.stringify({
-                        menuStage: form.menuStage,
-                        detail: form.detail,
-                        budget: Number(form.budget)
-                    })
+                    body: formData
                 }
             );
 
@@ -133,7 +158,7 @@ function NewCardDetail() {
                                         name="menuStage"
                                         value={form.menuStage}
                                         onChange={handleChange}
-                                        placeholder="Ej: Menú de hamburguesas"
+                                        placeholder="Ej: Stylo Clásico"
                                         required
                                     />
 
@@ -155,7 +180,33 @@ function NewCardDetail() {
 
                                 </div>
 
-                                <div className="form-group">
+                                <div className="form-group form-group-full">
+
+                                    <label>Imagen del Menú</label>
+
+                                    <input
+                                        type="file"
+                                        name="image"
+                                        accept="image/*"
+                                        onChange={handleImageChange}
+                                    />
+
+                                    <p className="form-hint">
+                                        JPG, PNG, WEBP o GIF. Máximo 5 MB.
+                                    </p>
+
+                                    {imagePreview && (
+                                        <div className="image-preview">
+                                            <img
+                                                src={imagePreview}
+                                                alt="Vista previa del menú"
+                                            />
+                                        </div>
+                                    )}
+
+                                </div>
+
+                                <div className="form-group form-group-full">
 
                                     <label>Detalle</label>
 
@@ -163,8 +214,47 @@ function NewCardDetail() {
                                         name="detail"
                                         value={form.detail}
                                         onChange={handleChange}
-                                        placeholder="Descripción del menú..."
+                                        placeholder="Descripción general del menú..."
                                         required
+                                    />
+
+                                </div>
+
+                                <div className="form-group form-group-full">
+
+                                    <label>Entrada</label>
+
+                                    <textarea
+                                        name="entrada"
+                                        value={form.entrada}
+                                        onChange={handleChange}
+                                        placeholder="Descripción de la entrada..."
+                                    />
+
+                                </div>
+
+                                <div className="form-group form-group-full">
+
+                                    <label>Plato Principal</label>
+
+                                    <textarea
+                                        name="platoPrincipal"
+                                        value={form.platoPrincipal}
+                                        onChange={handleChange}
+                                        placeholder="Descripción del plato principal..."
+                                    />
+
+                                </div>
+
+                                <div className="form-group form-group-full">
+
+                                    <label>Postre</label>
+
+                                    <textarea
+                                        name="postre"
+                                        value={form.postre}
+                                        onChange={handleChange}
+                                        placeholder="Descripción del postre..."
                                     />
 
                                 </div>

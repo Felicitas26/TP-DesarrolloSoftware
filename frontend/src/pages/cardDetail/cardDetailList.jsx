@@ -140,6 +140,7 @@ function CardDetailList() {
                                 <thead>
 
                                     <tr>
+                                        <th>Imagen</th>
                                         <th>Menú</th>
                                         <th>Detalle</th>
                                         <th>Presupuesto</th>
@@ -157,6 +158,20 @@ function CardDetailList() {
                                         cardDetails.map((cardDetail) => (
 
                                             <tr key={cardDetail.idCardDetail}>
+
+                                                <td>
+                                                    {cardDetail.imageUrl ? (
+                                                        <img
+                                                            className="menu-table-thumb"
+                                                            src={`http://localhost:3000${cardDetail.imageUrl}`}
+                                                            alt={cardDetail.menuStage}
+                                                        />
+                                                    ) : (
+                                                        <span className="menu-table-noimage">
+                                                            Sin imagen
+                                                        </span>
+                                                    )}
+                                                </td>
 
                                                 <td className="font-semibold">
                                                     {cardDetail.menuStage}
@@ -216,7 +231,7 @@ function CardDetailList() {
                                         <tr>
 
                                             <td
-                                                colSpan="4"
+                                                colSpan="5"
                                                 className="empty-table"
                                             >
                                                 No hay menúes registrados.
@@ -261,6 +276,15 @@ function CardDetailList() {
 
                         <div className="modal-detail-grid">
 
+                            {cardDetailToView.imageUrl && (
+                                <div className="detail-item detail-image-item">
+                                    <img
+                                        src={`http://localhost:3000${cardDetailToView.imageUrl}`}
+                                        alt={cardDetailToView.menuStage}
+                                    />
+                                </div>
+                            )}
+
                             <div className="detail-item">
                                 <label>Menú:</label>
                                 <span>
@@ -284,6 +308,33 @@ function CardDetailList() {
                                     ).toLocaleString("es-AR")}
                                 </span>
                             </div>
+
+                            {cardDetailToView.entrada && (
+                                <div className="detail-item">
+                                    <label>Entrada:</label>
+                                    <span>
+                                        {cardDetailToView.entrada}
+                                    </span>
+                                </div>
+                            )}
+
+                            {cardDetailToView.platoPrincipal && (
+                                <div className="detail-item">
+                                    <label>Plato Principal:</label>
+                                    <span>
+                                        {cardDetailToView.platoPrincipal}
+                                    </span>
+                                </div>
+                            )}
+
+                            {cardDetailToView.postre && (
+                                <div className="detail-item">
+                                    <label>Postre:</label>
+                                    <span>
+                                        {cardDetailToView.postre}
+                                    </span>
+                                </div>
+                            )}
 
                         </div>
 

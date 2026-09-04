@@ -13,10 +13,14 @@ enum Rol {
 }
 
 model CardDetail {
-  idCardDetail Int      @id @default(autoincrement())
-  menuStage    String   @db.VarChar(100)
-  detail       String   @db.VarChar(255)
-  budget       Decimal  @db.Decimal(10, 2)
+  idCardDetail  Int      @id @default(autoincrement())
+  menuStage     String   @db.VarChar(100)
+  detail        String   @db.VarChar(255)
+  budget        Decimal  @db.Decimal(10, 2)
+  imageUrl      String?  @db.VarChar(255)
+  entrada       String?  @db.VarChar(500)
+  platoPrincipal String? @db.VarChar(500)
+  postre        String?  @db.VarChar(500)
 
   reservations Reservation[]
 }

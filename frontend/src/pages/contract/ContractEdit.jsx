@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import FeedbackModal from "../../components/FeedbackModal";
 import "./ContractEdit.css";
 
 function ContractEdit() {
@@ -11,6 +12,8 @@ function ContractEdit() {
         finalValue: "",
         idReservation: ""
     });
+
+    const [feedback, setFeedback] = useState(null);
 
     const getContracts = async () => {
 
@@ -29,7 +32,7 @@ function ContractEdit() {
 
         } catch (error) {
             console.error(error);
-            alert(error.message);
+            setFeedback({ type: "error", title: "Error", message: error.message });
         }
     };
 
@@ -74,7 +77,7 @@ function ContractEdit() {
 
         } catch (error) {
             console.error(error);
-            alert(error.message);
+            setFeedback({ type: "error", title: "Error", message: error.message });
         }
     };
 
@@ -112,25 +115,23 @@ function ContractEdit() {
                 throw new Error(data.error);
             }
 
-            alert("Contrato actualizado correctamente.");
+            setFeedback({ type: "success", title: "Contrato actualizado", message: "El contrato se actualizó correctamente." });
 
             await getContracts();
 
         } catch (error) {
             console.error(error);
-            alert(error.message);
+            setFeedback({ type: "error", title: "Error", message: error.message });
         }
     };
 
-    const handleDelete = async () => {
+    const handleDeleteClick = () => {
+        setFeedback({ type: "confirm", title: "Eliminar contrato", message: "¿Está seguro de que desea eliminar este contrato?", confirmLabel: "Eliminar", onConfirm: handleDeleteConfirm, onCancel: () => setFeedback(null) });
+    };
 
-        const confirmDelete = window.confirm(
-            "¿Está seguro de que desea eliminar este contrato?"
-        );
+    const handleDeleteConfirm = async () => {
 
-        if (!confirmDelete) {
-            return;
-        }
+        setFeedback(null);
 
         try {
             const response = await fetch(
@@ -146,7 +147,7 @@ function ContractEdit() {
                 throw new Error(data.error);
             }
 
-            alert("Contrato eliminado correctamente.");
+            setFeedback({ type: "success", title: "Contrato eliminado", message: "El contrato se eliminó correctamente." });
 
             setSelectedId("");
 
@@ -161,7 +162,7 @@ function ContractEdit() {
 
         } catch (error) {
             console.error(error);
-            alert(error.message);
+            setFeedback({ type: "error", title: "Error", message: error.message });
         }
     };
 
@@ -263,7 +264,7 @@ function ContractEdit() {
                         <button
                             type="button"
                             className="contract-delete-button"
-                            onClick={handleDelete}
+                            onClick={handleDeleteClick}
                         >
                             Eliminar contrato
                         </button>
@@ -272,6 +273,19 @@ function ContractEdit() {
 
                 </form>
 
+            )}
+
+            {feedback && (
+                <FeedbackModal
+                    type={feedback.type}
+                    title={feedback.title}
+                    message={feedback.message}
+                    onClose={() => setFeedback(null)}
+                    onConfirm={feedback.onConfirm}
+                    confirmLabel={feedback.confirmLabel}
+                    cancelLabel="Cancelar"
+                    onCancel={feedback.onCancel}
+                />
             )}
 
         </div>

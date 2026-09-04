@@ -13,19 +13,23 @@ class CardDetailModel {
     }
 
     async create(cardDetail) {
-        const { menuStage, detail, budget } = cardDetail;
+        const { menuStage, detail, budget, imageUrl, entrada, platoPrincipal, postre } = cardDetail;
 
         return await prisma.cardDetail.create({
             data: {
                 menuStage,
                 detail,
-                budget: Number(budget)
+                budget: Number(budget),
+                imageUrl: imageUrl || null,
+                entrada: entrada || null,
+                platoPrincipal: platoPrincipal || null,
+                postre: postre || null
             }
         });
     }
 
     async update(id, cardDetail) {
-        const { menuStage, detail, budget } = cardDetail;
+        const { menuStage, detail, budget, imageUrl, entrada, platoPrincipal, postre } = cardDetail;
 
         try {
             return await prisma.cardDetail.update({
@@ -33,7 +37,11 @@ class CardDetailModel {
                 data: {
                     menuStage,
                     detail,
-                    budget: Number(budget)
+                    budget: Number(budget),
+                    imageUrl: imageUrl || null,
+                    entrada: entrada || null,
+                    platoPrincipal: platoPrincipal || null,
+                    postre: postre || null
                 }
             });
         } catch {

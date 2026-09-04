@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import FeedbackModal from "../../components/FeedbackModal";
 import "./MyReservations.css";
 
 const IconTrash = () => (
@@ -17,6 +18,9 @@ function MyReservations() {
     const [reservations, setReservations] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+
+    const [feedback, setFeedback] = useState(null);
+    const [reservationToDeleteId, setReservationToDeleteId] = useState(null);
 
     useEffect(() => {
 
@@ -79,15 +83,16 @@ function MyReservations() {
         return "Cantidad no especificada";
     };
 
-    const deleteReservation = async (id) => {
+    const handleDeleteClick = (id) => {
+        setReservationToDeleteId(id);
+        setFeedback({ type: "confirm", title: "Eliminar reserva", message: "¿Estás seguro de que querés eliminar esta solicitud de reserva?", confirmLabel: "Eliminar", onConfirm: handleDeleteConfirm, onCancel: () => { setFeedback(null); setReservationToDeleteId(null); } });
+    };
 
-        const confirmDelete = window.confirm(
-            "¿Estás seguro de que querés eliminar esta solicitud de reserva?"
-        );
+    const handleDeleteConfirm = async () => {
 
-        if (!confirmDelete) {
-            return;
-        }
+        const id = reservationToDeleteId;
+        setFeedback(null);
+        setReservationToDeleteId(null);
 
         const token = localStorage.getItem("sty_token");
 
@@ -117,8 +122,10 @@ function MyReservations() {
                 )
             );
 
+            setFeedback({ type: "success", title: "Reserva eliminada", message: "La reserva se eliminó correctamente." });
+
         } catch (err) {
-            alert(err.message);
+            setFeedback({ type: "error", title: "Error", message: err.message });
         }
     };
 
@@ -204,7 +211,7 @@ function MyReservations() {
                                         <button
                                             className="my-reservation-delete"
                                             onClick={() =>
-                                                deleteReservation(
+                                                handleDeleteClick(
                                                     reservation.idReservation
                                                 )
                                             }
@@ -310,6 +317,19 @@ function MyReservations() {
                 </span>
 
             </footer>
+
+            {feedback && (
+                <FeedbackModal
+                    type={feedback.type}
+                    title={feedback.title}
+                    message={feedback.message}
+                    onClose={() => { setFeedback(null); setReservationToDeleteId(null); }}
+                    onConfirm={feedback.onConfirm}
+                    confirmLabel={feedback.confirmLabel}
+                    cancelLabel="Cancelar"
+                    onCancel={feedback.onCancel}
+                />
+            )}
 
         </div>
     );

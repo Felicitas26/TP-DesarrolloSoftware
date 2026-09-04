@@ -3,6 +3,7 @@ dotenv.config();
 
 import express from "express";
 import cors from "cors";
+import path from "path";
 
 import clientRoutes from "./src/routes/client.routes.js";
 import loungeRoutes from "./src/routes/lounge.routes.js";
@@ -20,6 +21,8 @@ const app = express();
 app.use(cors());
 
 app.use(express.json());
+
+app.use("/uploads", express.static(path.resolve("uploads")));
 
 app.use("/api/client", clientRoutes);
 app.use("/api/lounge", loungeRoutes);

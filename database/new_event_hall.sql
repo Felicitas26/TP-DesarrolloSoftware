@@ -25,28 +25,48 @@ CREATE TABLE carddetail (
     menuStage VARCHAR(100) NOT NULL,
     detail VARCHAR(255) NOT NULL,
     budget DECIMAL(10,2) NOT NULL,
+    imageUrl VARCHAR(255) DEFAULT NULL,
+    entrada VARCHAR(500) DEFAULT NULL,
+    platoPrincipal VARCHAR(500) DEFAULT NULL,
+    postre VARCHAR(500) DEFAULT NULL,
     PRIMARY KEY (idCardDetail)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 INSERT INTO carddetail (
     menuStage,
     detail,
-    budget
+    budget,
+    imageUrl,
+    entrada,
+    platoPrincipal,
+    postre
 ) VALUES
 (
-    'Menú de hamburguesas',
-    'Hamburguesas con acompañamiento',
-    15000.00
+    'Stylo Clásico',
+    'Ideal para eventos cálidos, familiares y divertidos.',
+    85000.00,
+    NULL,
+    'Picada de fiambres artesanales de la región con selección de quesos duros y blandos, pan de campo y dips caseros.',
+    'Pollo relleno de jamón, queso y morrón acompañada de puré rústico o papas españolas.',
+    'Clásico brownie tibio de chocolate amargo coronado con bocha de helado de americana y hilos de frutos rojos.'
 ),
 (
-    'Menú de pastas',
-    'Pastas con salsa a elección',
-    12000.00
+    'Stylo Elegante',
+    'Perfecto para bodas de noche o eventos formales.',
+    120000.00,
+    NULL,
+    'Bruschettas de pan de masa madre con salmón ahumado, queso crema alimonado y alcaparras.',
+    'Sorrentinos caseros de calabaza y mozzarella con una sutil salsa de crema al verdeo y crocante de almendras tostadas.',
+    'Copa helada de autor con capas de helado de maracuyá, crumble crujiente de almendras y reducción de frutos tropicales.'
 ),
 (
-    'Menú de mariscos',
-    'Variedad de mariscos y acompañamiento',
-    20000.00
+    'Stylo Fest',
+    'Pensado especialmente para Fiestas de 15 o celebraciones jóvenes.',
+    95000.00,
+    NULL,
+    'Cazuelitas de rabas crocantes con rodajas de limón y emulsión de alioli suave.',
+    'Milanesa napolitana individual de ternera acompañada de una torre de papas fritas rústicas doradas al horno.',
+    'Bombón suizo bañado en chocolate semiamargo con corazón de dulce de leche granizado y lluvia de nueces.'
 );
 
 

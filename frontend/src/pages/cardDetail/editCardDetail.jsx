@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import FeedbackModal from "../../components/FeedbackModal";
 import "./editCardDetail.css";
 
 const IconMenu = () => (
@@ -32,12 +33,20 @@ function EditCardDetail() {
     const [form, setForm] = useState({
         menuStage: "",
         detail: "",
-        budget: ""
+        budget: "",
+        entrada: "",
+        platoPrincipal: "",
+        postre: ""
     });
+
+    const [imageUrl, setImageUrl] = useState(null);
+    const [imageFile, setImageFile] = useState(null);
 
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [deleting, setDeleting] = useState(false);
+
+    const [feedback, setFeedback] = useState(null);
 
     const fetchCardDetail = async () => {
 
@@ -63,13 +72,17 @@ function EditCardDetail() {
             setForm({
                 menuStage: data.menuStage || "",
                 detail: data.detail || "",
-                budget: data.budget || ""
+                budget: data.budget || "",
+                entrada: data.entrada || "",
+                platoPrincipal: data.platoPrincipal || "",
+                postre: data.postre || ""
             });
+
+            setImageUrl(data.imageUrl || "");
 
         } catch (error) {
 
-            alert(error.message);
-            navigate("/cardDetail");
+            setFeedback({ type: "error", title: "Error", message: error.message });
 
         } finally {
 
@@ -92,6 +105,17 @@ function EditCardDetail() {
         }));
     };
 
+    const handleImageChange = (e) => {
+
+        const file = e.target.files[0];
+
+        if (!file) {
+            return;
+        }
+
+        setImageFile(file);
+    };
+
     const handleSubmit = async (e) => {
 
         e.preventDefault();
@@ -100,19 +124,27 @@ function EditCardDetail() {
 
         try {
 
+            const formData = new FormData();
+
+            formData.append("menuStage", form.menuStage);
+            formData.append("detail", form.detail);
+            formData.append("budget", form.budget);
+            formData.append("entrada", form.entrada);
+            formData.append("platoPrincipal", form.platoPrincipal);
+            formData.append("postre", form.postre);
+
+            if (imageFile) {
+                formData.append("image", imageFile);
+            }
+
             const response = await fetch(
                 `http://localhost:3000/api/cardDetail/${id}`,
                 {
                     method: "PUT",
                     headers: {
-                        "Content-Type": "application/json",
                         Authorization: `Bearer ${localStorage.getItem("sty_token")}`
                     },
-                    body: JSON.stringify({
-                        menuStage: form.menuStage,
-                        detail: form.detail,
-                        budget: Number(form.budget)
-                    })
+                    body: formData
                 }
             );
 
@@ -124,13 +156,11 @@ function EditCardDetail() {
                 );
             }
 
-            alert("Menú actualizado correctamente.");
-
-            navigate("/cardDetail");
+            setFeedback({ type: "success", title: "Menú actualizado", message: "El menú se actualizó correctamente.", onClose: () => { setFeedback(null); navigate("/cardDetail"); } });
 
         } catch (error) {
 
-            alert(error.message);
+            setFeedback({ type: "error", title: "Error", message: error.message });
 
         } finally {
 
@@ -139,16 +169,13 @@ function EditCardDetail() {
         }
     };
 
-    const handleDelete = async () => {
+    const handleDeleteClick = () => {
+        setFeedback({ type: "confirm", title: "Eliminar menú", message: "¿Está seguro de que desea eliminar este menú?", confirmLabel: "Eliminar", onConfirm: handleDeleteConfirm, onCancel: () => setFeedback(null) });
+    };
 
-        const confirmDelete = window.confirm(
-            "¿Está seguro de que desea eliminar este menú?"
-        );
+    const handleDeleteConfirm = async () => {
 
-        if (!confirmDelete) {
-            return;
-        }
-
+        setFeedback(null);
         setDeleting(true);
 
         try {
@@ -171,13 +198,13 @@ function EditCardDetail() {
                 );
             }
 
-            alert("Menú eliminado correctamente.");
+            setFeedback({ type: "success", title: "Menú eliminado", message: "El menú se eliminó correctamente." });
 
             navigate("/cardDetail");
 
         } catch (error) {
 
-            alert(error.message);
+            setFeedback({ type: "error", title: "Error", message: error.message });
 
         } finally {
 
@@ -272,7 +299,36 @@ function EditCardDetail() {
 
                                 </div>
 
-                                <div className="form-group">
+                                <div className="form-group form-group-full">
+
+                                    <label>Imagen del Menú</label>
+
+                                    <input
+                                        type="file"
+                                        name="image"
+                                        accept="image/*"
+                                        onChange={handleImageChange}
+                                    />
+
+                                    <p className="form-hint">
+                                        JPG, PNG, WEBP o GIF. Máximo 5 MB.
+                                        {imageFile && " Nueva imagen seleccionada."}
+                                    </p>
+
+                                    {(imageFile || imageUrl) && (
+                                        <div className="image-preview">
+                                            <img
+                                                src={imageFile
+                                                    ? URL.createObjectURL(imageFile)
+                                                    : `http://localhost:3000${imageUrl}`}
+                                                alt="Vista previa del menú"
+                                            />
+                                        </div>
+                                    )}
+
+                                </div>
+
+                                <div className="form-group form-group-full">
 
                                     <label>Detalle</label>
 
@@ -281,6 +337,45 @@ function EditCardDetail() {
                                         value={form.detail}
                                         onChange={handleChange}
                                         required
+                                    />
+
+                                </div>
+
+                                <div className="form-group form-group-full">
+
+                                    <label>Entrada</label>
+
+                                    <textarea
+                                        name="entrada"
+                                        value={form.entrada}
+                                        onChange={handleChange}
+                                        placeholder="Descripción de la entrada..."
+                                    />
+
+                                </div>
+
+                                <div className="form-group form-group-full">
+
+                                    <label>Plato Principal</label>
+
+                                    <textarea
+                                        name="platoPrincipal"
+                                        value={form.platoPrincipal}
+                                        onChange={handleChange}
+                                        placeholder="Descripción del plato principal..."
+                                    />
+
+                                </div>
+
+                                <div className="form-group form-group-full">
+
+                                    <label>Postre</label>
+
+                                    <textarea
+                                        name="postre"
+                                        value={form.postre}
+                                        onChange={handleChange}
+                                        placeholder="Descripción del postre..."
                                     />
 
                                 </div>
@@ -301,7 +396,7 @@ function EditCardDetail() {
                                 <button
                                     type="button"
                                     className="btn-j-danger"
-                                    onClick={handleDelete}
+                                    onClick={handleDeleteClick}
                                     disabled={saving || deleting}
                                 >
                                     <IconTrash />
@@ -329,6 +424,19 @@ function EditCardDetail() {
                 </div>
 
             </div>
+
+            {feedback && (
+                <FeedbackModal
+                    type={feedback.type}
+                    title={feedback.title}
+                    message={feedback.message}
+                    onClose={feedback.onClose || (() => setFeedback(null))}
+                    onConfirm={feedback.onConfirm}
+                    confirmLabel={feedback.confirmLabel}
+                    cancelLabel="Cancelar"
+                    onCancel={feedback.onCancel}
+                />
+            )}
 
         </div>
     );

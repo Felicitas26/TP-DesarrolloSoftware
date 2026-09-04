@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import FeedbackModal from "../../components/FeedbackModal";
 import "./ReservationEdit.css";
 
 function ReservationEdit() {
@@ -14,6 +15,8 @@ function ReservationEdit() {
         idLounge: "",
         idLoungeType: ""
     });
+
+    const [feedback, setFeedback] = useState(null);
 
     const getReservations = async () => {
 
@@ -32,7 +35,7 @@ function ReservationEdit() {
 
         } catch (error) {
             console.error(error);
-            alert(error.message);
+            setFeedback({ type: "error", title: "Error", message: error.message });
         }
     };
 
@@ -81,7 +84,7 @@ function ReservationEdit() {
 
         } catch (error) {
             console.error(error);
-            alert(error.message);
+            setFeedback({ type: "error", title: "Error", message: error.message });
         }
     };
 
@@ -122,25 +125,23 @@ function ReservationEdit() {
                 throw new Error(data.error);
             }
 
-            alert("Reserva actualizada correctamente.");
+            setFeedback({ type: "success", title: "Reserva actualizada", message: "La reserva se actualizó correctamente." });
 
             await getReservations();
 
         } catch (error) {
             console.error(error);
-            alert(error.message);
+            setFeedback({ type: "error", title: "Error", message: error.message });
         }
     };
 
-    const handleDelete = async () => {
+    const handleDeleteClick = () => {
+        setFeedback({ type: "confirm", title: "Eliminar reserva", message: "¿Está seguro de que desea eliminar esta reserva?", confirmLabel: "Eliminar", onConfirm: handleDeleteConfirm, onCancel: () => setFeedback(null) });
+    };
 
-        const confirmDelete = window.confirm(
-            "¿Está seguro de que desea eliminar esta reserva?"
-        );
+    const handleDeleteConfirm = async () => {
 
-        if (!confirmDelete) {
-            return;
-        }
+        setFeedback(null);
 
         try {
             const response = await fetch(
@@ -156,7 +157,7 @@ function ReservationEdit() {
                 throw new Error(data.error);
             }
 
-            alert("Reserva eliminada correctamente.");
+            setFeedback({ type: "success", title: "Reserva eliminada", message: "La reserva se eliminó correctamente." });
 
             setSelectedId("");
 
@@ -173,7 +174,7 @@ function ReservationEdit() {
 
         } catch (error) {
             console.error(error);
-            alert(error.message);
+            setFeedback({ type: "error", title: "Error", message: error.message });
         }
     };
 
@@ -330,7 +331,7 @@ function ReservationEdit() {
                         <button
                             type="button"
                             className="reservation-delete-button"
-                            onClick={handleDelete}
+                            onClick={handleDeleteClick}
                         >
                             Eliminar reserva
                         </button>
@@ -339,6 +340,19 @@ function ReservationEdit() {
 
                 </form>
 
+            )}
+
+            {feedback && (
+                <FeedbackModal
+                    type={feedback.type}
+                    title={feedback.title}
+                    message={feedback.message}
+                    onClose={() => setFeedback(null)}
+                    onConfirm={feedback.onConfirm}
+                    confirmLabel={feedback.confirmLabel}
+                    cancelLabel="Cancelar"
+                    onCancel={feedback.onCancel}
+                />
             )}
 
         </div>
