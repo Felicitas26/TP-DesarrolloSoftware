@@ -7,16 +7,53 @@ function ReservationNew() {
 
     const [reservation, setReservation] = useState({
         dateEvent: "",
+        eventType: "",
         cantInvit: "",
+        idLounge: "",
+        idLoungeType: "",
         idCardDetail: "",
         idServices: []
     });
 
+    const EVENT_TYPES = [
+        "Casamiento",
+        "Cumpleaños",
+        "Cumpleaños +40",
+        "Fiesta de 15",
+        "Empresa / Corporativo",
+        "Otro"
+    ];
+
+    const guestRanges = [
+        { id: "1", min: 70, max: 90, label: "70 - 90 invitados" },
+        { id: "2", min: 90, max: 130, label: "90 - 130 invitados" }
+    ];
+
+    const [lounges, setLounges] = useState([]);
     const [loungeTypes, setLoungeTypes] = useState([]);
     const [cardDetails, setCardDetails] = useState([]);
     const [extraServices, setExtraServices] = useState([]);
 
+    const [message, setMessage] = useState(null);
+
+    const showMessage = (type, text) => {
+        setMessage({ type, text });
+    };
+
     useEffect(() => {
+
+        const getLounges = async () => {
+            try {
+                const response = await fetch(
+                    "http://localhost:3000/api/lounge"
+                );
+                const data = await response.json();
+                setLounges(data);
+            } catch (error) {
+                console.error("Error al obtener los salones:", error);
+            }
+        };
+
         const getLoungeTypes = async () => {
             try {
                 const response = await fetch(
@@ -65,6 +102,7 @@ function ReservationNew() {
             }
         };
 
+        getLounges();
         getLoungeTypes();
         getCardDetails();
         getExtraServices();
@@ -103,28 +141,39 @@ function ReservationNew() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setMessage(null);
 
-        let selectedLoungeType = null;
-
-        if (reservation.cantInvit === "1") {
-            selectedLoungeType = loungeTypes.find(
-                (type) =>
-                    type.minQuantity <= 70 &&
-                    type.maxQuantity >= 90
-            );
+        if (!reservation.eventType) {
+            showMessage("error", "Seleccioná el tipo de evento.");
+            return;
         }
 
-        if (reservation.cantInvit === "2") {
-            selectedLoungeType = loungeTypes.find(
-                (type) =>
-                    type.minQuantity <= 90 &&
-                    type.maxQuantity >= 130
-            );
-        }
+        const selectedLoungeType = loungeTypes.find(
+            (type) =>
+                String(type.idLoungeType) === String(reservation.idLoungeType)
+        );
 
         if (!selectedLoungeType) {
-            console.error(
-                "No se encontró un tipo de salón correspondiente."
+            showMessage("error", "Seleccioná un tipo de salón.");
+            return;
+        }
+
+        const selectedRange = guestRanges.find(
+            (r) => String(r.id) === String(reservation.cantInvit)
+        );
+
+        if (!selectedRange) {
+            showMessage("error", "Seleccioná la cantidad de invitados.");
+            return;
+        }
+
+        if (
+            selectedRange.min < selectedLoungeType.minQuantity ||
+            selectedRange.max > selectedLoungeType.maxQuantity
+        ) {
+            showMessage(
+                "error",
+                `El tipo de salón "${selectedLoungeType.nameLoungeType}" admite entre ${selectedLoungeType.minQuantity} y ${selectedLoungeType.maxQuantity} invitados. La cantidad seleccionada (${selectedRange.min} - ${selectedRange.max}) no es válida para este tipo de salón.`
             );
             return;
         }
@@ -132,14 +181,13 @@ function ReservationNew() {
         const token = localStorage.getItem("sty_token");
 
         if (!token) {
-            console.error(
-                "No hay un token de autenticación."
-            );
+            showMessage("error", "No hay un token de autenticación. Volvé a iniciar sesión.");
             return;
         }
 
         const reservationData = {
             dateEvent: reservation.dateEvent,
+            eventType: reservation.eventType,
             status: "pendiente",
             cantInvit: Number(reservation.cantInvit),
             idLounge: selectedLoungeType.idLounge,
@@ -170,17 +218,17 @@ function ReservationNew() {
                 );
             }
 
-            console.log(
-                "Reserva creada correctamente:",
-                data
-            );
-
+            showMessage("success", "¡Reserva creada correctamente!");
             navigate("/my-reservations");
 
         } catch (error) {
             console.error(
                 "Error al crear la reserva:",
                 error
+            );
+            showMessage(
+                "error",
+                error.message || "No se pudo crear la reserva."
             );
         }
     };
@@ -215,45 +263,145 @@ function ReservationNew() {
                 <div className="reservation-new-field">
 
                     <label>
+                        Tipo de evento
+                    </label>
+
+                    <select
+                        name="eventType"
+                        value={reservation.eventType}
+                        onChange={handleChange}
+                        required
+                    >
+                        <option value="" disabled>
+                            Seleccioná el tipo de evento...
+                        </option>
+                        {EVENT_TYPES.map((type) => (
+                            <option key={type} value={type}>
+                                {type}
+                            </option>
+                        ))}
+                    </select>
+
+                </div>
+
+                <div className="reservation-new-field">
+
+                    <label>
+                        Salón
+                    </label>
+
+                    {lounges.map((lounge) => (
+                        <label
+                            className="reservation-option"
+                            key={lounge.idLounge}
+                        >
+                            <input
+                                type="radio"
+                                name="idLounge"
+                                value={lounge.idLounge}
+                                checked={
+                                    reservation.idLounge ===
+                                    String(lounge.idLounge)
+                                }
+                                onChange={(e) =>
+                                    setReservation({
+                                        ...reservation,
+                                        idLounge: e.target.value,
+                                        idLoungeType: ""
+                                    })
+                                }
+                                required
+                            />
+                            <span>
+                                <strong>{lounge.name}</strong>
+                                {" - "}
+                                {lounge.loungeAddress}
+                            </span>
+                        </label>
+                    ))}
+
+                </div>
+
+                <div className="reservation-new-field">
+
+                    <label>
+                        Tipo de salón
+                    </label>
+
+                    {loungeTypes
+                        .filter(
+                            (type) =>
+                                String(type.idLounge) ===
+                                String(reservation.idLounge)
+                        )
+                        .map((type) => (
+                            <label
+                                className="reservation-option"
+                                key={type.idLoungeType}
+                            >
+                                <input
+                                    type="radio"
+                                    name="idLoungeType"
+                                    value={type.idLoungeType}
+                                    checked={
+                                        reservation.idLoungeType ===
+                                        String(type.idLoungeType)
+                                    }
+                                    onChange={handleChange}
+                                    required
+                                />
+                                <span>
+                                    <strong>
+                                        {type.nameLoungeType}
+                                    </strong>
+                                    {" ("}
+                                    {type.minQuantity}
+                                    {" - "}
+                                    {type.maxQuantity}
+                                    {" invitados)"}
+                                </span>
+                            </label>
+                        ))}
+
+                    {reservation.idLounge &&
+                        loungeTypes.filter(
+                            (type) =>
+                                String(type.idLounge) ===
+                                String(reservation.idLounge)
+                        ).length === 0 && (
+                            <p className="reservation-hint">
+                                Este salón no tiene tipos de salón cargados.
+                            </p>
+                        )}
+
+                </div>
+
+                <div className="reservation-new-field">
+
+                    <label>
                         Cantidad de invitados
                     </label>
 
-                    <label className="reservation-option">
-
-                        <input
-                            type="radio"
-                            name="cantInvit"
-                            value="1"
-                            checked={
-                                reservation.cantInvit === "1"
-                            }
-                            onChange={handleChange}
-                            required
-                        />
-
-                        <span>
-                            70 - 90 invitados
-                        </span>
-
-                    </label>
-
-                    <label className="reservation-option">
-
-                        <input
-                            type="radio"
-                            name="cantInvit"
-                            value="2"
-                            checked={
-                                reservation.cantInvit === "2"
-                            }
-                            onChange={handleChange}
-                        />
-
-                        <span>
-                            90 - 130 invitados
-                        </span>
-
-                    </label>
+                    {guestRanges.map((range) => (
+                        <label
+                            className="reservation-option"
+                            key={range.id}
+                        >
+                            <input
+                                type="radio"
+                                name="cantInvit"
+                                value={range.id}
+                                checked={
+                                    reservation.cantInvit === range.id
+                                }
+                                onChange={handleChange}
+                                required
+                            />
+                            <span>
+                                {range.label}
+                            </span>
+                        </label>
+                    ))}
 
                 </div>
 
@@ -391,6 +539,41 @@ function ReservationNew() {
                 </div>
 
             </form>
+
+            {message && (
+                <div
+                    className="reservation-modal-backdrop"
+                    onClick={() => setMessage(null)}
+                >
+                    <div
+                        className={`reservation-modal ${message.type}`}
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        <button
+                            className="reservation-modal-close"
+                            onClick={() => setMessage(null)}
+                        >
+                            ✕
+                        </button>
+                        <h3>
+                            {message.type === "error"
+                                ? "No se pudo procesar la solicitud"
+                                : "Proceso exitoso"}
+                        </h3>
+                        <p>
+                            {message.text}
+                        </p>
+                        <div className="reservation-modal-actions">
+                            <button
+                                type="button"
+                                onClick={() => setMessage(null)}
+                            >
+                                Cerrar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
 
         </div>
     );

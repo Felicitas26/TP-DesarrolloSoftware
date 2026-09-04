@@ -2,6 +2,14 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./MyReservations.css";
 
+const IconTrash = () => (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+        stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <polyline points="3 6 5 6 21 6" />
+        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+    </svg>
+);
+
 function MyReservations() {
 
     const navigate = useNavigate();
@@ -69,6 +77,49 @@ function MyReservations() {
         }
 
         return "Cantidad no especificada";
+    };
+
+    const deleteReservation = async (id) => {
+
+        const confirmDelete = window.confirm(
+            "¿Estás seguro de que querés eliminar esta solicitud de reserva?"
+        );
+
+        if (!confirmDelete) {
+            return;
+        }
+
+        const token = localStorage.getItem("sty_token");
+
+        try {
+
+            const response = await fetch(
+                `http://localhost:3000/api/reservation/${id}`,
+                {
+                    method: "DELETE",
+                    headers: {
+                        "Authorization": `Bearer ${token}`
+                    }
+                }
+            );
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(
+                    data.error || "No se pudo eliminar la reserva."
+                );
+            }
+
+            setReservations((prev) =>
+                prev.filter(
+                    (r) => r.idReservation !== id
+                )
+            );
+
+        } catch (err) {
+            alert(err.message);
+        }
     };
 
     if (loading) {
@@ -144,9 +195,25 @@ function MyReservations() {
                                 key={reservation.idReservation}
                             >
 
-                                <h2>
-                                    Reserva #{reservation.idReservation}
-                                </h2>
+                                <div className="my-reservation-card-header">
+                                    <h2>
+                                        Reserva #{reservation.idReservation}
+                                    </h2>
+
+                                    {reservation.status === "pendiente" && (
+                                        <button
+                                            className="my-reservation-delete"
+                                            onClick={() =>
+                                                deleteReservation(
+                                                    reservation.idReservation
+                                                )
+                                            }
+                                            title="Eliminar solicitud"
+                                        >
+                                            <IconTrash />
+                                        </button>
+                                    )}
+                                </div>
 
                                 <p>
                                     <strong>
@@ -155,6 +222,27 @@ function MyReservations() {
                                     {formatDate(
                                         reservation.dateEvent
                                     )}
+                                </p>
+
+                                <p>
+                                    <strong>
+                                        Tipo de evento:
+                                    </strong>{" "}
+                                    {reservation.eventType}
+                                </p>
+
+                                <p>
+                                    <strong>
+                                        Salón:
+                                    </strong>{" "}
+                                    {reservation.lounge?.name}
+                                </p>
+
+                                <p>
+                                    <strong>
+                                        Tipo de salón:
+                                    </strong>{" "}
+                                    {reservation.loungeType?.nameLoungeType}
                                 </p>
 
                                 <p>
@@ -177,7 +265,9 @@ function MyReservations() {
                                     <strong>
                                         Menú:
                                     </strong>{" "}
-                                    {reservation.menuStage}
+                                    {reservation.cardDetail
+                                        ? reservation.cardDetail.menuStage
+                                        : "Sin menú"}
                                 </p>
 
                                 <p>

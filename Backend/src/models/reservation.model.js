@@ -9,7 +9,16 @@ class ReservationModel {
                     select: {
                         nameCli: true,
                         surnameCli: true,
-                        dniCli: true
+                        dniCli: true,
+                        phoneCli: true,
+                        emailCli: true,
+                        addressCli: true,
+                        location: {
+                            select: {
+                                city: true,
+                                zipCode: true
+                            }
+                        }
                     }
                 },
                 lounge: {
@@ -29,6 +38,16 @@ class ReservationModel {
             orderBy: { dateEvent: "asc" },
             include: {
                 cardDetail: true,
+                lounge: {
+                    select: { name: true, loungeAddress: true }
+                },
+                loungeType: {
+                    select: {
+                        nameLoungeType: true,
+                        minQuantity: true,
+                        maxQuantity: true
+                    }
+                },
                 extraServices: {
                     include: {
                         extraService: {
@@ -76,6 +95,7 @@ class ReservationModel {
         const {
             dateEvent,
             status,
+            eventType,
             cantInvit,
             idLounge,
             idLoungeType,
@@ -88,6 +108,7 @@ class ReservationModel {
                 dateReservation: new Date(),
                 dateEvent: new Date(dateEvent),
                 status,
+                eventType: eventType || null,
                 cantInvit: Number(cantInvit),
                 idCli: Number(idCli),
                 idLounge: Number(idLounge),
@@ -115,6 +136,7 @@ class ReservationModel {
         const {
             dateEvent,
             status,
+            eventType,
             cantInvit,
             idCli,
             idLounge,
@@ -128,6 +150,7 @@ class ReservationModel {
                 data: {
                     dateEvent: new Date(dateEvent),
                     status,
+                    eventType: eventType || null,
                     cantInvit: Number(cantInvit),
                     idCli: Number(idCli),
                     idLounge: Number(idLounge),

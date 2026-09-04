@@ -112,6 +112,147 @@
     text-align: center;
 }
 
+/* MODAL EMERGENTE */
+.reservation-modal-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 99999;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: rgba(5, 8, 16, 0.72);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+}
+
+.reservation-modal {
+    position: relative;
+    width: 90%;
+    max-width: 460px;
+    padding: 32px 28px 26px;
+    background: rgba(20, 26, 46, 0.96);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 18px;
+    box-shadow:
+        0 20px 60px rgba(0, 0, 0, 0.45),
+        0 0 35px rgba(0, 229, 255, 0.08);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    text-align: center;
+    font-family: "Montserrat", system-ui, sans-serif;
+    animation: fadeInModal 0.2s ease-out;
+}
+
+@keyframes fadeInModal {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.reservation-modal.error {
+    border-color: rgba(248, 113, 113, 0.5);
+    box-shadow:
+        0 20px 60px rgba(0, 0, 0, 0.45),
+        0 0 35px rgba(248, 113, 113, 0.15);
+}
+
+.reservation-modal.success {
+    border-color: rgba(74, 222, 128, 0.5);
+    box-shadow:
+        0 20px 60px rgba(0, 0, 0, 0.45),
+        0 0 35px rgba(74, 222, 128, 0.15);
+}
+
+.reservation-modal-close {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 50%;
+    color: rgba(255, 255, 255, 0.55);
+    font-size: 1rem;
+    cursor: pointer;
+    transition:
+        background 0.2s ease,
+        color 0.2s ease,
+        border-color 0.2s ease;
+}
+
+.reservation-modal-close:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.3);
+    color: #ffffff;
+}
+
+.reservation-modal h3 {
+    margin: 0 0 14px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #ffffff;
+}
+
+.reservation-modal.error h3 {
+    color: #fca5a5;
+}
+
+.reservation-modal.success h3 {
+    color: #86efac;
+}
+
+.reservation-modal p {
+    margin: 0 0 22px;
+    font-size: 0.88rem;
+    line-height: 1.5;
+    color: rgba(255, 255, 255, 0.82);
+}
+
+.reservation-modal-actions button {
+    width: 100%;
+    padding: 12px 20px;
+    font-family: "Montserrat", system-ui, sans-serif;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #ffffff;
+    background: rgba(34, 211, 238, 0.12);
+    border: 1px solid rgba(34, 211, 238, 0.5);
+    border-radius: 999px;
+    cursor: pointer;
+    transition:
+        background 0.2s ease,
+        color 0.2s ease,
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.reservation-modal-actions button:hover {
+    background: #22d3ee;
+    color: #0b0f19;
+    transform: translateY(-2px);
+    box-shadow: 0 0 22px rgba(0, 229, 255, 0.3);
+}
+
+.reservation-modal.error .reservation-modal-actions button {
+    border-color: rgba(248, 113, 113, 0.5);
+    background: rgba(248, 113, 113, 0.12);
+}
+
+.reservation-modal.error .reservation-modal-actions button:hover {
+    background: #f87171;
+    color: #0b0f19;
+    box-shadow: 0 0 22px rgba(248, 113, 113, 0.3);
+}
+
 /* FORMULARIO */
 
 .reservation-new-container form {
@@ -172,6 +313,39 @@
 .reservation-new-field input[type="date"]:focus {
     border-color: rgba(34, 211, 238, 0.7);
     box-shadow: 0 0 18px rgba(0, 229, 255, 0.15);
+}
+
+/* SELECT TIPO DE EVENTO */
+.reservation-new-field select {
+    width: 100%;
+    padding: 13px 15px;
+    font-family: "Montserrat", system-ui, sans-serif;
+    font-size: 0.9rem;
+    color: #ffffff;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 10px;
+    outline: none;
+    appearance: none;
+    -webkit-appearance: none;
+    cursor: pointer;
+}
+
+.reservation-new-field select:focus {
+    border-color: rgba(34, 211, 238, 0.7);
+    box-shadow: 0 0 18px rgba(0, 229, 255, 0.15);
+}
+
+.reservation-new-field select option {
+    background: #141a2e;
+    color: #ffffff;
+}
+
+/* HINT */
+.reservation-hint {
+    font-size: 0.8rem;
+    color: #fca5a5;
+    margin: 0;
 }
 
 /* OPCIONES */

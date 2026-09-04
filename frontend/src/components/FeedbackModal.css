@@ -1,0 +1,206 @@
+.feedback-modal-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 99999;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: rgba(5, 8, 16, 0.72);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    font-family: "Montserrat", system-ui, sans-serif;
+}
+
+.feedback-modal {
+    position: relative;
+    width: 90%;
+    max-width: 460px;
+    padding: 34px 28px 26px;
+    background: rgba(20, 26, 46, 0.96);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 18px;
+    box-shadow:
+        0 20px 60px rgba(0, 0, 0, 0.45),
+        0 0 35px rgba(0, 229, 255, 0.08);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    text-align: center;
+    animation: feedbackFadeIn 0.2s ease-out;
+}
+
+@keyframes feedbackFadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.feedback-modal.error {
+    border-color: rgba(248, 113, 113, 0.5);
+    box-shadow:
+        0 20px 60px rgba(0, 0, 0, 0.45),
+        0 0 35px rgba(248, 113, 113, 0.15);
+}
+
+.feedback-modal.success {
+    border-color: rgba(74, 222, 128, 0.5);
+    box-shadow:
+        0 20px 60px rgba(0, 0, 0, 0.45),
+        0 0 35px rgba(74, 222, 128, 0.15);
+}
+
+.feedback-modal-close {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 50%;
+    color: rgba(255, 255, 255, 0.55);
+    font-size: 1rem;
+    cursor: pointer;
+    transition:
+        background 0.2s ease,
+        color 0.2s ease,
+        border-color 0.2s ease;
+}
+
+.feedback-modal-close:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.3);
+    color: #ffffff;
+}
+
+.feedback-modal-icon {
+    width: 52px;
+    height: 52px;
+    margin: 0 auto 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    font-size: 1.6rem;
+    font-weight: 800;
+}
+
+.feedback-modal.error .feedback-modal-icon {
+    background: rgba(248, 113, 113, 0.15);
+    border: 1px solid rgba(248, 113, 113, 0.5);
+    color: #fca5a5;
+}
+
+.feedback-modal.success .feedback-modal-icon {
+    background: rgba(74, 222, 128, 0.15);
+    border: 1px solid rgba(74, 222, 128, 0.5);
+    color: #86efac;
+}
+
+.feedback-modal.info .feedback-modal-icon {
+    background: rgba(34, 211, 238, 0.15);
+    border: 1px solid rgba(34, 211, 238, 0.5);
+    color: #67e8f9;
+}
+
+.feedback-modal h3 {
+    margin: 0 0 14px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #ffffff;
+}
+
+.feedback-modal.error h3 {
+    color: #fca5a5;
+}
+
+.feedback-modal.success h3 {
+    color: #86efac;
+}
+
+.feedback-modal.info h3 {
+    color: #67e8f9;
+}
+
+.feedback-modal p {
+    margin: 0 0 24px;
+    font-size: 0.88rem;
+    line-height: 1.5;
+    color: rgba(255, 255, 255, 0.85);
+}
+
+.feedback-modal-actions button {
+    width: 100%;
+    padding: 12px 20px;
+    font-family: "Montserrat", system-ui, sans-serif;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #ffffff;
+    background: rgba(34, 211, 238, 0.12);
+    border: 1px solid rgba(34, 211, 238, 0.5);
+    border-radius: 999px;
+    cursor: pointer;
+    transition:
+        background 0.2s ease,
+        color 0.2s ease,
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.feedback-modal-actions button:hover {
+    background: #22d3ee;
+    color: #0b0f19;
+    transform: translateY(-2px);
+    box-shadow: 0 0 22px rgba(0, 229, 255, 0.3);
+}
+
+.feedback-modal.error .feedback-modal-actions button {
+    border-color: rgba(248, 113, 113, 0.5);
+    background: rgba(248, 113, 113, 0.12);
+}
+
+.feedback-modal.error .feedback-modal-actions button:hover {
+    background: #f87171;
+    color: #0b0f19;
+    box-shadow: 0 0 22px rgba(248, 113, 113, 0.3);
+}
+
+.feedback-modal-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.feedback-modal-actions button {
+    flex: 1;
+    width: auto;
+}
+
+.feedback-modal-actions button.secondary {
+    background: transparent;
+    border-color: rgba(255, 255, 255, 0.18);
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.feedback-modal-actions button.secondary:hover {
+    background: rgba(255, 255, 255, 0.06);
+    color: #ffffff;
+    box-shadow: none;
+}
+
+.feedback-modal-actions button.confirm {
+    border-color: rgba(248, 113, 113, 0.5);
+    background: rgba(248, 113, 113, 0.12);
+}
+
+.feedback-modal-actions button.confirm:hover {
+    background: #f87171;
+    color: #0b0f19;
+    box-shadow: 0 0 22px rgba(248, 113, 113, 0.3);
+}

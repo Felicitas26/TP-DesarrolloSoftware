@@ -86,6 +86,7 @@ model Reservation {
   dateReservation DateTime @db.Date
   dateEvent      DateTime @db.Date
   status         String   @db.VarChar(50)
+  eventType      String?  @db.VarChar(100)
   cantInvit      Int
   idCli          Int
   idLounge       Int

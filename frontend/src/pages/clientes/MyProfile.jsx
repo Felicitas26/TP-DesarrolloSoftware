@@ -143,12 +143,12 @@ function MyProfile() {
 
                         <div className="my-profile-field">
                             <span>Ciudad</span>
-                            <p>{client.city}</p>
+                            <p>{client.location?.city}</p>
                         </div>
 
                         <div className="my-profile-field">
                             <span>Código Postal</span>
-                            <p>{client.zipCode}</p>
+                            <p>{client.location?.zipCode}</p>
                         </div>
 
                         <div className="my-profile-buttons">
@@ -160,15 +160,6 @@ function MyProfile() {
                                 }
                             >
                                 Editar perfil
-                            </button>
-
-                            <button
-                                className="my-profile-back-button-bottom"
-                                onClick={() =>
-                                    navigate("/client-home")
-                                }
-                            >
-                                Volver al menú
                             </button>
 
                         </div>
