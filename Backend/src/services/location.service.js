@@ -3,13 +3,13 @@ import locationModel from "../models/location.model.js";
 class LocationService {
 
     async getAll() {
-        return await locationModel.findAll(); 
+        return await locationModel.findAll();
     }
 
     async getById(id) {
         const location = await locationModel.findByPk(id);
         if (!location) {
-            throw { statusCode: 404, message: `Ubicación con ID ${id} no encontrada.` };
+            throw { statusCode: 404, message: `Ubicacion con ID ${id} no encontrada.` };
         }
         return location;
     }
@@ -18,7 +18,7 @@ class LocationService {
         const { city, zipCode } = locationData;
 
         if (!city || !zipCode) {
-            throw { statusCode: 400, message: "Todos los campos (ciudad y código postal) son obligatorios." };
+            throw { statusCode: 400, message: "Todos los campos (ciudad y codigo postal) son obligatorios." };
         }
 
         return await locationModel.create(locationData);
@@ -28,33 +28,24 @@ class LocationService {
         const { city, zipCode } = locationData;
 
         if (!city || !zipCode) {
-            throw { statusCode: 400, message: "Todos los campos (ciudad y código postal) son obligatorios." };
+            throw { statusCode: 400, message: "Todos los campos (ciudad y codigo postal) son obligatorios." };
         }
 
         const location = await locationModel.findByPk(id);
         if (!location) {
-            throw { statusCode: 404, message: `No se encontró la ubicación con ID ${id} para actualizar.` };
+            throw { statusCode: 404, message: `No se encontro la ubicacion con ID ${id} para actualizar.` };
         }
 
-        const [result] = await locationModel.db.execute(
-            "UPDATE location SET city = ?, zipCode = ? WHERE idLocation = ?",
-            [city, zipCode, id]
-        );
-
-        return await locationModel.findByPk(id);
+        return await locationModel.update(id, locationData);
     }
 
     async delete(id) {
         const location = await locationModel.findByPk(id);
         if (!location) {
-            throw { statusCode: 404, message: `No se encontró la ubicación con ID ${id} para eliminar.` };
+            throw { statusCode: 404, message: `No se encontro la ubicacion con ID ${id} para eliminar.` };
         }
 
-        await locationModel.db.execute(
-            "DELETE FROM location WHERE idLocation = ?",
-            [id]
-        );
-        return true;
+        return await locationModel.delete(id);
     }
 }
 

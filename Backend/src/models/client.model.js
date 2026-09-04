@@ -1,27 +1,18 @@
-import db from "../../db.js";
+import prisma from "../lib/prisma.js";
 
 class ClientModel {
 
     async getAll() {
-        const [rows] = await db.execute(
-            `SELECT c.*, l.city, l.zipCode
-            FROM Client c
-            LEFT JOIN location l ON c.idLocation = l.idLocation`
-        );
-
-        return rows;
+        return await prisma.client.findMany({
+            include: { location: true }
+        });
     }
 
     async getById(id) {
-        const [rows] = await db.execute(
-            `SELECT c.*, l.city, l.zipCode
-            FROM Client c
-            LEFT JOIN location l ON c.idLocation = l.idLocation
-            WHERE c.idCli = ?`,
-            [id]
-        );
-
-        return rows[0];
+        return await prisma.client.findUnique({
+            where: { idCli: Number(id) },
+            include: { location: true }
+        });
     }
 
     async create(client) {
@@ -35,31 +26,17 @@ class ClientModel {
             idLocation
         } = client;
 
-        const [result] = await db.execute(
-            `INSERT INTO Client
-            (nameCli, surnameCli, phoneCli, dniCli, emailCli, addressCli, idLocation)
-            VALUES (?, ?, ?, ?, ?, ?, ?)`,
-            [
+        return await prisma.client.create({
+            data: {
                 nameCli,
                 surnameCli,
                 phoneCli,
-                dniCli,
+                dniCli: Number(dniCli),
                 emailCli,
                 addressCli,
-                idLocation
-            ]
-        );
-
-        return {
-            idCli: result.insertId,
-            nameCli,
-            surnameCli,
-            phoneCli,
-            dniCli,
-            emailCli,
-            addressCli,
-            idLocation
-        };
+                idLocation: Number(idLocation)
+            }
+        });
     }
 
     async update(id, client) {
@@ -73,33 +50,22 @@ class ClientModel {
             idLocation
         } = client;
 
-        const [result] = await db.execute(
-            `UPDATE Client
-            SET nameCli = ?,
-                surnameCli = ?,
-                phoneCli = ?,
-                dniCli = ?,
-                emailCli = ?,
-                addressCli = ?,
-                idLocation = ?
-            WHERE idCli = ?`,
-            [
-                nameCli,
-                surnameCli,
-                phoneCli,
-                dniCli,
-                emailCli,
-                addressCli,
-                idLocation,
-                id
-            ]
-        );
-
-        if (result.affectedRows === 0) {
+        try {
+            return await prisma.client.update({
+                where: { idCli: Number(id) },
+                data: {
+                    nameCli,
+                    surnameCli,
+                    phoneCli,
+                    dniCli: Number(dniCli),
+                    emailCli,
+                    addressCli,
+                    idLocation: Number(idLocation)
+                }
+            });
+        } catch {
             return null;
         }
-
-        return this.getById(id);
     }
 
     async updateMe(idCli, client) {
@@ -113,46 +79,33 @@ class ClientModel {
             idLocation
         } = client;
 
-        const [result] = await db.execute(
-            `UPDATE Client
-            SET nameCli = ?,
-                surnameCli = ?,
-                phoneCli = ?,
-                dniCli = ?,
-                emailCli = ?,
-                addressCli = ?,
-                idLocation = ?
-            WHERE idCli = ?`,
-            [
-                nameCli,
-                surnameCli,
-                phoneCli,
-                dniCli,
-                emailCli,
-                addressCli,
-                idLocation,
-                idCli
-            ]
-        );
-
-        if (result.affectedRows === 0) {
+        try {
+            return await prisma.client.update({
+                where: { idCli: Number(idCli) },
+                data: {
+                    nameCli,
+                    surnameCli,
+                    phoneCli,
+                    dniCli: Number(dniCli),
+                    emailCli,
+                    addressCli,
+                    idLocation: Number(idLocation)
+                }
+            });
+        } catch {
             return null;
         }
-
-        return this.getById(idCli);
     }
-    
-    async delete(id) {
-        const [result] = await db.execute(
-            "DELETE FROM Client WHERE idCli = ?",
-            [id]
-        );
 
-        if (result.affectedRows === 0) {
+    async delete(id) {
+        try {
+            await prisma.client.delete({
+                where: { idCli: Number(id) }
+            });
+            return true;
+        } catch {
             return null;
         }
-
-        return true;
     }
 }
 

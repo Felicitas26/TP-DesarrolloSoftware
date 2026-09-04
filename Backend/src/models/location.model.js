@@ -1,29 +1,47 @@
-import db from "../../db.js";
+import prisma from "../lib/prisma.js";
 
 class LocationModel {
 
     async findAll() {
-        const [rows] = await db.execute(
-            "SELECT * FROM location"
-        );
-        return rows;
+        return await prisma.location.findMany();
     }
 
     async findByPk(id) {
-        const [rows] = await db.execute(
-            "SELECT * FROM location WHERE idLocation = ?",
-            [id]
-        );
-        return rows[0];
+        return await prisma.location.findUnique({
+            where: { idLocation: Number(id) }
+        });
     }
 
     async create(locationData) {
         const { city, zipCode } = locationData;
-        const [result] = await db.execute(
-            "INSERT INTO location (city, zipCode) VALUES (?, ?)",
-            [city, zipCode]
-        );
-        return { idLocation: result.insertId, city, zipCode };
+
+        return await prisma.location.create({
+            data: { city, zipCode }
+        });
+    }
+
+    async update(id, locationData) {
+        const { city, zipCode } = locationData;
+
+        try {
+            return await prisma.location.update({
+                where: { idLocation: Number(id) },
+                data: { city, zipCode }
+            });
+        } catch {
+            return null;
+        }
+    }
+
+    async delete(id) {
+        try {
+            await prisma.location.delete({
+                where: { idLocation: Number(id) }
+            });
+            return true;
+        } catch {
+            return null;
+        }
     }
 }
 

@@ -1,107 +1,55 @@
-import db from "../../db.js";
+import prisma from "../lib/prisma.js";
 
 class CardDetailModel {
 
     async getAll() {
-
-        const [rows] = await db.execute(
-            `SELECT *
-            FROM cardDetail`
-        );
-
-        return rows;
+        return await prisma.cardDetail.findMany();
     }
 
     async getById(id) {
-
-        const [rows] = await db.execute(
-            `SELECT *
-            FROM cardDetail
-            WHERE idCardDetail = ?`,
-            [id]
-        );
-
-        return rows[0];
+        return await prisma.cardDetail.findUnique({
+            where: { idCardDetail: Number(id) }
+        });
     }
 
     async create(cardDetail) {
+        const { menuStage, detail, budget } = cardDetail;
 
-        const {
-            menuStage,
-            detail,
-            budget
-        } = cardDetail;
-
-        const [result] = await db.execute(
-            `INSERT INTO cardDetail
-            (
+        return await prisma.cardDetail.create({
+            data: {
                 menuStage,
                 detail,
-                budget
-            )
-            VALUES
-            (
-                ?,
-                ?,
-                ?
-            )`,
-            [
-                menuStage,
-                detail,
-                budget
-            ]
-        );
-
-        return {
-            idCardDetail: result.insertId,
-            menuStage,
-            detail,
-            budget
-        };
+                budget: Number(budget)
+            }
+        });
     }
 
     async update(id, cardDetail) {
+        const { menuStage, detail, budget } = cardDetail;
 
-        const {
-            menuStage,
-            detail,
-            budget
-        } = cardDetail;
-
-        const [result] = await db.execute(
-            `UPDATE cardDetail
-            SET
-                menuStage = ?,
-                detail = ?,
-                budget = ?
-            WHERE idCardDetail = ?`,
-            [
-                menuStage,
-                detail,
-                budget,
-                id
-            ]
-        );
-
-        if (result.affectedRows === 0) {
+        try {
+            return await prisma.cardDetail.update({
+                where: { idCardDetail: Number(id) },
+                data: {
+                    menuStage,
+                    detail,
+                    budget: Number(budget)
+                }
+            });
+        } catch {
             return null;
         }
-
-        return this.getById(id);
     }
 
     async delete(id) {
-
-        const [result] = await db.execute(
-            "DELETE FROM cardDetail WHERE idCardDetail = ?",
-            [id]
-        );
-
-        if (result.affectedRows === 0) {
+        try {
+            await prisma.cardDetail.delete({
+                where: { idCardDetail: Number(id) }
+            });
+            return true;
+        } catch {
             return null;
         }
-
-        return true;
     }
 }
 

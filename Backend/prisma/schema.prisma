@@ -1,0 +1,168 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+enum Rol {
+  administrador
+  cliente
+}
+
+model CardDetail {
+  idCardDetail Int      @id @default(autoincrement())
+  menuStage    String   @db.VarChar(100)
+  detail       String   @db.VarChar(255)
+  budget       Decimal  @db.Decimal(10, 2)
+
+  reservations Reservation[]
+}
+
+model Location {
+  idLocation Int      @id @default(autoincrement())
+  city       String   @db.VarChar(100)
+  zipCode    String   @db.VarChar(20)
+
+  clients Client[]
+  lounges Lounge[]
+}
+
+model Lounge {
+  idLounge      Int    @id @default(autoincrement())
+  name          String @db.VarChar(100)
+  loungeAddress String @db.VarChar(200)
+  idLocation    Int
+
+  location     Location     @relation(fields: [idLocation], references: [idLocation])
+  loungeTypes  LoungeType[]
+  reservations Reservation[]
+}
+
+model LoungeType {
+  idLoungeType   Int    @id @default(autoincrement())
+  nameLoungeType String @db.VarChar(255)
+  minQuantity    Int
+  maxQuantity    Int
+  idLounge       Int
+
+  lounge       Lounge        @relation(fields: [idLounge], references: [idLounge], onDelete: Cascade)
+  prices       Price[]
+  reservations Reservation[]
+
+  @@unique([idLounge, nameLoungeType])
+}
+
+model Price {
+  effectiveDate DateTime @db.Date
+  endDate       DateTime? @db.Date
+  value         Decimal  @db.Decimal(10, 2)
+  idLoungeType  Int
+
+  loungeType LoungeType @relation(fields: [idLoungeType], references: [idLoungeType], onDelete: Cascade)
+
+  @@id([effectiveDate, idLoungeType])
+}
+
+model Client {
+  idCli      Int    @id @default(autoincrement())
+  nameCli    String @db.VarChar(100)
+  surnameCli String @db.VarChar(100)
+  phoneCli   String @db.VarChar(20)
+  dniCli     Int
+  addressCli String @db.VarChar(200)
+  emailCli   String @db.VarChar(150)
+  idLocation Int
+
+  location    Location      @relation(fields: [idLocation], references: [idLocation])
+  reservations Reservation[]
+  usuarios    Usuario[]
+}
+
+model Reservation {
+  idReservation  Int      @id @default(autoincrement())
+  dateReservation DateTime @db.Date
+  dateEvent      DateTime @db.Date
+  status         String   @db.VarChar(50)
+  cantInvit      Int
+  idCli          Int
+  idLounge       Int
+  idLoungeType   Int
+  idCardDetail   Int?
+
+  client      Client      @relation(fields: [idCli], references: [idCli])
+  lounge      Lounge      @relation(fields: [idLounge], references: [idLounge])
+  loungeType  LoungeType  @relation(fields: [idLoungeType], references: [idLoungeType])
+  cardDetail  CardDetail? @relation(fields: [idCardDetail], references: [idCardDetail])
+
+  contract       Contract?
+  extraServices  ReservationExtraService[]
+}
+
+model ExtraService {
+  idService     Int      @id @default(autoincrement())
+  nameService   String   @db.VarChar(100)
+  detailService String   @db.VarChar(255)
+  cost          Decimal  @db.Decimal(10, 2)
+
+  reservations ReservationExtraService[]
+  contracts    ContractExtraService[]
+}
+
+model ReservationExtraService {
+  idReservation Int
+  idService     Int
+
+  reservation  Reservation  @relation(fields: [idReservation], references: [idReservation])
+  extraService ExtraService @relation(fields: [idService], references: [idService])
+
+  @@id([idReservation, idService])
+}
+
+model Contract {
+  idContract    Int      @id @default(autoincrement())
+  eventStartTime DateTime @db.Time(6)
+  eventEndTime   DateTime @db.Time(6)
+  dateContract   DateTime @db.Date
+  finalValue     Decimal  @db.Decimal(10, 2)
+  idReservation  Int
+
+  reservation    Reservation          @relation(fields: [idReservation], references: [idReservation])
+  payments       Payment[]
+  extraServices  ContractExtraService[]
+
+  @@unique([idReservation])
+}
+
+model ContractExtraService {
+  idContract Int
+  idService  Int
+
+  contract     Contract     @relation(fields: [idContract], references: [idContract])
+  extraService ExtraService @relation(fields: [idService], references: [idService])
+
+  @@id([idContract, idService])
+}
+
+model Payment {
+  idPayment     Int      @id @default(autoincrement())
+  value         Decimal  @db.Decimal(10, 2)
+  statusPayment String   @db.VarChar(50)
+  datePayment   DateTime @db.Date
+  idContract    Int
+
+  contract Contract @relation(fields: [idContract], references: [idContract])
+}
+
+model Usuario {
+  idUsuario        Int     @id @default(autoincrement())
+  username         String? @db.VarChar(150) @unique
+  password         String  @db.VarChar(255)
+  rol              Rol
+  idCli            Int?
+  passwordTemporal Boolean @default(true)
+
+  client Client? @relation(fields: [idCli], references: [idCli])
+}

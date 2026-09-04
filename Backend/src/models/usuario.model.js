@@ -1,143 +1,115 @@
-import db from "../../db.js";
+import prisma from "../lib/prisma.js";
+import bcrypt from "bcryptjs";
+
+const SALT_ROUNDS = 10;
 
 class UsuarioModel {
 
     async findById(id) {
-        const [rows] = await db.execute(
-            `SELECT u.idUsuario,
-                    u.username,
-                    u.password,
-                    u.rol,
-                    u.idCli,
-                    u.passwordTemporal,
-                    c.nameCli,
-                    c.surnameCli,
-                    c.dniCli,
-                    c.emailCli,
-                    c.phoneCli,
-                    c.addressCli
-             FROM usuario u
-             LEFT JOIN client c ON c.idCli = u.idCli
-             WHERE u.idUsuario = ?`,
-            [id]
-        );
-
-        return rows[0];
+        return await prisma.usuario.findUnique({
+            where: { idUsuario: Number(id) },
+            include: {
+                client: {
+                    select: {
+                        nameCli: true,
+                        surnameCli: true,
+                        dniCli: true,
+                        emailCli: true,
+                        phoneCli: true,
+                        addressCli: true
+                    }
+                }
+            }
+        });
     }
 
     async findByUsername(username) {
-        const [rows] = await db.execute(
-            "SELECT * FROM usuario WHERE username = ?",
-            [username]
-        );
-
-        return rows[0];
+        return await prisma.usuario.findUnique({
+            where: { username }
+        });
     }
 
     async findByDni(dni) {
-        const [rows] = await db.execute(
-            "SELECT * FROM client WHERE dniCli = ?",
-            [dni]
-        );
-
-        return rows[0];
+        return await prisma.client.findFirst({
+            where: { dniCli: Number(dni) }
+        });
     }
 
     async findByCli(idCli) {
-        const [rows] = await db.execute(
-            "SELECT * FROM usuario WHERE idCli = ?",
-            [idCli]
-        );
-
-        return rows[0];
+        return await prisma.usuario.findFirst({
+            where: { idCli: Number(idCli) }
+        });
     }
 
     async create({ username, password, rol, idCli, passwordTemporal }) {
-        const [result] = await db.execute(
-            `INSERT INTO usuario
-            (username, password, rol, idCli, passwordTemporal)
-            VALUES (?, ?, ?, ?, ?)`,
-            [
+        const created = await prisma.usuario.create({
+            data: {
                 username,
                 password,
                 rol,
-                idCli ?? null,
-                passwordTemporal === undefined ? 1 : passwordTemporal
-            ]
-        );
+                idCli: idCli ?? null,
+                passwordTemporal: passwordTemporal === undefined ? true : passwordTemporal
+            }
+        });
 
-        return this.findById(result.insertId);
+        return this.findById(created.idUsuario);
     }
 
     async updatePassword(id, passwordHash) {
-        await db.execute(
-            `UPDATE usuario
-             SET password = ?, passwordTemporal = 0
-             WHERE idUsuario = ?`,
-            [passwordHash, id]
-        );
+        await prisma.usuario.update({
+            where: { idUsuario: Number(id) },
+            data: {
+                password: passwordHash,
+                passwordTemporal: false
+            }
+        });
 
         return this.findById(id);
     }
 
     async delete(id) {
-        const [result] = await db.execute(
-            "DELETE FROM usuario WHERE idUsuario = ?",
-            [id]
-        );
-
-        if (result.affectedRows === 0) {
+        try {
+            await prisma.usuario.delete({
+                where: { idUsuario: Number(id) }
+            });
+            return true;
+        } catch {
             return null;
         }
-
-        return true;
     }
 
-    // ADMINISTRADORES
-
     async getAllAdministradores() {
-        const [rows] = await db.execute(
-            `SELECT idUsuario,
-                    username,
-                    rol,
-                    passwordTemporal
-             FROM usuario
-             WHERE rol = 'administrador'`
-        );
-
-        return rows;
+        return await prisma.usuario.findMany({
+            where: { rol: "administrador" },
+            select: {
+                idUsuario: true,
+                username: true,
+                rol: true,
+                passwordTemporal: true
+            }
+        });
     }
 
     async updateAdministrador(id, { username, password }) {
+        const data = { username };
 
         if (password) {
-            const [result] = await db.execute(
-                `UPDATE usuario
-                 SET username = ?,
-                     password = ?
-                 WHERE idUsuario = ?
-                 AND rol = 'administrador'`,
-                [username, password, id]
-            );
-
-            if (result.affectedRows === 0) {
-                return null;
-            }
-        } else {
-            const [result] = await db.execute(
-                `UPDATE usuario
-                 SET username = ?
-                 WHERE idUsuario = ?
-                 AND rol = 'administrador'`,
-                [username, id]
-            );
-
-            if (result.affectedRows === 0) {
-                return null;
-            }
+            data.password = password;
         }
 
-        return this.findById(id);
+        try {
+            await prisma.usuario.update({
+                where: {
+                    idUsuario: Number(id),
+                    rol: "administrador"
+                },
+                data
+            });
+
+            return this.findById(id);
+        } catch {
+            return null;
+        }
     }
 }
 

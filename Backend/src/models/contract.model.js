@@ -1,99 +1,58 @@
-import db from "../../db.js";
+import prisma from "../lib/prisma.js";
 
 class ContractModel {
 
     async getAll() {
-        const [rows] = await db.execute(
-            `SELECT *
-            FROM contract`
-        );
-
-        return rows;
+        return await prisma.contract.findMany();
     }
 
     async getById(id) {
-        const [rows] = await db.execute(
-            `SELECT *
-            FROM contract
-            WHERE idContract = ?`,
-            [id]
-        );
-
-        return rows[0];
+        return await prisma.contract.findUnique({
+            where: { idContract: Number(id) }
+        });
     }
 
     async create(contract) {
-        const {
-            eventStartTime,
-            eventEndTime,
-            finalValue,
-            idReservation
-        } = contract;
+        const { eventStartTime, eventEndTime, finalValue, idReservation } = contract;
 
-        const [result] = await db.execute(
-            `INSERT INTO contract
-            (eventStartTime, eventEndTime, dateContract, finalValue, idReservation)
-            VALUES (?, ?, CURDATE(), ?, ?)`,
-            [
+        return await prisma.contract.create({
+            data: {
                 eventStartTime,
                 eventEndTime,
-                finalValue,
-                idReservation
-            ]
-        );
-
-        return {
-            idContract: result.insertId,
-            eventStartTime,
-            eventEndTime,
-            dateContract: new Date().toISOString().split("T")[0],
-            finalValue,
-            idReservation
-        };
+                dateContract: new Date(),
+                finalValue: Number(finalValue),
+                idReservation: Number(idReservation)
+            }
+        });
     }
 
     async update(id, contract) {
-        const {
-            eventStartTime,
-            eventEndTime,
-            finalValue,
-            idReservation
-        } = contract;
+        const { eventStartTime, eventEndTime, finalValue, idReservation } = contract;
 
-        const [result] = await db.execute(
-            `UPDATE contract
-            SET eventStartTime = ?,
-                eventEndTime = ?,
-                finalValue = ?,
-                idReservation = ?
-            WHERE idContract = ?`,
-            [
-                eventStartTime,
-                eventEndTime,
-                finalValue,
-                idReservation,
-                id
-            ]
-        );
-
-        if (result.affectedRows === 0) {
+        try {
+            return await prisma.contract.update({
+                where: { idContract: Number(id) },
+                data: {
+                    eventStartTime,
+                    eventEndTime,
+                    finalValue: Number(finalValue),
+                    idReservation: Number(idReservation)
+                }
+            });
+        } catch {
             return null;
         }
-
-        return this.getById(id);
     }
 
     async delete(id) {
-        const [result] = await db.execute(
-            "DELETE FROM contract WHERE idContract = ?",
-            [id]
-        );
-
-        if (result.affectedRows === 0) {
+        try {
+            await prisma.contract.delete({
+                where: { idContract: Number(id) }
+            });
+            return true;
+        } catch {
             return null;
         }
-
-        return true;
     }
 }
 

@@ -1,117 +1,78 @@
-import db from "../../db.js";
+import prisma from "../lib/prisma.js";
 
 class LoungeTypeModel {
 
     async getAll() {
-        const [rows] = await db.execute(
-            `SELECT lt.idLoungeType,
-                    lt.nameLoungeType,
-                    lt.minQuantity,
-                    lt.maxQuantity,
-                    lt.idLounge,
-                    l.name AS loungeName
-             FROM loungeType lt
-             INNER JOIN lounge l ON l.idLounge = lt.idLounge`
-        );
-        return rows;
+        return await prisma.loungeType.findMany({
+            include: { lounge: { select: { name: true } } }
+        });
     }
 
     async getById(id) {
-        const [rows] = await db.execute(
-            `SELECT lt.idLoungeType,
-                    lt.nameLoungeType,
-                    lt.minQuantity,
-                    lt.maxQuantity,
-                    lt.idLounge,
-                    l.name AS loungeName
-             FROM loungeType lt
-             INNER JOIN lounge l ON l.idLounge = lt.idLounge
-             WHERE lt.idLoungeType = ?`,
-            [id]
-        );
-        return rows[0];
+        return await prisma.loungeType.findUnique({
+            where: { idLoungeType: Number(id) },
+            include: { lounge: { select: { name: true } } }
+        });
     }
 
     async create(loungeType) {
-        const {
-            nameLoungeType,
-            minQuantity,
-            maxQuantity,
-            idLounge
-        } = loungeType;
+        const { nameLoungeType, minQuantity, maxQuantity, idLounge } = loungeType;
 
-        const [result] = await db.execute(
-            `INSERT INTO loungeType
-            (nameLoungeType, minQuantity, maxQuantity, idLounge)
-            VALUES (?, ?, ?, ?)`,
-            [
+        const created = await prisma.loungeType.create({
+            data: {
                 nameLoungeType,
-                minQuantity,
-                maxQuantity,
-                idLounge
-            ]
-        );
+                minQuantity: Number(minQuantity),
+                maxQuantity: Number(maxQuantity),
+                idLounge: Number(idLounge)
+            }
+        });
 
-        return this.getById(result.insertId);
+        return this.getById(created.idLoungeType);
     }
 
     async update(id, loungeType) {
-        const {
-            nameLoungeType,
-            minQuantity,
-            maxQuantity,
-            idLounge
-        } = loungeType;
+        const { nameLoungeType, minQuantity, maxQuantity, idLounge } = loungeType;
 
-        const [result] = await db.execute(
-            `UPDATE loungeType
-            SET nameLoungeType = ?,
-                minQuantity = ?,
-                maxQuantity = ?,
-                idLounge = ?
-            WHERE idLoungeType = ?`,
-            [
-                nameLoungeType,
-                minQuantity,
-                maxQuantity,
-                idLounge,
-                id
-            ]
-        );
+        try {
+            await prisma.loungeType.update({
+                where: { idLoungeType: Number(id) },
+                data: {
+                    nameLoungeType,
+                    minQuantity: Number(minQuantity),
+                    maxQuantity: Number(maxQuantity),
+                    idLounge: Number(idLounge)
+                }
+            });
 
-        if (result.affectedRows === 0) {
+            return this.getById(id);
+        } catch {
             return null;
         }
-
-        return this.getById(id);
     }
 
     async delete(id) {
-        const [result] = await db.execute(
-            "DELETE FROM loungeType WHERE idLoungeType = ?",
-            [id]
-        );
-
-        if (result.affectedRows === 0) {
+        try {
+            await prisma.loungeType.delete({
+                where: { idLoungeType: Number(id) }
+            });
+            return true;
+        } catch {
             return null;
         }
-
-        return true;
     }
 
     async existsByName(nameLoungeType, idLounge, excludeId = null) {
-        if (excludeId === null) {
-            const [rows] = await db.execute(
-                "SELECT idLoungeType FROM loungeType WHERE nameLoungeType = ? AND idLounge = ? LIMIT 1",
-                [nameLoungeType, idLounge]
-            );
-            return rows.length > 0;
+        const where = {
+            nameLoungeType,
+            idLounge: Number(idLounge)
+        };
+
+        if (excludeId !== null) {
+            where.idLoungeType = { not: Number(excludeId) };
         }
-        const [rows] = await db.execute(
-            "SELECT idLoungeType FROM loungeType WHERE nameLoungeType = ? AND idLounge = ? AND idLoungeType <> ? LIMIT 1",
-            [nameLoungeType, idLounge, excludeId]
-        );
-        return rows.length > 0;
+
+        const found = await prisma.loungeType.findFirst({ where });
+        return found !== null;
     }
 }
 

@@ -1,7 +1,6 @@
-import db from "../db.js";
+import prisma from "../src/lib/prisma.js";
 
 const locations = [
-    // Capitales de provincia
     { city: "Buenos Aires", zipCode: "1000" },
     { city: "La Plata", zipCode: "1900" },
     { city: "Córdoba", zipCode: "5000" },
@@ -25,7 +24,6 @@ const locations = [
     { city: "Rawson", zipCode: "9103" },
     { city: "Viedma", zipCode: "8500" },
     { city: "Santa Rosa", zipCode: "6300" },
-    // Grandes ciudades / partidos de la Provincia de Buenos Aires
     { city: "Mar del Plata", zipCode: "7600" },
     { city: "Bahía Blanca", zipCode: "8000" },
     { city: "Tandil", zipCode: "7000" },
@@ -56,7 +54,6 @@ const locations = [
     { city: "Pehuajó", zipCode: "6450" },
     { city: "Trenque Lauquen", zipCode: "6400" },
     { city: "Lincoln", zipCode: "6070" },
-    // Córdoba y Santa Fe
     { city: "Río Cuarto", zipCode: "5800" },
     { city: "Villa María", zipCode: "5900" },
     { city: "San Francisco", zipCode: "2400" },
@@ -65,15 +62,12 @@ const locations = [
     { city: "Rafaela", zipCode: "2300" },
     { city: "Venado Tuerto", zipCode: "2600" },
     { city: "Reconquista", zipCode: "3560" },
-    // Entre Ríos
     { city: "Gualeguaychú", zipCode: "2820" },
     { city: "Concordia", zipCode: "3200" },
     { city: "Concepción del Uruguay", zipCode: "3260" },
-    // Mendoza
     { city: "San Rafael", zipCode: "5600" },
     { city: "Godoy Cruz", zipCode: "5501" },
     { city: "Maipú", zipCode: "5515" },
-    // Patagonia
     { city: "Comodoro Rivadavia", zipCode: "9000" },
     { city: "Trelew", zipCode: "9100" },
     { city: "Puerto Madryn", zipCode: "9120" },
@@ -93,7 +87,9 @@ const normalize = (value) =>
         .trim();
 
 async function seed() {
-    const [existing] = await db.execute("SELECT city, zipCode FROM location");
+    const existing = await prisma.location.findMany({
+        select: { city: true, zipCode: true }
+    });
     const existingKeys = new Set(
         existing.map((row) => `${normalize(row.city)}|${String(row.zipCode)}`)
     );
@@ -107,10 +103,9 @@ async function seed() {
             duplicates.push(location.city);
             continue;
         }
-        await db.execute(
-            "INSERT INTO location (city, zipCode) VALUES (?, ?)",
-            [location.city, location.zipCode]
-        );
+        await prisma.location.create({
+            data: { city: location.city, zipCode: location.zipCode }
+        });
         existingKeys.add(key);
         inserted++;
     }
@@ -118,10 +113,12 @@ async function seed() {
     console.log(
         `Seed de locations finalizado: ${inserted} insertadas, ${existing.length} ya existentes, ${duplicates.length} duplicadas.`
     );
+    await prisma.$disconnect();
     process.exit(0);
 }
 
-seed().catch((err) => {
+seed().catch(async (err) => {
     console.error("Error al sembrar locations:", err.message);
+    await prisma.$disconnect();
     process.exit(1);
 });

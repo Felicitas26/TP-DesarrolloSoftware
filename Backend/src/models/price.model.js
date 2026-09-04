@@ -1,97 +1,91 @@
-import db from "../../db.js";
+import prisma from "../lib/prisma.js";
 
 class PriceModel {
 
     async getAll() {
-        const [rows] = await db.execute(
-            `SELECT p.effectiveDate,
-                    p.endDate,
-                    p.value,
-                    p.idLoungeType,
-                    lt.minQuantity,
-                    lt.maxQuantity
-             FROM price p
-             INNER JOIN loungeType lt ON lt.idLoungeType = p.idLoungeType`
-        );
-        return rows;
+        return await prisma.price.findMany({
+            include: {
+                loungeType: {
+                    select: {
+                        minQuantity: true,
+                        maxQuantity: true
+                    }
+                }
+            }
+        });
     }
 
     async getById(idLoungeType, effectiveDate) {
-        const [rows] = await db.execute(
-            `SELECT p.effectiveDate,
-                    p.endDate,
-                    p.value,
-                    p.idLoungeType,
-                    lt.minQuantity,
-                    lt.maxQuantity
-             FROM price p
-             INNER JOIN loungeType lt ON lt.idLoungeType = p.idLoungeType
-             WHERE p.idLoungeType = ? AND p.effectiveDate = ?`,
-            [idLoungeType, effectiveDate]
-        );
-        return rows[0];
+        return await prisma.price.findUnique({
+            where: {
+                effectiveDate_idLoungeType: {
+                    effectiveDate: new Date(effectiveDate),
+                    idLoungeType: Number(idLoungeType)
+                }
+            },
+            include: {
+                loungeType: {
+                    select: {
+                        minQuantity: true,
+                        maxQuantity: true
+                    }
+                }
+            }
+        });
     }
 
     async create(price) {
-        const {
-            effectiveDate,
-            endDate,
-            value,
-            idLoungeType
-        } = price;
+        const { effectiveDate, endDate, value, idLoungeType } = price;
 
-        await db.execute(
-            `INSERT INTO price
-            (effectiveDate, endDate, value, idLoungeType)
-            VALUES (?, ?, ?, ?)`,
-            [
-                effectiveDate,
-                endDate || null,
-                value,
-                idLoungeType
-            ]
-        );
+        await prisma.price.create({
+            data: {
+                effectiveDate: new Date(effectiveDate),
+                endDate: endDate ? new Date(endDate) : null,
+                value: Number(value),
+                idLoungeType: Number(idLoungeType)
+            }
+        });
 
         return this.getById(idLoungeType, effectiveDate);
     }
 
     async update(idLoungeType, effectiveDate, price) {
-        const {
-            endDate,
-            value
-        } = price;
+        const { endDate, value } = price;
 
-        const [result] = await db.execute(
-            `UPDATE price
-            SET endDate = ?,
-                value = ?
-            WHERE idLoungeType = ? AND effectiveDate = ?`,
-            [
-                endDate || null,
-                value,
-                idLoungeType,
-                effectiveDate
-            ]
-        );
+        try {
+            await prisma.price.update({
+                where: {
+                    effectiveDate_idLoungeType: {
+                        effectiveDate: new Date(effectiveDate),
+                        idLoungeType: Number(idLoungeType)
+                    }
+                },
+                data: {
+                    endDate: endDate ? new Date(endDate) : null,
+                    value: Number(value)
+                }
+            });
 
-        if (result.affectedRows === 0) {
+            return this.getById(idLoungeType, effectiveDate);
+        } catch {
             return null;
         }
-
-        return this.getById(idLoungeType, effectiveDate);
     }
 
     async delete(idLoungeType, effectiveDate) {
-        const [result] = await db.execute(
-            "DELETE FROM price WHERE idLoungeType = ? AND effectiveDate = ?",
-            [idLoungeType, effectiveDate]
-        );
-
-        if (result.affectedRows === 0) {
+        try {
+            await prisma.price.delete({
+                where: {
+                    effectiveDate_idLoungeType: {
+                        effectiveDate: new Date(effectiveDate),
+                        idLoungeType: Number(idLoungeType)
+                    }
+                }
+            });
+            return true;
+        } catch {
             return null;
         }
-
-        return true;
     }
 }
 

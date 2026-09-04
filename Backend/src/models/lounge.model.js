@@ -1,87 +1,55 @@
-import db from "../../db.js";
+import prisma from "../lib/prisma.js";
 
 class LoungeModel {
 
     async getAll() {
-        const [rows] = await db.execute(
-            "SELECT * FROM lounge"
-        );
-        return rows;
+        return await prisma.lounge.findMany();
     }
 
     async getById(id) {
-        const [rows] = await db.execute(
-            "SELECT * FROM lounge WHERE idLounge = ?",
-            [id]
-        );
-        return rows[0];
+        return await prisma.lounge.findUnique({
+            where: { idLounge: Number(id) }
+        });
     }
 
     async create(lounge) {
-        const {
-            name,
-            loungeAddress,
-            idLocation
-        } = lounge;
+        const { name, loungeAddress, idLocation } = lounge;
 
-        const [result] = await db.execute(
-            `INSERT INTO lounge
-            (name, loungeAddress, idLocation)
-            VALUES (?, ?, ?)`,
-            [
+        return await prisma.lounge.create({
+            data: {
                 name,
                 loungeAddress,
-                idLocation
-            ]
-        );
-
-        return {
-            idLounge: result.insertId,
-            name,
-            loungeAddress,
-            idLocation
-        };
+                idLocation: Number(idLocation)
+            }
+        });
     }
 
     async update(id, lounge) {
-        const {
-            name,
-            loungeAddress,
-            idLocation
-        } = lounge;
+        const { name, loungeAddress, idLocation } = lounge;
 
-        const [result] = await db.execute(
-            `UPDATE lounge
-            SET name = ?,
-                loungeAddress = ?,
-                idLocation = ?
-            WHERE idLounge = ?`,
-            [
-                name,
-                loungeAddress,
-                idLocation,
-                id
-            ]
-        );
-
-        if (result.affectedRows === 0) {
+        try {
+            return await prisma.lounge.update({
+                where: { idLounge: Number(id) },
+                data: {
+                    name,
+                    loungeAddress,
+                    idLocation: Number(idLocation)
+                }
+            });
+        } catch {
             return null;
         }
-
-        return this.getById(id);
     }
 
     async delete(id) {
-        const [result] = await db.execute(
-            "DELETE FROM lounge WHERE idLounge = ?",
-            [id]
-        );
-
-        if (result.affectedRows === 0) {
+        try {
+            await prisma.lounge.delete({
+                where: { idLounge: Number(id) }
+            });
+            return true;
+        } catch {
             return null;
         }
-
-        return true;
     }
 }
 
