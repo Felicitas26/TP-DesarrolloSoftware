@@ -104,13 +104,18 @@ INSERT INTO lounge (
     idLocation
 ) VALUES
 (
-    'Salón Grande (90-130)',
-    'Av. Carlos Pellegrini 3135',
+    'Stylo Funes',
+    'Av Pellegrini 31',
     1
 ),
 (
-    'Salón Pequeño (70-90)',
-    'Av. Carlos Pellegrini 3135',
+    'Stylo zona norte',
+    'Urquiza 3455',
+    1
+),
+(
+    'Stylo Roldán',
+    'Av Pellegrini 3124',
     1
 );
 
@@ -137,16 +142,28 @@ INSERT INTO loungetype (
     idLounge
 ) VALUES
 (
-    'Tipo Grande',
-    90,
-    130,
+    'Reina',
+    52,
+    123,
     1
 ),
 (
-    'Tipo Pequeño',
+    'Princesa',
+    100,
+    150,
+    2
+),
+(
+    'Grande',
+    90,
+    130,
+    3
+),
+(
+    'Chico',
     70,
     90,
-    2
+    3
 );
 
 
@@ -188,6 +205,7 @@ CREATE TABLE reservation (
     status VARCHAR(50) NOT NULL,
     eventType VARCHAR(100) DEFAULT NULL,
     cantInvit INT NOT NULL,
+    maxCantInvit INT NOT NULL,
     idCli INT NOT NULL,
     idLounge INT NOT NULL,
     idLoungeType INT NOT NULL,

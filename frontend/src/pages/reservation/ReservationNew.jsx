@@ -24,11 +24,6 @@ function ReservationNew() {
         "Otro"
     ];
 
-    const guestRanges = [
-        { id: "1", min: 70, max: 90, label: "70 - 90 invitados" },
-        { id: "2", min: 90, max: 130, label: "90 - 130 invitados" }
-    ];
-
     const [lounges, setLounges] = useState([]);
     const [loungeTypes, setLoungeTypes] = useState([]);
     const [cardDetails, setCardDetails] = useState([]);
@@ -138,6 +133,18 @@ function ReservationNew() {
             idServices: []
         });
     };
+
+    const salonTypes = loungeTypes.filter(
+        (type) =>
+            String(type.idLounge) === String(reservation.idLounge)
+    );
+
+    const guestRanges = salonTypes.map((type) => ({
+        id: String(type.idLoungeType),
+        min: type.minQuantity,
+        max: type.maxQuantity,
+        label: `${type.minQuantity} - ${type.maxQuantity} invitados`
+    }));
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -386,6 +393,18 @@ function ReservationNew() {
                     <label>
                         Cantidad de invitados
                     </label>
+
+                    {!reservation.idLounge && (
+                        <p className="reservation-hint">
+                            Primero seleccioná un salón.
+                        </p>
+                    )}
+
+                    {reservation.idLounge && guestRanges.length === 0 && (
+                        <p className="reservation-hint">
+                            Este salón no tiene tipos de salón cargados.
+                        </p>
+                    )}
 
                     {guestRanges.map((range) => (
                         <label

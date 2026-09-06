@@ -92,6 +92,7 @@ model Reservation {
   status         String   @db.VarChar(50)
   eventType      String?  @db.VarChar(100)
   cantInvit      Int
+  maxCantInvit   Int
   idCli          Int
   idLounge       Int
   idLoungeType   Int
