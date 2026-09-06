@@ -6,10 +6,10 @@ const NOTIFICATION_LABEL = {
     modificacion_solicitada: "Solicitud de modificación",
     modificacion_aprobada: "Modificación aprobada",
     modificacion_rechazada: "Modificación rechazada",
-    modificacion_reenviada: "Contrato reenviado",
-    modificacion_revisada: "Revisión de modificación",
     contrato_revisado: "Revisión de contrato",
-    contrato_firmado: "Contrato firmado"
+    contrato_firmado: "Contrato firmado",
+    modificacion_descartada: "Modificación descartada",
+    contrato_cancelado: "Evento cancelado"
 };
 
 const IconBell = () => (

@@ -87,6 +87,8 @@ function ContractDetail() {
     const [modificando, setModificando] = useState(false);
     const [commentMod, setCommentMod] = useState("");
     const [showTerminos, setShowTerminos] = useState(false);
+    const [confirmCancelar, setConfirmCancelar] = useState(false);
+    const [pendingRedirect, setPendingRedirect] = useState(false);
     const [activePrice, setActivePrice] = useState(null);
 
     const rol = localStorage.getItem("sty_rol");
@@ -101,14 +103,25 @@ function ContractDetail() {
         "Otro"
     ];
 
-    const canEdit = contract && ["generado", "rechazado"].includes(contract.status);
-    const enReModificacion =
-        contract?.status === "modificacion_en_curso" && rol === "cliente";
+const canEdit = contract && ["generado", "rechazado"].includes(contract.status);
     const tieneModPendiente = contract?.modificationStatus === "pendiente";
-    const puedeEditar = canEdit || enReModificacion || (rol === "cliente" && contract?.status === "firmado" && modificando);
+    const tieneModRechazada =
+        rol === "cliente" &&
+        contract?.status === "firmado" &&
+        contract?.modificationStatus === "rechazada";
+
+    const puedeEditar = canEdit;
 
     const showMessage = (type, title, text) => {
         setMessage({ type, title, text });
+    };
+
+    const closeMessage = () => {
+        setMessage(null);
+        if (pendingRedirect) {
+            setPendingRedirect(false);
+            navigate("/client-home");
+        }
     };
 
     const formatDate = (dateStr) => {
@@ -462,6 +475,71 @@ function ContractDetail() {
         }
     };
 
+    const handleContinuarContrato = async () => {
+        setMessage(null);
+        setSaving(true);
+
+        try {
+            const response = await fetch(
+                `http://localhost:3000/api/contract/${id}/modificacion/rechazo`,
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ decision: "continuar" })
+                }
+            );
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.error || "No se pudo procesar tu decisión.");
+            }
+
+            setContract(data.contract);
+            showMessage("success", "Contrato vigente", "Continuás con el contrato como estaba.");
+        } catch (error) {
+            showMessage("error", "Error", error.message);
+        } finally {
+            setSaving(false);
+        }
+    };
+
+    const handleCancelarEvento = async () => {
+        setConfirmCancelar(false);
+        setMessage(null);
+        setSaving(true);
+
+        try {
+            const response = await fetch(
+                `http://localhost:3000/api/contract/${id}/modificacion/rechazo`,
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ decision: "cancelar" })
+                }
+            );
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.error || "No se pudo cancelar el evento.");
+            }
+
+            setPendingRedirect(true);
+            showMessage("success", "Evento cancelado", data.message);
+        } catch (error) {
+            showMessage("error", "Error", error.message);
+        } finally {
+            setSaving(false);
+        }
+    };
+
     const handleAceptar = async () => {
         setMessage(null);
         setSaving(true);
@@ -528,6 +606,7 @@ function ContractDetail() {
         rol === "cliente" &&
         contract.status === "firmado" &&
         !tieneModPendiente &&
+        !tieneModRechazada &&
         diasHastaEvento !== null &&
         diasHastaEvento >= 14;
 
@@ -570,6 +649,121 @@ function ContractDetail() {
     const modExtras = (contract.modificationData?.idServices || []).map(
         (sid) => mountData.extraServices.find((s) => s.idService === Number(sid))?.nameService
     ).filter(Boolean);
+
+    const modDiffs = (() => {
+        const d = contract.modificationData || {};
+        const res = reservation || {};
+        const diffs = [];
+
+        const curDate = res.dateEvent ? res.dateEvent.split("T")[0] : "";
+        const newDate = d.dateEvent ? d.dateEvent.split("T")[0] : "";
+        if (newDate && newDate !== curDate) {
+            diffs.push({
+                campo: "Fecha del evento",
+                actual: formatDate(curDate) || "—",
+                nuevo: formatDate(newDate)
+            });
+        }
+
+        if (d.eventType && d.eventType !== res.eventType) {
+            diffs.push({
+                campo: "Tipo de evento",
+                actual: res.eventType || "—",
+                nuevo: d.eventType
+            });
+        }
+
+        if (d.cantExactaInvit != null && Number(d.cantExactaInvit) !== Number(contract.cantExactaInvit)) {
+            diffs.push({
+                campo: "Cantidad de invitados",
+                actual: contract.cantExactaInvit ?? "—",
+                nuevo: `${d.cantExactaInvit} invitados`
+            });
+        }
+
+        if (d.eventStartTime && formatTime(d.eventStartTime) !== formatTime(contract.eventStartTime)) {
+            diffs.push({
+                campo: "Hora de inicio",
+                actual: formatTime(contract.eventStartTime) || "—",
+                nuevo: formatTime(d.eventStartTime)
+            });
+        }
+
+        if (d.eventEndTime && formatTime(d.eventEndTime) !== formatTime(contract.eventEndTime)) {
+            diffs.push({
+                campo: "Hora de fin",
+                actual: formatTime(contract.eventEndTime) || "—",
+                nuevo: formatTime(d.eventEndTime)
+            });
+        }
+
+        if (d.idCardDetail != null && String(d.idCardDetail) !== String(res.idCardDetail)) {
+            diffs.push({
+                campo: "Menú",
+                actual: res.cardDetail?.menuStage || "—",
+                nuevo: modMenu ? `${modMenu.menuStage} — ${modMenu.detail}` : "—"
+            });
+        }
+
+        const curIds = (contract.extraServices || [])
+            .map((s) => Number(s.idService))
+            .sort((a, b) => a - b);
+        const newIds = Array.isArray(d.idServices)
+            ? d.idServices.map((s) => Number(s)).sort((a, b) => a - b)
+            : null;
+
+        if (newIds && newIds.join(",") !== curIds.join(",")) {
+            diffs.push({
+                campo: "Servicios extras",
+                actual: curIds.length > 0
+                    ? (contract.extraServices || []).map((s) => s.nameService).join(", ")
+                    : "Ninguno",
+                nuevo: modExtras.length > 0 ? modExtras.join(", ") : "Ninguno"
+            });
+        }
+
+        return diffs;
+    })();
+
+    const modAppliedList = (() => {
+        const d = contract.modificationData || {};
+        const applied = [];
+
+        if (d.dateEvent) {
+            applied.push({ campo: "Fecha del evento", valor: formatDate(d.dateEvent) });
+        }
+        if (d.eventType) {
+            applied.push({ campo: "Tipo de evento", valor: d.eventType });
+        }
+        if (d.cantExactaInvit != null) {
+            applied.push({ campo: "Cantidad exacta de invitados", valor: `${d.cantExactaInvit} invitados` });
+        }
+        if (d.eventStartTime) {
+            applied.push({ campo: "Hora de inicio", valor: formatTime(d.eventStartTime) });
+        }
+        if (d.eventEndTime) {
+            applied.push({ campo: "Hora de fin", valor: formatTime(d.eventEndTime) });
+        }
+        if (d.idCardDetail != null) {
+            applied.push({
+                campo: "Menú",
+                valor: modMenu ? `${modMenu.menuStage} — ${modMenu.detail}` : "—"
+            });
+        }
+        if (Array.isArray(d.idServices)) {
+            applied.push({
+                campo: "Servicios extras",
+                valor: modExtras.length > 0 ? modExtras.join(", ") : "Ninguno"
+            });
+        }
+
+        return applied;
+    })();
+
+    const modNuevos = modDiffs.map((diff) => ({
+        campo: diff.campo,
+        valor: diff.nuevo
+    }));
 
     return (
         <div className="contract-detail-container">
@@ -785,92 +979,159 @@ function ContractDetail() {
                     )}
                 </section>
 
-                {/* SOLICITUD DE MODIFICACION (cliente) */}
-                {modificando && (
-                    <section className="contract-section contract-mod-solicitando">
-                        <h2>Modificación post-firma</h2>
-                        <p>
-                            Estás por solicitar una modificación al contrato firmado. Los cambios que hagas
-                            se envían al administrador para su aprobación y recién se aplican al evento si él
-                            los acepta. Faltan {diasHastaEvento} días para el evento.
+                {/* MODIFICACION APROBADA — PENDIENTE DE FIRMA (cliente) */}
+                {rol === "cliente" &&
+                    contract.status === "aprobado" &&
+                    contract.modificationStatus === "aprobada" && (
+                        <section className="contract-section contract-mod-solicitando">
+                            <div className="contract-mod-alert">
+                                <strong>MODIFICACIÓN APROBADA — PENDIENTE DE TU FIRMA</strong>
+                                <span>
+                                    El administrador aprobó tu modificación el {formatDate(contract.modificationReviewedAt)}.
+                                    Los cambios ya fueron aplicados. Revisá los datos y firmá el contrato nuevamente.
+                                </span>
+                            </div>
+                            <p className="contract-mod-meta">
+                                Solicitud del {formatDate(contract.modificationRequestedAt)}.
+                            </p>
+                            {modAppliedList.length > 0 ? (
+                                <div className="contract-mod-diff">
+                                    {modAppliedList.map((app, i) => (
+                                        <div className="contract-mod-diff-row" key={i}>
+                                            <div className="contract-mod-diff-campo">{app.campo}</div>
+                                            <div className="contract-mod-diff-val nuevo contract-mod-diff-val-full">{app.valor}</div>
+                                        </div>
+                                    ))}
+                                </div>
+                            ) : (
+                                <p className="contract-mod-meta">Modificación sin cambios de datos, solo comentario.</p>
+                            )}
+                            {!!contract.modificationComment && (
+                                <div className="contract-mod-comment">
+                                    <strong>Comentario que dejaste:</strong>
+                                    <p>{contract.modificationComment}</p>
+                                </div>
+                            )}
+                        </section>
+                    )}
+
+                {/* MODIFICACION RECHAZADA (decision del cliente) */}
+                {tieneModRechazada && (
+                    <section className="contract-section contract-mod-rechazada">
+                        <div className="contract-mod-alert contract-mod-alert-red">
+                            <strong>MODIFICACIÓN RECHAZADA</strong>
+                            <span>
+                                El administrador rechazó tu solicitud de modificación
+                                {contract.modificationReviewedAt
+                                    ? ` el ${formatDate(contract.modificationReviewedAt)}`
+                                    : ""}. Tu contrato sigue vigente con los datos originales.
+                            </span>
+                        </div>
+                        <p className="contract-mod-meta">
+                            Estos son los cambios que habías solicitado y que quedaron sin efecto:
                         </p>
+                        {modNuevos.length > 0 ? (
+                            <div className="contract-mod-diff">
+                                {modNuevos.map((nv, i) => (
+                                    <div className="contract-mod-diff-row" key={i}>
+                                        <div className="contract-mod-diff-campo">{nv.campo}</div>
+                                        <div className="contract-mod-diff-val nuevo contract-mod-diff-val-full">{nv.valor}</div>
+                                    </div>
+                                ))}
+                            </div>
+                        ) : (
+                            <p className="contract-mod-meta">No se detectaron cambios en los datos del evento.</p>
+                        )}
+                        {!!contract.modificationComment && (
+                            <div className="contract-mod-comment">
+                                <strong>Comentario que dejaste en la solicitud:</strong>
+                                <p>{contract.modificationComment}</p>
+                            </div>
+                        )}
+                        <p className="contract-mod-meta">
+                            Decidí cómo querés continuar con el evento:
+                        </p>
+                        <div className="contract-actions">
+                            <button className="contract-btn-save" onClick={handleContinuarContrato} disabled={saving}>
+                                {saving ? "Procesando..." : "Continuar con el contrato como estaba"}
+                            </button>
+                            <button className="contract-btn-reject" onClick={() => setConfirmCancelar(true)} disabled={saving}>
+                                Rechazar y cancelar el evento
+                            </button>
+                        </div>
                     </section>
                 )}
 
-                {/* REGISTRO DE MODIFICACION APROBADA (cliente, en curso) */}
-                {rol === "cliente" && enReModificacion && (
-                    <section className="contract-section contract-mod-solicitando">
-                        <h2>Registro de la modificación</h2>
-                        <p>
-                            El administrador aprobó tu solicitud de modificación el {formatDate(contract.modificationReviewedAt)}
-                            (solicitada el {formatDate(contract.modificationRequestedAt)}). Los cambios ya fueron aplicados
-                            y el contrato quedó habilitado para que los confirmes. Enviá el contrato de nuevo
-                            para que vuelva al proceso de aceptación y firmarlo nuevamente.
-                        </p>
-                        {!!contract.modificationComment && (
-                            <p>
-                                <strong>Comentario:</strong> {contract.modificationComment}
+                {/* CONTRATO MODIFICADO (admin: pendiente de firma tras modificacion) */}
+                {rol === "administrador" &&
+                    contract.modificationStatus === "aprobada" &&
+                    ["en_revision", "aprobado"].includes(contract.status) && (
+                        <section className="contract-section contract-mod-revision">
+                            <div className="contract-mod-alert">
+                                <strong>CONTRATO MODIFICADO — PENDIENTE DE FIRMA</strong>
+                                <span>
+                                    Este contrato tiene una modificación aprobada y aplicada el {formatDate(contract.modificationReviewedAt)}.
+                                    Quedó pendiente de la firma del cliente.
+                                </span>
+                            </div>
+                            <p className="contract-mod-meta">
+                                Solicitud del {formatDate(contract.modificationRequestedAt)}.
                             </p>
-                        )}
-                    </section>
-                )}
+                            {modAppliedList.length > 0 ? (
+                                <div className="contract-mod-diff">
+                                    {modAppliedList.map((app, i) => (
+                                        <div className="contract-mod-diff-row" key={i}>
+                                            <div className="contract-mod-diff-campo">{app.campo}</div>
+                                            <div className="contract-mod-diff-val nuevo contract-mod-diff-val-full">{app.valor}</div>
+                                        </div>
+                                    ))}
+                                </div>
+                            ) : (
+                                <p className="contract-mod-meta">Modificación sin cambios de datos, solo comentario.</p>
+                            )}
+                            <div className="contract-mod-comment">
+                                <strong>Comentario del cliente:</strong>
+                                <p>{contract.modificationComment || "Sin comentario."}</p>
+                            </div>
+                        </section>
+                    )}
 
                 {/* REVISION DE MODIFICACION (admin) */}
                 {rol === "administrador" && tieneModPendiente && contract.modificationData && (
-                    <section className="contract-section">
-                        <h2>Modificación solicitada por el cliente</h2>
-                        <p className="contract-mod-meta">
-                            Solicitada el {formatDate(contract.modificationRequestedAt)}. Compará los datos
-                            propuestos y decidí si los aplicás al evento.
-                        </p>
-                        <div className="contract-fields">
-                            <div className="contract-field">
-                                <label>Nueva fecha del evento</label>
-                                <span>{formatDate(contract.modificationData.dateEvent)}</span>
-                            </div>
-                            {contract.modificationData.eventType && (
-                                <div className="contract-field">
-                                    <label>Tipo de evento</label>
-                                    <span>{contract.modificationData.eventType}</span>
-                                </div>
-                            )}
-                            {contract.modificationData.cantExactaInvit != null && (
-                                <div className="contract-field">
-                                    <label>Cantidad exacta</label>
-                                    <span>{contract.modificationData.cantExactaInvit} invitados</span>
-                                </div>
-                            )}
-                            {!!contract.modificationData.eventStartTime && (
-                                <div className="contract-field">
-                                    <label>Hora de inicio</label>
-                                    <span>{formatTime(contract.modificationData.eventStartTime)}</span>
-                                </div>
-                            )}
-                            {!!contract.modificationData.eventEndTime && (
-                                <div className="contract-field">
-                                    <label>Hora de fin</label>
-                                    <span>{formatTime(contract.modificationData.eventEndTime)}</span>
-                                </div>
-                            )}
-                            {contract.modificationData.idCardDetail != null && (
-                                <div className="contract-field">
-                                    <label>Menú</label>
-                                    <span>{modMenu ? `${modMenu.menuStage} — ${modMenu.detail}` : "—"}</span>
-                                </div>
-                            )}
-                            {modExtras.length > 0 && (
-                                <div className="contract-field">
-                                    <label>Servicios extras</label>
-                                    <span>{modExtras.join(", ")}</span>
-                                </div>
-                            )}
-                            {!!contract.modificationComment && (
-                                <div className="contract-field">
-                                    <label>Comentario del cliente</label>
-                                    <span>{contract.modificationComment}</span>
-                                </div>
-                            )}
+                    <section className="contract-section contract-mod-revision">
+                        <div className="contract-mod-alert">
+                            <strong>MODIFICACIÓN SOLICITADA</strong>
+                            <span>
+                                El cliente firmó el contrato y propuso estos cambios al evento. Estos son
+                                UNICAMENTE los datos que quiere cambiar. Si los aprobás, el contrato vuelve
+                                al cliente como pendiente de firma; si los rechazás, el contrato mantiene sus
+                                datos vigentes y el cliente decide cómo continuar.
+                            </span>
                         </div>
+                        <p className="contract-mod-meta">
+                            Solicitud del {formatDate(contract.modificationRequestedAt)}. Verificá los datos nuevos propuestos:
+                        </p>
+
+                        {modNuevos.length > 0 ? (
+                            <div className="contract-mod-diff">
+                                {modNuevos.map((nv, i) => (
+                                    <div className="contract-mod-diff-row" key={i}>
+                                        <div className="contract-mod-diff-campo">{nv.campo}</div>
+                                        <div className="contract-mod-diff-val nuevo contract-mod-diff-val-full">{nv.valor}</div>
+                                    </div>
+                                ))}
+                            </div>
+                        ) : (
+                            <p className="contract-mod-meta">
+                                No se detectaron cambios en los datos del evento; revisá el comentario del cliente.
+                            </p>
+                        )}
+
+                        <div className="contract-mod-comment">
+                            <strong>Comentario del cliente:</strong>
+                            <p>{contract.modificationComment || "Sin comentario."}</p>
+                        </div>
+
                         <div className="contract-actions contract-mod-actions">
                             <button className="contract-btn-reject" onClick={() => handleRevisarMod("rechazar")} disabled={saving}>
                                 Rechazar modificación
@@ -896,29 +1157,13 @@ function ContractDetail() {
                         </>
                     )}
 
-                    {rol === "cliente" && enReModificacion && (
-                        <>
-                            <button className="contract-btn-save" onClick={handleSave} disabled={saving}>
-                                {saving ? "Guardando..." : "Guardar cambios"}
-                            </button>
-                            <button className="contract-btn-primary" onClick={handleEnviar} disabled={saving}>
-                                Enviar de nuevo para revisión
-                            </button>
-                            <p className="contract-pending-note">
-                                Tu modificación fue aprobada por el administrador. Revisá los datos y enviá
-                                el contrato de nuevo; volverá al proceso de aceptación y tendrás que firmarlo
-                                otra vez.
-                            </p>
-                        </>
-                    )}
-
                     {rol === "cliente" && contract.status === "aprobado" && (
                         <button className="contract-btn-accept" onClick={() => setShowTerminos(true)} disabled={saving}>
                             Aceptar contrato (firmar)
                         </button>
                     )}
 
-                    {rol === "cliente" && contract.status === "firmado" && !modificando && !tieneModPendiente && puedeSolicitarMod && (
+                    {rol === "cliente" && contract.status === "firmado" && !modificando && !tieneModPendiente && !tieneModRechazada && puedeSolicitarMod && (
                         <button className="contract-btn-primary" onClick={() => setModificando(true)} disabled={saving}>
                             Solicitar modificación
                         </button>
@@ -941,7 +1186,7 @@ function ContractDetail() {
                         </p>
                     )}
 
-                    {rol === "cliente" && contract.status === "firmado" && !modificando && !tieneModPendiente && !puedeSolicitarMod && (
+                    {rol === "cliente" && contract.status === "firmado" && !modificando && !tieneModPendiente && !tieneModRechazada && !puedeSolicitarMod && (
                         <p className="contract-pending-note">
                             No se admiten más modificaciones: las solicitudes se aceptan hasta 2 semanas antes del evento.
                         </p>
@@ -956,6 +1201,121 @@ function ContractDetail() {
                 </section>
 
             </main>
+
+            {modificando && (
+                <div className="contract-mod-screen-backdrop" onClick={() => setModificando(false)}>
+                    <div className="contract-mod-screen" onClick={(e) => e.stopPropagation()}>
+                        <button className="contract-terms-close" onClick={() => setModificando(false)} aria-label="Cerrar">✕</button>
+                        <h3>Pedido de modificación</h3>
+                        <p className="contract-terms-intro">
+                            Completá SOLO los datos que querés cambiar del contrato firmado
+                            {diasHastaEvento !== null ? ` (faltan ${diasHastaEvento} días para el evento)` : ""}.
+                            Al enviar, el administrador verá únicamente estos cambios para aprobarlos o rechazarlos.
+                        </p>
+
+                        <div className="contract-mod-screen-fields">
+                            <div className="contract-field">
+                                <label>Fecha del evento</label>
+                                <input type="date" name="dateEvent" value={form.dateEvent} onChange={handleChange} />
+                            </div>
+
+                            <div className="contract-field">
+                                <label>Tipo de evento</label>
+                                <select name="eventType" value={form.eventType} onChange={handleChange}>
+                                    <option value="" disabled>Seleccioná el tipo de evento...</option>
+                                    {EVENT_TYPES.map((t) => (
+                                        <option key={t} value={t}>{t}</option>
+                                    ))}
+                                </select>
+                            </div>
+
+                            <div className="contract-field">
+                                <label>Cantidad exacta de invitados</label>
+                                <input
+                                    type="number"
+                                    name="cantExactaInvit"
+                                    value={form.cantExactaInvit}
+                                    onChange={handleChange}
+                                    min={reservation.cantInvit}
+                                    max={reservation.maxCantInvit}
+                                    placeholder={`${reservation.cantInvit} - ${reservation.maxCantInvit}`}
+                                />
+                                <small>Debe estar entre {reservation.cantInvit} y {reservation.maxCantInvit} invitados.</small>
+                            </div>
+
+                            <div className="contract-field">
+                                <label>Hora de inicio del evento</label>
+                                <input type="time" name="eventStartTime" value={form.eventStartTime} onChange={handleChange} />
+                            </div>
+
+                            <div className="contract-field">
+                                <label>Hora de fin del evento</label>
+                                <input type="time" name="eventEndTime" value={form.eventEndTime} onChange={handleChange} />
+                            </div>
+                        </div>
+
+                        <div className="contract-field">
+                            <label>Menú por persona</label>
+                            {mountData.cardDetails.map((menu) => (
+                                <label className="contract-option" key={menu.idCardDetail}>
+                                    <input
+                                        type="radio"
+                                        name="idCardDetail"
+                                        value={menu.idCardDetail}
+                                        checked={form.idCardDetail === String(menu.idCardDetail)}
+                                        onChange={handleChange}
+                                    />
+                                    <span><strong>{menu.menuStage}</strong> — {menu.detail} ({currency(menu.budget)} por persona)</span>
+                                </label>
+                            ))}
+                        </div>
+
+                        <div className="contract-field">
+                            <label>Servicios extras</label>
+                            {mountData.extraServices.map((service) => (
+                                <label className="contract-option" key={service.idService}>
+                                    <input
+                                        type="checkbox"
+                                        checked={form.idServices.includes(service.idService)}
+                                        onChange={() => handleServiceChange(service.idService)}
+                                    />
+                                    <span><strong>{service.nameService}</strong> — {service.detailService} ({currency(service.cost)})</span>
+                                </label>
+                            ))}
+                        </div>
+
+                        <div className="contract-field">
+                            <label>Comentario para el administrador (opcional)</label>
+                            <textarea
+                                className="contract-mod-screen-comment"
+                                value={commentMod}
+                                onChange={(e) => setCommentMod(e.target.value)}
+                                placeholder="Explicá el motivo de la modificación..."
+                                rows="3"
+                            />
+                        </div>
+
+                        <p className="contract-mod-meta contract-mod-screen-total">
+                            Valor final estimado con los datos modificados:{" "}
+                            <strong>{calcLive.hasPrice ? currency(calcLive.total) : "—"}</strong>
+                        </p>
+                        {!calcLive.hasPrice && (
+                            <small className="contract-warning">
+                                No hay un precio de salón vigente cargado, por lo que se consideró $0 para el salón.
+                            </small>
+                        )}
+
+                        <div className="contract-terms-actions">
+                            <button className="contract-btn-save" onClick={() => setModificando(false)} disabled={saving}>
+                                Cancelar
+                            </button>
+                            <button className="contract-btn-accept" onClick={handleSolicitarMod} disabled={saving}>
+                                {saving ? "Enviando..." : "Enviar solicitud de modificación"}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
 
             {showTerminos && (
                 <div className="contract-terms-backdrop" onClick={() => setShowTerminos(false)}>
@@ -990,12 +1350,33 @@ function ContractDetail() {
                 </div>
             )}
 
+            {confirmCancelar && (
+                <div className="contract-terms-backdrop" onClick={() => setConfirmCancelar(false)}>
+                    <div className="contract-terms-modal" onClick={(e) => e.stopPropagation()}>
+                        <button className="contract-terms-close" onClick={() => setConfirmCancelar(false)} aria-label="Cerrar">✕</button>
+                        <h3>Cancelar el evento</h3>
+                        <p className="contract-terms-intro">
+                            Esta acción da de baja el contrato y cancela la reserva del evento.
+                            No se puede deshacer.
+                        </p>
+                        <div className="contract-terms-actions">
+                            <button className="contract-btn-save" onClick={() => setConfirmCancelar(false)} disabled={saving}>
+                                Volver
+                            </button>
+                            <button className="contract-btn-reject" onClick={handleCancelarEvento} disabled={saving}>
+                                {saving ? "Cancelando..." : "Sí, cancelar el evento"}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
             {message && (
                 <FeedbackModal
                     type={message.type}
                     title={message.title}
                     message={message.text}
-                    onClose={() => setMessage(null)}
+                    onClose={closeMessage}
                 />
             )}
 

@@ -139,6 +139,16 @@ function MyContracts() {
                                             Modificación pendiente
                                         </span>
                                     )}
+                                    {contract.modificationStatus === "aprobada" && (
+                                        <span className="my-contract-modbadge approved">
+                                            Modificación aprobada — firmá de nuevo
+                                        </span>
+                                    )}
+                                    {contract.modificationStatus === "rechazada" && (
+                                        <span className="my-contract-rejbadge">
+                                            Modificación rechazada — decidí cómo continuar
+                                        </span>
+                                    )}
                                 </p>
                             </div>
                         ))}

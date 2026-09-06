@@ -80,6 +80,7 @@ function ContractList() {
             return contracts.filter(
                 (c) =>
                     c.modificationStatus === "pendiente" ||
+                    c.modificationStatus === "aprobada" ||
                     c.status === "modificacion_en_curso"
             );
         }
@@ -214,6 +215,11 @@ function ContractList() {
                                                 {contract.modificationStatus === "pendiente" && (
                                                     <span className="contract-list-modbadge">
                                                         Modif. pendiente
+                                                    </span>
+                                                )}
+                                                {contract.modificationStatus === "aprobada" && (
+                                                    <span className="contract-list-modbadge approved">
+                                                        Modif. aplicada
                                                     </span>
                                                 )}
                                             </div>

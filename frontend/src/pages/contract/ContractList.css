@@ -432,6 +432,12 @@
     white-space: nowrap;
 }
 
+.contract-list-modbadge.approved {
+    background: rgba(34, 211, 238, 0.12);
+    border-color: rgba(34, 211, 238, 0.5);
+    color: #67e8f9;
+}
+
 .contract-actions-row {
         flex-direction: column;
         align-items: stretch;

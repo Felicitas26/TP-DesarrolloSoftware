@@ -230,9 +230,9 @@ class ReservationModel {
                         ? {
                             extraServices: {
                                 deleteMany: {},
-                                create: idServices.map(idService => ({
-                                    idService: Number(idService)
-                                }))
+                                ...(idServices.length > 0
+                                    ? { create: idServices.map(idService => ({ idService: Number(idService) })) }
+                                    : {})
                             }
                         }
                         : {})
