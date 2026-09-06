@@ -164,115 +164,119 @@ function ContractList() {
     return (
         <div className="contract-list-container">
 
-            <div className="contract-list-header">
+            <main className="contract-list-panel">
 
-                <div>
-                    <h1>Gestión de Contratos</h1>
-                    <p>Revisá y gestioná los contratos generados.</p>
+                <div className="contract-list-header">
+
+                    <div>
+                        <h1>Gestión de Contratos</h1>
+                        <p>Revisá y gestioná los contratos generados.</p>
+                    </div>
+
+                    <div className="contract-list-header-actions">
+                        <button
+                            className="contract-btn-back"
+                            onClick={() => navigate("/admin-home")}
+                        >
+                            Volver al menú
+                        </button>
+                        <span>{filteredContracts.length}</span>
+                    </div>
+
                 </div>
 
-                <div className="contract-list-header-actions">
-                    <button
-                        className="contract-btn-back"
-                        onClick={() => navigate("/admin-home")}
-                    >
-                        Volver al menú
-                    </button>
-                    <span>{filteredContracts.length}</span>
+                <div className="contract-list-filters">
+                    {STATUS_OPTIONS.map((opt) => (
+                        <button
+                            key={opt.value}
+                            className={`contract-filter-btn ${statusFilter === opt.value ? "active" : ""}`}
+                            onClick={() => setStatusFilter(opt.value)}
+                        >
+                            {opt.label}
+                        </button>
+                    ))}
                 </div>
 
-            </div>
-
-            <div className="contract-list-filters">
-                {STATUS_OPTIONS.map((opt) => (
-                    <button
-                        key={opt.value}
-                        className={`contract-filter-btn ${statusFilter === opt.value ? "active" : ""}`}
-                        onClick={() => setStatusFilter(opt.value)}
-                    >
-                        {opt.label}
-                    </button>
-                ))}
-            </div>
-
-            {loading ? (
-                <p className="contract-list-empty">Cargando contratos...</p>
-            ) : filteredContracts.length === 0 ? (
-                <p className="contract-list-empty">No hay contratos en este estado.</p>
-            ) : (
-                <div className="contract-list-table-container">
-                    <table className="contract-list-table">
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Cliente</th>
-                                <th>Fecha evento</th>
-                                <th>Invitados</th>
-                                <th>Valor final</th>
-                                <th>Estado</th>
-                                <th>Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {filteredContracts.map((contract) => (
-                                <tr key={contract.idContract}>
-                                    <td>{contract.idContract}</td>
-                                    <td>
-                                        {contract.reservation?.client?.nameCli}{" "}
-                                        {contract.reservation?.client?.surnameCli}
-                                    </td>
-                                    <td>{formatDate(contract.reservation?.dateEvent)}</td>
-                                    <td>
-                                        {contract.reservation
-                                            ? `${contract.reservation.cantInvit} - ${contract.reservation.maxCantInvit}`
-                                            : ""}
-                                    </td>
-                                    <td>{currency(contract.finalValue)}</td>
-                                    <td>
-                                        <span className={`contract-list-status ${contract.status}`}>
-                                            {STATUS_LABEL[contract.status] || contract.status}
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <div className="contract-actions-row">
-                                            <button
-                                                className="contract-action-view"
-                                                onClick={() => navigate(`/contract/${contract.idContract}`)}
-                                            >
-                                                Ver
-                                            </button>
-
-                                            {contract.status === "en_revision" && (
-                                                <>
-                                                    <button
-                                                        className="contract-action-approve"
-                                                        onClick={() => review(contract.idContract, "aprobar")}
-                                                    >
-                                                        Aprobar
-                                                    </button>
-                                                    <button
-                                                        className="contract-action-reject"
-                                                        onClick={() => review(contract.idContract, "rechazar")}
-                                                    >
-                                                        Rechazar
-                                                    </button>
-                                                </>
-                                            )}
-
-                                            <button
-                                                className="contract-action-delete"
-                                                onClick={() => handleDeleteClick(contract.idContract)}
-                                            >
-                                                Eliminar
-                                            </button>
-                                        </div>
-                                    </td>
+                {loading ? (
+                    <p className="contract-list-empty">Cargando contratos...</p>
+                ) : filteredContracts.length === 0 ? (
+                    <p className="contract-list-empty">No hay contratos en este estado.</p>
+                ) : (
+                    <div className="contract-list-table-container">
+                        <table className="contract-list-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Cliente</th>
+                                    <th>Fecha evento</th>
+                                    <th>Invitados</th>
+                                    <th>Valor final</th>
+                                    <th>Estado</th>
+                                    <th>Acciones</th>
                                 </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
-            )}
+                            </thead>
+                            <tbody>
+                                {filteredContracts.map((contract) => (
+                                    <tr key={contract.idContract}>
+                                        <td>{contract.idContract}</td>
+                                        <td>
+                                            {contract.reservation?.client?.nameCli}{" "}
+                                            {contract.reservation?.client?.surnameCli}
+                                        </td>
+                                        <td>{formatDate(contract.reservation?.dateEvent)}</td>
+                                        <td>
+                                            {contract.reservation
+                                                ? `${contract.reservation.cantInvit} - ${contract.reservation.maxCantInvit}`
+                                                : ""}
+                                        </td>
+                                        <td>{currency(contract.finalValue)}</td>
+                                        <td>
+                                            <span className={`contract-list-status ${contract.status}`}>
+                                                {STATUS_LABEL[contract.status] || contract.status}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <div className="contract-actions-row">
+                                                <button
+                                                    className="contract-action-view"
+                                                    onClick={() => navigate(`/contract/${contract.idContract}`)}
+                                                >
+                                                    Ver
+                                                </button>
+
+                                                {contract.status === "en_revision" && (
+                                                    <>
+                                                        <button
+                                                            className="contract-action-approve"
+                                                            onClick={() => review(contract.idContract, "aprobar")}
+                                                        >
+                                                            Aprobar
+                                                        </button>
+                                                        <button
+                                                            className="contract-action-reject"
+                                                            onClick={() => review(contract.idContract, "rechazar")}
+                                                        >
+                                                            Rechazar
+                                                        </button>
+                                                    </>
+                                                )}
+
+                                                <button
+                                                    className="contract-action-delete"
+                                                    onClick={() => handleDeleteClick(contract.idContract)}
+                                                >
+                                                    Eliminar
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                )}
+
+            </main>
 
             {feedback && (
                 <FeedbackModal

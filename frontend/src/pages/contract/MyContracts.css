@@ -1,148 +1,363 @@
 .my-contracts-container {
+    position: relative;
     min-height: 100vh;
-    background-color: #0b1020;
-    color: #e2e8f0;
     display: flex;
     flex-direction: column;
-    font-family: "Segoe UI", system-ui, sans-serif;
+    background-color: #0b0f19;
+    color: #ffffff;
+    width: 100%;
+    font-family: "Montserrat", system-ui, sans-serif;
+    overflow-x: hidden;
 }
 
+#root:has(> .my-contracts-container) {
+    width: 100%;
+    max-width: 100%;
+    margin: 0;
+    border-inline: none;
+    min-height: 100vh;
+    display: block;
+    text-align: left;
+    background-color: #0b0f19;
+}
+
+.my-contracts-container *,
+.my-contracts-container *::before,
+.my-contracts-container *::after {
+    box-sizing: border-box;
+}
+
+/* FONDO */
+
+.my-contracts-container::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    background:
+        radial-gradient(
+            circle at 25% 20%,
+            rgba(168, 85, 247, 0.45),
+            transparent 45%
+        ),
+        radial-gradient(
+            circle at 80% 15%,
+            rgba(236, 72, 153, 0.4),
+            transparent 45%
+        ),
+        radial-gradient(
+            circle at 50% 90%,
+            rgba(0, 229, 255, 0.28),
+            transparent 50%
+        ),
+        linear-gradient(
+            160deg,
+            #0b0f19 0%,
+            #141a2e 60%,
+            #1a1140 100%
+        );
+}
+
+.my-contracts-container::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    background-image:
+        linear-gradient(
+            rgba(0, 229, 255, 0.05) 1px,
+            transparent 1px
+        ),
+        linear-gradient(
+            90deg,
+            rgba(0, 229, 255, 0.05) 1px,
+            transparent 1px
+        );
+    background-size: 56px 56px;
+    mask-image: radial-gradient(
+        ellipse at center,
+        black 30%,
+        transparent 75%
+    );
+}
+
+/* BARRA */
+
 .my-contracts-bar {
+    position: relative;
+    z-index: 10;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 18px 40px;
-    background-color: rgba(255, 255, 255, 0.04);
+    gap: 16px;
+    padding: 28px 48px;
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .my-contracts-logo {
-    font-size: 1.4rem;
+    font-family: "Playfair Display", Georgia, serif;
+    font-size: 1.9rem;
     font-weight: 800;
-    letter-spacing: 3px;
+    letter-spacing: 0.22em;
     color: #ffffff;
+    text-shadow: 0 0 26px rgba(0, 229, 255, 0.6);
 }
 
 .my-contracts-back-button {
-    padding: 9px 18px;
-    border: 1px solid rgba(255, 255, 255, 0.25);
-    border-radius: 8px;
-    background: transparent;
-    color: #e2e8f0;
+    padding: 10px 22px;
+    font-family: "Montserrat", system-ui, sans-serif;
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    color: #ffffff;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: 999px;
     cursor: pointer;
-    font-size: 0.9rem;
+    transition:
+        background 0.18s ease,
+        border-color 0.18s ease,
+        transform 0.18s ease,
+        box-shadow 0.18s ease;
 }
 
+.my-contracts-back-button:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(34, 211, 238, 0.6);
+    transform: translateY(-2px);
+    box-shadow: 0 0 20px rgba(0, 229, 255, 0.2);
+}
+
+/* CONTENIDO */
+
 .my-contracts-content {
+    position: relative;
+    z-index: 10;
     flex: 1;
-    max-width: 880px;
     width: 100%;
+    max-width: 880px;
     margin: 0 auto;
-    padding: 40px 24px;
+    padding: 60px 24px;
+}
+
+.my-contracts-title {
+    text-align: center;
+    margin-bottom: 45px;
 }
 
 .my-contracts-title h1 {
-    margin: 0;
-    font-size: 2rem;
+    font-family: "Playfair Display", Georgia, serif;
+    font-size: clamp(2rem, 4.5vw, 3.2rem);
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    line-height: 1.1;
     color: #ffffff;
+    margin: 0;
+    text-shadow: 0 0 34px rgba(0, 229, 255, 0.35);
 }
 
 .my-contracts-title p {
-    margin: 8px 0 0;
-    color: #94a3b8;
-    font-size: 0.95rem;
+    font-size: 0.85rem;
+    font-weight: 500;
+    letter-spacing: 0.18em;
+    color: rgba(255, 255, 255, 0.65);
+    margin: 14px 0 0;
 }
+
+/* LISTA */
 
 .my-contracts-list {
+    width: 100%;
     display: flex;
     flex-direction: column;
-    gap: 16px;
-    margin-top: 28px;
+    gap: 24px;
 }
 
+/* TARJETAS */
+
 .my-contract-card {
-    background-color: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 14px;
-    padding: 22px;
+    width: 100%;
+    padding: 28px 30px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 18px;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    box-shadow: 0 0 40px rgba(0, 229, 255, 0.08);
+    transition:
+        transform 0.2s ease,
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
 }
+
+.my-contract-card:hover {
+    transform: translateY(-4px);
+    border-color: rgba(34, 211, 238, 0.45);
+    box-shadow: 0 0 36px rgba(0, 229, 255, 0.18);
+}
+
+/* CABECERA DE TARJETA */
 
 .my-contract-card-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 12px;
+    gap: 20px;
+    margin-bottom: 18px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .my-contract-card-header h2 {
     margin: 0;
     font-size: 1.15rem;
-    color: #7dd3fc;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    color: #ffffff;
 }
 
 .my-contract-view {
-    padding: 8px 14px;
-    border: none;
-    border-radius: 8px;
-    background-color: #0284c7;
-    color: #ffffff;
+    padding: 9px 18px;
+    font-family: "Montserrat", system-ui, sans-serif;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #0b0f19;
+    background: #22d3ee;
+    border: 1px solid #22d3ee;
+    border-radius: 999px;
     cursor: pointer;
-    font-size: 0.85rem;
-    font-weight: 600;
+    white-space: nowrap;
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
 }
 
 .my-contract-view:hover {
-    background-color: #0369a1;
+    transform: translateY(-2px);
+    box-shadow: 0 0 28px rgba(0, 229, 255, 0.4);
 }
 
+/* INFORMACIÓN */
+
 .my-contract-card p {
-    margin: 6px 0;
-    color: #cbd5e1;
-    font-size: 0.9rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    margin: 0;
+    padding: 11px 14px;
+    color: rgba(255, 255, 255, 0.85);
+    font-size: 0.88rem;
+    background: rgba(255, 255, 255, 0.04);
+    border-radius: 10px;
 }
+
+.my-contract-card p + p {
+    margin-top: 10px;
+}
+
+.my-contract-card p strong {
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.5);
+}
+
+/* ESTADO */
 
 .my-contract-status {
     display: inline-block;
-    padding: 3px 10px;
+    padding: 5px 12px;
     border-radius: 999px;
-    font-size: 0.78rem;
-    font-weight: 600;
-    background-color: #334155;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    background: rgba(148, 163, 184, 0.14);
+    border: 1px solid rgba(148, 163, 184, 0.35);
     color: #e2e8f0;
+    white-space: nowrap;
 }
 
 .my-contract-status.en_revision {
-    background-color: #b45309;
-    color: #ffedd5;
+    background: rgba(245, 158, 11, 0.14);
+    border-color: rgba(245, 158, 11, 0.4);
+    color: #fbbf24;
 }
 
-.my-contract-status.aprobado {
-    background-color: #15803d;
-    color: #dcfce7;
-}
-
+.my-contract-status.aprobado,
 .my-contract-status.firmado {
-    background-color: #166534;
-    color: #dcfce7;
+    background: rgba(34, 197, 94, 0.12);
+    border-color: rgba(34, 197, 94, 0.4);
+    color: #86efac;
 }
 
 .my-contract-status.rechazado {
-    background-color: #b91c1c;
-    color: #fee2e2;
+    background: rgba(248, 113, 113, 0.12);
+    border-color: rgba(248, 113, 113, 0.4);
+    color: #fca5a5;
 }
+
+/* SIN CONTRATOS / MENSAJES */
 
 .my-contracts-empty,
 .my-contracts-message {
-    margin-top: 40px;
+    margin-top: 20px;
+    padding: 45px 35px;
     text-align: center;
-    color: #94a3b8;
-    font-size: 0.95rem;
+    color: rgba(255, 255, 255, 0.75);
+    font-size: 0.9rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px dashed rgba(255, 255, 255, 0.2);
+    border-radius: 18px;
 }
 
+/* FOOTER */
+
 .my-contracts-footer {
-    padding: 18px 40px;
-    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    position: relative;
+    z-index: 10;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 26px 24px;
     text-align: center;
-    color: #64748b;
-    font-size: 0.8rem;
+    font-size: 0.78rem;
+    letter-spacing: 0.1em;
+    color: rgba(255, 255, 255, 0.5);
+    background: rgba(11, 15, 25, 0.9);
+}
+
+/* RESPONSIVE */
+
+@media (max-width: 700px) {
+
+    .my-contracts-bar {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 22px 24px;
+    }
+
+    .my-contracts-content {
+        padding: 40px 16px;
+    }
+
+    .my-contracts-title h1 {
+        font-size: 2rem;
+    }
+
+    .my-contract-card {
+        padding: 22px;
+    }
+
+    .my-contract-card-header {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .my-contract-card p {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 6px;
+    }
 }

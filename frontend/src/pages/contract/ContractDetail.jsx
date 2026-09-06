@@ -275,7 +275,36 @@ function ContractDetail() {
         setSaving(true);
 
         try {
-            const response = await fetch(
+            const saveResponse = await fetch(
+                `http://localhost:3000/api/contract/${id}`,
+                {
+                    method: "PUT",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        dateEvent: form.dateEvent,
+                        eventType: form.eventType,
+                        idCardDetail: form.idCardDetail
+                            ? Number(form.idCardDetail)
+                            : null,
+                        idServices: form.idServices,
+                        cantExactaInvit: form.cantExactaInvit
+                            ? Number(form.cantExactaInvit)
+                            : null,
+                        eventStartTime: form.eventStartTime || null,
+                        eventEndTime: form.eventEndTime || null
+                    })
+                }
+            );
+
+            if (!saveResponse.ok) {
+                const saveData = await saveResponse.json();
+                throw new Error(saveData.error || "No se pudieron guardar los cambios antes de enviar.");
+            }
+
+            const enviarResponse = await fetch(
                 `http://localhost:3000/api/contract/${id}/enviar`,
                 {
                     method: "POST",
@@ -285,9 +314,9 @@ function ContractDetail() {
                 }
             );
 
-            const data = await response.json();
+            const data = await enviarResponse.json();
 
-            if (!response.ok) {
+            if (!enviarResponse.ok) {
                 throw new Error(data.error || "No se pudo enviar el contrato.");
             }
 
