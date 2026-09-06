@@ -9,6 +9,7 @@ function ReservationNew() {
         dateEvent: "",
         eventType: "",
         cantInvit: "",
+        maxCantInvit: "",
         idLounge: "",
         idLoungeType: "",
         idCardDetail: "",
@@ -110,6 +111,23 @@ function ReservationNew() {
         });
     };
 
+    const handleRangeChange = (range) => {
+        setReservation({
+            ...reservation,
+            cantInvit: String(range.min),
+            maxCantInvit: String(range.max)
+        });
+    };
+
+    const handleTypeChange = (e) => {
+        setReservation({
+            ...reservation,
+            idLoungeType: e.target.value,
+            cantInvit: "",
+            maxCantInvit: ""
+        });
+    };
+
     const handleServiceChange = (idService) => {
         let updatedServices = [...reservation.idServices];
 
@@ -174,18 +192,18 @@ function ReservationNew() {
             return;
         }
 
-        const cantInvitNum = Number(reservation.cantInvit);
-
         if (
-            cantInvitNum < selectedLoungeType.minQuantity ||
-            cantInvitNum > selectedLoungeType.maxQuantity
+            selectedRange.min !== selectedLoungeType.minQuantity ||
+            selectedRange.max !== selectedLoungeType.maxQuantity
         ) {
             showMessage(
                 "error",
-                `El tipo de salón "${selectedLoungeType.nameLoungeType}" admite entre ${selectedLoungeType.minQuantity} y ${selectedLoungeType.maxQuantity} invitados. La cantidad ingresada (${cantInvitNum}) no es válida para este tipo de salón.`
+                `El rango de invitados elegido (${selectedRange.min} - ${selectedRange.max}) no coincide con la capacidad del tipo de salón "${selectedLoungeType.nameLoungeType}" (${selectedLoungeType.minQuantity} - ${selectedLoungeType.maxQuantity} invitados).`
             );
             return;
         }
+
+        const cantInvitNum = selectedRange.min;
 
         const token = localStorage.getItem("sty_token");
 
@@ -199,6 +217,7 @@ function ReservationNew() {
             eventType: reservation.eventType,
             status: "pendiente",
             cantInvit: cantInvitNum,
+            maxCantInvit: selectedRange.max,
             idLounge: selectedLoungeType.idLounge,
             idLoungeType: selectedLoungeType.idLoungeType,
             idCardDetail: reservation.idCardDetail
@@ -319,7 +338,8 @@ function ReservationNew() {
                                         ...reservation,
                                         idLounge: e.target.value,
                                         idLoungeType: "",
-                                        cantInvit: ""
+                                        cantInvit: "",
+                                        maxCantInvit: ""
                                     })
                                 }
                                 required
@@ -359,7 +379,7 @@ function ReservationNew() {
                                         reservation.idLoungeType ===
                                         String(type.idLoungeType)
                                     }
-                                    onChange={handleChange}
+                                    onChange={handleTypeChange}
                                     required
                                 />
                                 <span>
@@ -419,7 +439,7 @@ function ReservationNew() {
                                     reservation.cantInvit ===
                                     String(range.min)
                                 }
-                                onChange={handleChange}
+                                onChange={() => handleRangeChange(range)}
                                 required
                             />
                             <span>

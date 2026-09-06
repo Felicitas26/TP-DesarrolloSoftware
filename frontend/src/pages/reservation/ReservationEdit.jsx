@@ -59,6 +59,7 @@ function ReservationEdit() {
                 dateEvent: "",
                 status: "",
                 cantInvit: "",
+                maxCantInvit: "",
                 idCli: "",
                 idLounge: "",
                 idLoungeType: ""
@@ -87,6 +88,7 @@ function ReservationEdit() {
                 dateEvent: data.dateEvent,
                 status: data.status,
                 cantInvit: data.cantInvit,
+                maxCantInvit: data.maxCantInvit || data.cantInvit,
                 idCli: data.idCli,
                 idLounge: data.idLounge,
                 idLoungeType: data.idLoungeType
@@ -123,6 +125,7 @@ function ReservationEdit() {
                         dateEvent: reservation.dateEvent,
                         status: reservation.status,
                         cantInvit: Number(reservation.cantInvit),
+                        maxCantInvit: Number(reservation.maxCantInvit) || Number(reservation.cantInvit),
                         idCli: Number(reservation.idCli),
                         idLounge: Number(reservation.idLounge),
                         idLoungeType: Number(reservation.idLoungeType)

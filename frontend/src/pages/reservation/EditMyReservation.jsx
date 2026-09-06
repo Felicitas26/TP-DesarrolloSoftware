@@ -10,6 +10,7 @@ function EditMyReservation() {
         dateEvent: "",
         eventType: "",
         cantInvit: "",
+        maxCantInvit: "",
         idLounge: "",
         idLoungeType: "",
         idCardDetail: "",
@@ -92,6 +93,7 @@ function EditMyReservation() {
                         : "",
                     eventType: data.eventType || "",
                     cantInvit: data.cantInvit || "",
+                    maxCantInvit: data.maxCantInvit || "",
                     idLounge: data.idLounge ? String(data.idLounge) : "",
                     idLoungeType: data.idLoungeType
                         ? String(data.idLoungeType)
@@ -123,6 +125,34 @@ function EditMyReservation() {
             [e.target.name]: e.target.value
         });
     };
+
+    const handleRangeChange = (range) => {
+        setReservation({
+            ...reservation,
+            cantInvit: String(range.min),
+            maxCantInvit: String(range.max)
+        });
+    };
+
+    const handleTypeChange = (e) => {
+        setReservation({
+            ...reservation,
+            idLoungeType: e.target.value,
+            cantInvit: "",
+            maxCantInvit: ""
+        });
+    };
+
+    const guestRanges = loungeTypes
+        .filter(
+            (type) => String(type.idLounge) === String(reservation.idLounge)
+        )
+        .map((type) => ({
+            id: String(type.idLoungeType),
+            min: type.minQuantity,
+            max: type.maxQuantity,
+            label: `${type.minQuantity} - ${type.maxQuantity} invitados`
+        }));
 
     const handleServiceChange = (idService) => {
         let updatedServices = [...reservation.idServices];
@@ -167,29 +197,34 @@ function EditMyReservation() {
             return;
         }
 
-        const cantInvitNum = Number(reservation.cantInvit);
+        const selectedRange = guestRanges.find(
+            (r) => String(r.min) === String(reservation.cantInvit)
+        );
 
-        if (!reservation.cantInvit || Number.isNaN(cantInvitNum) || cantInvitNum <= 0) {
-            showMessage("error", "Ingresá la cantidad de invitados.");
+        if (!selectedRange) {
+            showMessage("error", "Seleccioná la cantidad de invitados.");
             return;
         }
 
         if (
-            cantInvitNum < selectedLoungeType.minQuantity ||
-            cantInvitNum > selectedLoungeType.maxQuantity
+            selectedRange.min !== selectedLoungeType.minQuantity ||
+            selectedRange.max !== selectedLoungeType.maxQuantity
         ) {
             showMessage(
                 "error",
-                `El tipo de salón "${selectedLoungeType.nameLoungeType}" admite entre ${selectedLoungeType.minQuantity} y ${selectedLoungeType.maxQuantity} invitados. La cantidad ingresada (${cantInvitNum}) no es válida para este tipo de salón.`
+                `El rango de invitados elegido (${selectedRange.min} - ${selectedRange.max}) no coincide con la capacidad del tipo de salón "${selectedLoungeType.nameLoungeType}" (${selectedLoungeType.minQuantity} - ${selectedLoungeType.maxQuantity} invitados).`
             );
             return;
         }
+
+        const cantInvitNum = selectedRange.min;
 
         const reservationData = {
             dateEvent: reservation.dateEvent,
             eventType: reservation.eventType,
             status: "pendiente",
             cantInvit: cantInvitNum,
+            maxCantInvit: selectedRange.max,
             idCli: Number(localStorage.getItem("sty_idCli")),
             idLounge: selectedLoungeType.idLounge,
             idLoungeType: selectedLoungeType.idLoungeType,
@@ -314,7 +349,8 @@ function EditMyReservation() {
                                         ...reservation,
                                         idLounge: e.target.value,
                                         idLoungeType: "",
-                                        cantInvit: ""
+                                        cantInvit: "",
+                                        maxCantInvit: ""
                                     })
                                 }
                                 required
@@ -354,7 +390,7 @@ function EditMyReservation() {
                                         reservation.idLoungeType ===
                                         String(type.idLoungeType)
                                     }
-                                    onChange={handleChange}
+                                    onChange={handleTypeChange}
                                     required
                                 />
                                 <span>
@@ -389,15 +425,39 @@ function EditMyReservation() {
                         Cantidad de invitados
                     </label>
 
-                    <input
-                        type="number"
-                        name="cantInvit"
-                        value={reservation.cantInvit}
-                        onChange={handleChange}
-                        min="1"
-                        required
-                        placeholder="Ingresá la cantidad de invitados"
-                    />
+                    {!reservation.idLounge && (
+                        <p className="reservation-hint">
+                            Primero seleccioná un salón.
+                        </p>
+                    )}
+
+                    {reservation.idLounge && guestRanges.length === 0 && (
+                        <p className="reservation-hint">
+                            Este salón no tiene tipos de salón cargados.
+                        </p>
+                    )}
+
+                    {guestRanges.map((range) => (
+                        <label
+                            className="reservation-option"
+                            key={range.id}
+                        >
+                            <input
+                                type="radio"
+                                name="cantInvit"
+                                value={String(range.min)}
+                                checked={
+                                    reservation.cantInvit ===
+                                    String(range.min)
+                                }
+                                onChange={() => handleRangeChange(range)}
+                                required
+                            />
+                            <span>
+                                {range.label}
+                            </span>
+                        </label>
+                    ))}
 
                     {reservation.idLoungeType &&
                         (() => {

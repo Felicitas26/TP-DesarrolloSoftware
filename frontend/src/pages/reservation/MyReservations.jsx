@@ -267,7 +267,9 @@ function MyReservations() {
                                     <strong>
                                         Invitados:
                                     </strong>{" "}
-                                    {reservation.cantInvit}
+                                    {reservation.maxCantInvit
+                                        ? `${reservation.cantInvit} - ${reservation.maxCantInvit}`
+                                        : reservation.cantInvit}
                                 </p>
 
                                 <p>

@@ -256,7 +256,9 @@ function ReservationList() {
                                     </td>
 
                                     <td>
-                                        {reservation.cantInvit}
+                                        {reservation.maxCantInvit
+                                            ? `${reservation.cantInvit} - ${reservation.maxCantInvit}`
+                                            : reservation.cantInvit}
                                     </td>
 
                                     <td>
