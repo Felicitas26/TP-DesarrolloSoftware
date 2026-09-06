@@ -247,7 +247,7 @@ function ReservationList() {
                                             <button
                                                 className="reservation-btn-cancel"
                                                 onClick={() =>
-                                                    cancelReservation(
+                                                    performCancel(
                                                         reservation.idReservation
                                                     )
                                                 }

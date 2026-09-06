@@ -70,19 +70,6 @@ function MyReservations() {
         return `${day}/${month}/${year}`;
     };
 
-    const getGuestRange = (cantInvit) => {
-
-        if (cantInvit === 1) {
-            return "70 - 90 invitados";
-        }
-
-        if (cantInvit === 2) {
-            return "90 - 130 invitados";
-        }
-
-        return "Cantidad no especificada";
-    };
-
     const handleDeleteClick = (id) => {
         setReservationToDeleteId(id);
         setFeedback({ type: "confirm", title: "Eliminar reserva", message: "¿Estás seguro de que querés eliminar esta solicitud de reserva?", confirmLabel: "Eliminar", onConfirm: handleDeleteConfirm, onCancel: () => { setFeedback(null); setReservationToDeleteId(null); } });
@@ -256,9 +243,7 @@ function MyReservations() {
                                     <strong>
                                         Invitados:
                                     </strong>{" "}
-                                    {getGuestRange(
-                                        reservation.cantInvit
-                                    )}
+                                    {reservation.cantInvit}
                                 </p>
 
                                 <p>

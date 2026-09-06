@@ -159,7 +159,7 @@ function ReservationNew() {
         }
 
         const selectedRange = guestRanges.find(
-            (r) => String(r.id) === String(reservation.cantInvit)
+            (r) => String(r.min) === String(reservation.cantInvit)
         );
 
         if (!selectedRange) {
@@ -167,13 +167,15 @@ function ReservationNew() {
             return;
         }
 
+        const cantInvitNum = Number(reservation.cantInvit);
+
         if (
-            selectedRange.min < selectedLoungeType.minQuantity ||
-            selectedRange.max > selectedLoungeType.maxQuantity
+            cantInvitNum < selectedLoungeType.minQuantity ||
+            cantInvitNum > selectedLoungeType.maxQuantity
         ) {
             showMessage(
                 "error",
-                `El tipo de salón "${selectedLoungeType.nameLoungeType}" admite entre ${selectedLoungeType.minQuantity} y ${selectedLoungeType.maxQuantity} invitados. La cantidad seleccionada (${selectedRange.min} - ${selectedRange.max}) no es válida para este tipo de salón.`
+                `El tipo de salón "${selectedLoungeType.nameLoungeType}" admite entre ${selectedLoungeType.minQuantity} y ${selectedLoungeType.maxQuantity} invitados. La cantidad seleccionada (${cantInvitNum}) no es válida para este tipo de salón.`
             );
             return;
         }
@@ -189,10 +191,12 @@ function ReservationNew() {
             dateEvent: reservation.dateEvent,
             eventType: reservation.eventType,
             status: "pendiente",
-            cantInvit: Number(reservation.cantInvit),
+            cantInvit: cantInvitNum,
             idLounge: selectedLoungeType.idLounge,
             idLoungeType: selectedLoungeType.idLoungeType,
-            idCardDetail: Number(reservation.idCardDetail),
+            idCardDetail: reservation.idCardDetail
+                ? Number(reservation.idCardDetail)
+                : null,
             idServices: reservation.idServices
         };
 
@@ -390,9 +394,10 @@ function ReservationNew() {
                             <input
                                 type="radio"
                                 name="cantInvit"
-                                value={range.id}
+                                value={String(range.min)}
                                 checked={
-                                    reservation.cantInvit === range.id
+                                    reservation.cantInvit ===
+                                    String(range.min)
                                 }
                                 onChange={handleChange}
                                 required
