@@ -15,6 +15,11 @@ class PriceService {
         return price;
     }
 
+    async getActive(idLoungeType, dateEvent) {
+        const price = await priceModel.getActive(idLoungeType, dateEvent);
+        return price;
+    }
+
     async create(price) {
         const { effectiveDate, value, idLoungeType } = price;
 

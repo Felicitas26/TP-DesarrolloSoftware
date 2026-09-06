@@ -142,12 +142,53 @@ class ContractController {
         }
     }
 
-    async cancelar(req, res) {
+    async solicitarModificacion(req, res) {
         try {
-            await contractService.cancelar(req.params.id);
+            const contract = await contractService.getById(req.params.id);
+
+            if (!contract) {
+                return res.status(404).json({ error: "Contrato no encontrado." });
+            }
+
+            if (
+                req.usuario.rol === "cliente" &&
+                contract.reservation.idCli !== req.usuario.idCli
+            ) {
+                return res.status(403).json({ error: "No tenés acceso a este contrato." });
+            }
+
+            const updated = await contractService.solicitarModificacion(
+                req.params.id,
+                req.body
+            );
 
             return res.status(200).json({
-                message: "Contrato eliminado y reserva asociada cancelada."
+                message: "Modificación solicitada. Queda pendiente de aprobación por el administrador.",
+                contract: updated
+            });
+        } catch (error) {
+            return res.status(error.statusCode || 500).json({ error: error.message });
+        }
+    }
+
+    async revisarModificacion(req, res) {
+        try {
+            const { decision } = req.body;
+
+            if (!["aprobar", "rechazar"].includes(decision)) {
+                return res.status(400).json({ error: "La decisión debe ser 'aprobar' o 'rechazar'." });
+            }
+
+            const reviewed = await contractService.revisarModificacion(
+                req.params.id,
+                decision
+            );
+
+            return res.status(200).json({
+                message: decision === "aprobar"
+                    ? "Modificación aprobada y aplicada al contrato."
+                    : "Modificación rechazada. El contrato conserva sus datos vigentes.",
+                contract: reviewed
             });
         } catch (error) {
             return res.status(error.statusCode || 500).json({ error: error.message });

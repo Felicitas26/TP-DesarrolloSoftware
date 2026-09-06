@@ -178,6 +178,29 @@ class ContractModel {
         }
     }
 
+    async updateModification(id, data) {
+        const {
+            modificationStatus,
+            modificationData,
+            modificationComment,
+            modificationRequestedAt
+        } = data;
+
+        try {
+            return await prisma.contract.update({
+                where: { idContract: Number(id) },
+                data: {
+                    modificationStatus: modificationStatus ?? null,
+                    modificationData: modificationData ?? null,
+                    modificationComment: modificationComment ?? null,
+                    modificationRequestedAt: modificationRequestedAt ?? null
+                }
+            });
+        } catch {
+            return null;
+        }
+    }
+
     async updateExtraServices(idContract, idServices) {
         return await prisma.$transaction(async (tx) => {
             await tx.contractExtraService.deleteMany({

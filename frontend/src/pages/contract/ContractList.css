@@ -308,8 +308,7 @@
 
 .contract-action-view,
 .contract-action-approve,
-.contract-action-reject,
-.contract-action-delete {
+.contract-action-reject {
     padding: 8px 13px;
     border-radius: 9px;
     font-family: "Montserrat", system-ui, sans-serif;
@@ -362,22 +361,9 @@
     box-shadow: 0 0 18px rgba(248, 113, 113, 0.12);
 }
 
-.contract-action-delete {
-    background: rgba(248, 113, 113, 0.08);
-    border: 1px solid rgba(248, 113, 113, 0.25);
-    color: #fca5a5;
-}
-
-.contract-action-delete:hover {
-    transform: translateY(-1px);
-    background: rgba(248, 113, 113, 0.16);
-    box-shadow: 0 0 18px rgba(248, 113, 113, 0.12);
-}
-
 .contract-action-view:active,
 .contract-action-approve:active,
-.contract-action-reject:active,
-.contract-action-delete:active {
+.contract-action-reject:active {
     transform: scale(0.97);
 }
 
@@ -421,15 +407,33 @@
         font-size: 0.8rem;
     }
 
-    .contract-actions-row {
+.contract-list-status-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+}
+
+.contract-list-modbadge {
+    padding: 3px 10px;
+    border-radius: 999px;
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    background: rgba(168, 85, 247, 0.14);
+    border: 1px solid rgba(168, 85, 247, 0.45);
+    color: #d8b4fe;
+    white-space: nowrap;
+}
+
+.contract-actions-row {
         flex-direction: column;
         align-items: stretch;
     }
 
     .contract-action-view,
     .contract-action-approve,
-    .contract-action-reject,
-    .contract-action-delete {
+    .contract-action-reject {
         width: 100%;
     }
 }

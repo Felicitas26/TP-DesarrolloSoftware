@@ -4,6 +4,7 @@ import priceController from "../controllers/price.controller.js";
 const router = Router();
 
 router.get("/", priceController.getAll);
+router.get("/activo/:idLoungeType/:dateEvent", priceController.getActive);
 router.get("/:idLoungeType/:effectiveDate", priceController.getById);
 router.post("/", priceController.create);
 router.put("/:idLoungeType/:effectiveDate", priceController.update);

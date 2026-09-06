@@ -285,6 +285,244 @@ class ContractService {
         return await contractModel.getById(id);
     }
 
+    async solicitarModificacion(id, data) {
+        const contract = await contractModel.getById(id);
+
+        if (!contract) {
+            const error = new Error("Contrato no encontrado.");
+            error.statusCode = 404;
+            throw error;
+        }
+
+        if (contract.status !== "firmado") {
+            const error = new Error(
+                "Solo podés solicitar modificaciones sobre contratos firmados."
+            );
+            error.statusCode = 400;
+            throw error;
+        }
+
+        if (contract.modificationStatus === "pendiente") {
+            const error = new Error(
+                "Ya existe una solicitud de modificación pendiente de aprobación."
+            );
+            error.statusCode = 400;
+            throw error;
+        }
+
+        const reservation = contract.reservation;
+
+        const dateEvent = data.dateEvent || reservation.dateEvent;
+        const eventType = data.eventType || reservation.eventType;
+        const idCardDetail =
+            data.idCardDetail === undefined || data.idCardDetail === ""
+                ? reservation.idCardDetail
+                : data.idCardDetail
+                    ? Number(data.idCardDetail)
+                    : null;
+        const idServices = Array.isArray(data.idServices)
+            ? data.idServices
+            : contract.extraServices.map((s) => s.idService);
+
+        const cantExactaReal =
+            data.cantExactaInvit === undefined ||
+            data.cantExactaInvit === null ||
+            data.cantExactaInvit === ""
+                ? contract.cantExactaInvit
+                : Number(data.cantExactaInvit);
+
+        const eventStartTime =
+            data.eventStartTime === undefined || data.eventStartTime === ""
+                ? contract.eventStartTime
+                : data.eventStartTime;
+        const eventEndTime =
+            data.eventEndTime === undefined || data.eventEndTime === ""
+                ? contract.eventEndTime
+                : data.eventEndTime;
+
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        const eventDate = new Date(
+            `${String(dateEvent).split("T")[0]}T00:00:00`
+        );
+        const daysUntil = Math.round(
+            (eventDate.getTime() - today.getTime()) / 86400000
+        );
+
+        if (daysUntil < 14) {
+            const error = new Error(
+                "Las modificaciones se aceptan hasta 2 semanas (14 días) antes del evento. Ya no hay tiempo para solicitar cambios."
+            );
+            error.statusCode = 400;
+            throw error;
+        }
+
+        if (
+            cantExactaReal !== null &&
+            cantExactaReal !== undefined &&
+            (cantExactaReal < reservation.cantInvit ||
+                cantExactaReal > reservation.maxCantInvit)
+        ) {
+            const error = new Error(
+                `La cantidad exacta de invitados debe estar entre ${reservation.cantInvit} y ${reservation.maxCantInvit}.`
+            );
+            error.statusCode = 400;
+            throw error;
+        }
+
+        const conflicts = await prisma.reservation.count({
+            where: {
+                idLounge: reservation.idLounge,
+                idLoungeType: reservation.idLoungeType,
+                dateEvent: new Date(dateEvent),
+                status: { not: "cancelada" },
+                idReservation: { not: reservation.idReservation }
+            }
+        });
+
+        if (conflicts > 0) {
+            const error = new Error(
+                "El salón no se encuentra disponible para la nueva fecha seleccionada."
+            );
+            error.statusCode = 409;
+            throw error;
+        }
+
+        const updated = await contractModel.updateModification(id, {
+            modificationStatus: "pendiente",
+            modificationData: {
+                dateEvent: String(dateEvent).split("T")[0],
+                eventType,
+                idCardDetail: idCardDetail ?? null,
+                idServices,
+                cantExactaInvit: cantExactaReal,
+                eventStartTime,
+                eventEndTime
+            },
+            modificationComment: data.comment || null,
+            modificationRequestedAt: new Date()
+        });
+
+        if (!updated) {
+            const error = new Error(
+                "No se pudo registrar la solicitud de modificación."
+            );
+            error.statusCode = 500;
+            throw error;
+        }
+
+        return await contractModel.getById(id);
+    }
+
+    async revisarModificacion(id, decision) {
+        const contract = await contractModel.getById(id);
+
+        if (!contract) {
+            const error = new Error("Contrato no encontrado.");
+            error.statusCode = 404;
+            throw error;
+        }
+
+        if (contract.modificationStatus !== "pendiente") {
+            const error = new Error(
+                "No hay solicitudes de modificación pendientes para este contrato."
+            );
+            error.statusCode = 400;
+            throw error;
+        }
+
+        if (decision === "rechazar") {
+            const rechazado = await contractModel.updateModification(id, {
+                modificationStatus: "rechazada"
+            });
+
+            if (!rechazado) {
+                const error = new Error(
+                    "No se pudo registrar el rechazo de la modificación."
+                );
+                error.statusCode = 500;
+                throw error;
+            }
+
+            return await contractModel.getById(id);
+        }
+
+        const data = contract.modificationData || {};
+        const reservation = contract.reservation;
+
+        const dateEvent = data.dateEvent || reservation.dateEvent;
+        const eventType = data.eventType || reservation.eventType;
+        const idCardDetail = data.idCardDetail || reservation.idCardDetail;
+        const idServices = Array.isArray(data.idServices)
+            ? data.idServices
+            : contract.extraServices.map((s) => s.idService);
+        const cantExactaReal =
+            data.cantExactaInvit === undefined || data.cantExactaInvit === null
+                ? contract.cantExactaInvit
+                : Number(data.cantExactaInvit);
+
+        const updatedReservation = await reservationModel.update(
+            reservation.idReservation,
+            {
+                dateEvent,
+                status: reservation.status,
+                eventType,
+                cantInvit: reservation.cantInvit,
+                maxCantInvit: reservation.maxCantInvit,
+                idCli: reservation.idCli,
+                idLounge: reservation.idLounge,
+                idLoungeType: reservation.idLoungeType,
+                idCardDetail: idCardDetail ?? null,
+                idServices
+            }
+        );
+
+        if (!updatedReservation) {
+            const error = new Error(
+                "No se pudieron aplicar los datos de la modificación."
+            );
+            error.statusCode = 500;
+            throw error;
+        }
+
+        await contractModel.updateExtraServices(id, idServices);
+
+        const freshReservation = await reservationModel.getById(
+            reservation.idReservation
+        );
+        const calc = await this.calcValues(
+            { ...contract, cantExactaInvit: cantExactaReal },
+            freshReservation
+        );
+
+        await contractModel.updateData(id, {
+            eventStartTime: data.eventStartTime,
+            eventEndTime: data.eventEndTime,
+            cantExactaInvit: cantExactaReal,
+            finalValue: calc.total
+        });
+
+        const aprobado = await contractModel.updateModification(id, {
+            modificationStatus: "aprobada"
+        });
+
+        if (!aprobado) {
+            const error = new Error(
+                "No se pudo confirmar la aprobación de la modificación."
+            );
+            error.statusCode = 500;
+            throw error;
+        }
+
+        const updatedContract = await contractModel.getById(id);
+
+        return {
+            ...updatedContract,
+            calc
+        };
+    }
+
     async cancelar(id) {
         const contract = await contractModel.getById(id);
 

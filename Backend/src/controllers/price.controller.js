@@ -21,6 +21,16 @@ class PriceController {
         }
     }
 
+    async getActive(req, res) {
+        try {
+            const { idLoungeType, dateEvent } = req.params;
+            const price = await priceService.getActive(idLoungeType, dateEvent);
+            return res.status(200).json(price);
+        } catch (error) {
+            return res.status(error.statusCode || 500).json({ error: error.message });
+        }
+    }
+
     async create(req, res) {
         try {
             const newPrice = await priceService.create(req.body);

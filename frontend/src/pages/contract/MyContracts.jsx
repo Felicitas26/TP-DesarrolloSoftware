@@ -133,6 +133,11 @@ function MyContracts() {
                                     <span className={`my-contract-status ${contract.status}`}>
                                         {STATUS_LABEL[contract.status] || contract.status}
                                     </span>
+                                    {contract.modificationStatus === "pendiente" && (
+                                        <span className="my-contract-modbadge">
+                                            Modificación pendiente
+                                        </span>
+                                    )}
                                 </p>
                             </div>
                         ))}

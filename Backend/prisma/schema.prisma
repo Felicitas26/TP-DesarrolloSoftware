@@ -135,6 +135,10 @@ model Contract {
   finalValue     Decimal  @db.Decimal(10, 2)
   status         String   @db.VarChar(50) @default("generado")
   cantExactaInvit Int?
+  modificationStatus    String?  @db.VarChar(50)
+  modificationData      Json?
+  modificationComment   String?  @db.VarChar(500)
+  modificationRequestedAt DateTime?
   idReservation  Int
 
   reservation    Reservation          @relation(fields: [idReservation], references: [idReservation])

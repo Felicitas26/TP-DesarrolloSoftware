@@ -12,6 +12,7 @@ router.put("/:id", authenticate, contractController.update);
 router.post("/:id/enviar", authenticate, contractController.enviar);
 router.post("/:id/aceptar", authenticate, contractController.firmar);
 router.put("/:id/revision", authenticate, requireRole(["administrador"]), contractController.review);
-router.delete("/:id", authenticate, requireRole(["administrador"]), contractController.cancelar);
+router.put("/:id/modificacion", authenticate, contractController.solicitarModificacion);
+router.put("/:id/modificacion/revision", authenticate, requireRole(["administrador"]), contractController.revisarModificacion);
 
 export default router;

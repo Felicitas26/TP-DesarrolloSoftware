@@ -5,6 +5,7 @@
     "dev": "nodemon server.js",
     "seed:locations": "node scripts/seedLocations.js",
     "seed:usuarios": "node scripts/seedUsuarios.js",
+    "seed:prices": "node scripts/seedPrices.js",
     "postinstall": "prisma generate"
   },
   "devDependencies": {

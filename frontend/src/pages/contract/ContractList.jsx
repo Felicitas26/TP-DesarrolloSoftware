@@ -28,7 +28,6 @@ function ContractList() {
     const [contracts, setContracts] = useState([]);
     const [statusFilter, setStatusFilter] = useState("en_revision");
     const [feedback, setFeedback] = useState(null);
-    const [contractToDeleteId, setContractToDeleteId] = useState(null);
     const [loading, setLoading] = useState(true);
 
     const showFeedback = (type, title, message) => {
@@ -101,46 +100,6 @@ function ContractList() {
                 data.message
             );
 
-            getContracts();
-        } catch (error) {
-            console.error(error);
-            showFeedback("error", "Error", error.message);
-        }
-    };
-
-    const handleDeleteClick = (id) => {
-        setContractToDeleteId(id);
-        setFeedback({
-            type: "confirm",
-            title: "Eliminar contrato",
-            message: "¿Estás seguro de que querés eliminar este contrato? Se cancelará la reserva asociada.",
-            confirmLabel: "Eliminar"
-        });
-    };
-
-    const performDelete = async () => {
-        const id = contractToDeleteId;
-        setContractToDeleteId(null);
-        setFeedback(null);
-
-        try {
-            const response = await fetch(
-                `http://localhost:3000/api/contract/${id}`,
-                {
-                    method: "DELETE",
-                    headers: {
-                        "Authorization": `Bearer ${token}`
-                    }
-                }
-            );
-
-            const data = await response.json();
-
-            if (!response.ok) {
-                throw new Error(data.error);
-            }
-
-            showFeedback("success", "Contrato eliminado", data.message);
             getContracts();
         } catch (error) {
             console.error(error);
@@ -231,9 +190,16 @@ function ContractList() {
                                         </td>
                                         <td>{currency(contract.finalValue)}</td>
                                         <td>
-                                            <span className={`contract-list-status ${contract.status}`}>
-                                                {STATUS_LABEL[contract.status] || contract.status}
-                                            </span>
+                                            <div className="contract-list-status-wrap">
+                                                <span className={`contract-list-status ${contract.status}`}>
+                                                    {STATUS_LABEL[contract.status] || contract.status}
+                                                </span>
+                                                {contract.modificationStatus === "pendiente" && (
+                                                    <span className="contract-list-modbadge">
+                                                        Modif. pendiente
+                                                    </span>
+                                                )}
+                                            </div>
                                         </td>
                                         <td>
                                             <div className="contract-actions-row">
@@ -260,13 +226,6 @@ function ContractList() {
                                                         </button>
                                                     </>
                                                 )}
-
-                                                <button
-                                                    className="contract-action-delete"
-                                                    onClick={() => handleDeleteClick(contract.idContract)}
-                                                >
-                                                    Eliminar
-                                                </button>
                                             </div>
                                         </td>
                                     </tr>
@@ -283,10 +242,6 @@ function ContractList() {
                     type={feedback.type}
                     title={feedback.title}
                     message={feedback.message}
-                    confirmLabel={feedback.confirmLabel}
-                    cancelLabel="Volver"
-                    onConfirm={feedback.type === "confirm" ? performDelete : undefined}
-                    onCancel={() => { setFeedback(null); setContractToDeleteId(null); }}
                     onClose={() => setFeedback(null)}
                 />
             )}
