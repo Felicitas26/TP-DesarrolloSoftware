@@ -186,6 +186,7 @@ CREATE TABLE reservation (
     dateReservation DATE NOT NULL,
     dateEvent DATE NOT NULL,
     status VARCHAR(50) NOT NULL,
+    eventType VARCHAR(100) DEFAULT NULL,
     cantInvit INT NOT NULL,
     idCli INT NOT NULL,
     idLounge INT NOT NULL,

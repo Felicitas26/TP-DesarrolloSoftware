@@ -24,6 +24,11 @@ function ReservationNew() {
         "Otro"
     ];
 
+    const guestRanges = [
+        { id: "1", min: 70, max: 90, label: "70 - 90 invitados" },
+        { id: "2", min: 90, max: 130, label: "90 - 130 invitados" }
+    ];
+
     const [lounges, setLounges] = useState([]);
     const [loungeTypes, setLoungeTypes] = useState([]);
     const [cardDetails, setCardDetails] = useState([]);
@@ -153,12 +158,16 @@ function ReservationNew() {
             return;
         }
 
-        const cantInvitNum = Number(reservation.cantInvit);
+        const selectedRange = guestRanges.find(
+            (r) => String(r.min) === String(reservation.cantInvit)
+        );
 
-        if (!reservation.cantInvit || Number.isNaN(cantInvitNum) || cantInvitNum <= 0) {
-            showMessage("error", "Ingresá la cantidad de invitados.");
+        if (!selectedRange) {
+            showMessage("error", "Seleccioná la cantidad de invitados.");
             return;
         }
+
+        const cantInvitNum = Number(reservation.cantInvit);
 
         if (
             cantInvitNum < selectedLoungeType.minQuantity ||
@@ -378,15 +387,27 @@ function ReservationNew() {
                         Cantidad de invitados
                     </label>
 
-                    <input
-                        type="number"
-                        name="cantInvit"
-                        value={reservation.cantInvit}
-                        onChange={handleChange}
-                        min="1"
-                        required
-                        placeholder="Ingresá la cantidad de invitados"
-                    />
+                    {guestRanges.map((range) => (
+                        <label
+                            className="reservation-option"
+                            key={range.id}
+                        >
+                            <input
+                                type="radio"
+                                name="cantInvit"
+                                value={String(range.min)}
+                                checked={
+                                    reservation.cantInvit ===
+                                    String(range.min)
+                                }
+                                onChange={handleChange}
+                                required
+                            />
+                            <span>
+                                {range.label}
+                            </span>
+                        </label>
+                    ))}
 
                     {reservation.idLoungeType &&
                         (() => {
