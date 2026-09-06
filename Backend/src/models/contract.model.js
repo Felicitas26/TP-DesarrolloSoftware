@@ -183,7 +183,8 @@ class ContractModel {
             modificationStatus,
             modificationData,
             modificationComment,
-            modificationRequestedAt
+            modificationRequestedAt,
+            modificationReviewedAt
         } = data;
 
         try {
@@ -193,7 +194,8 @@ class ContractModel {
                     modificationStatus: modificationStatus ?? null,
                     modificationData: modificationData ?? null,
                     modificationComment: modificationComment ?? null,
-                    modificationRequestedAt: modificationRequestedAt ?? null
+                    modificationRequestedAt: modificationRequestedAt ?? null,
+                    modificationReviewedAt: modificationReviewedAt ?? null
                 }
             });
         } catch {

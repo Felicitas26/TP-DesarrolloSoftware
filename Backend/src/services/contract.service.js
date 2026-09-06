@@ -1,9 +1,10 @@
 import contractModel, { timeToDate } from "../models/contract.model.js";
 import reservationModel from "../models/reservation.model.js";
 import priceModel from "../models/price.model.js";
+import notificationService from "./notification.service.js";
 import prisma from "../lib/prisma.js";
 
-const EDITABLE_STATUSES = ["generado", "rechazado"];
+const EDITABLE_STATUSES = ["generado", "rechazado", "modificacion_en_curso"];
 
 class ContractService {
 
@@ -236,6 +237,14 @@ class ContractService {
 
         await contractModel.updateStatus(id, "en_revision");
 
+        if (contract.status === "modificacion_en_curso") {
+            await notificationService.notifyAdmins({
+                mensaje: `El cliente solicitó la re-firma del contrato #${id} tras su modificación.`,
+                tipo: "modificacion_reenviada",
+                idContract: id
+            });
+        }
+
         return await contractModel.getById(id);
     }
 
@@ -260,6 +269,26 @@ class ContractService {
 
         await contractModel.updateStatus(id, newStatus);
 
+        if (contract.status === "modificacion_en_curso") {
+            await notificationService.notifyClient({
+                idCli: contract.reservation.idCli,
+                mensaje: decision === "aprobar"
+                    ? `La revisión de tu modificación del contrato #${id} fue aprobada. Confirmá la firma nuevamente.`
+                    : `La revisión de tu modificación del contrato #${id} fue rechazada. Corregí los datos y enviá de nuevo.`,
+                tipo: "modificacion_revisada",
+                idContract: id
+            });
+        } else {
+            await notificationService.notifyClient({
+                idCli: contract.reservation.idCli,
+                mensaje: decision === "aprobar"
+                    ? `El contrato #${id} fue aprobado. Quedó listo para firmar.`
+                    : `El contrato #${id} fue rechazado. Corregí los datos y enviá de nuevo.`,
+                tipo: "contrato_revisado",
+                idContract: id
+            });
+        }
+
         return await contractModel.getById(id);
     }
 
@@ -281,6 +310,12 @@ class ContractService {
         }
 
         await contractModel.updateStatus(id, "firmado");
+
+        await notificationService.notifyAdmins({
+            mensaje: `El cliente firmó el contrato #${id}.`,
+            tipo: "contrato_firmado",
+            idContract: id
+        });
 
         return await contractModel.getById(id);
     }
@@ -412,6 +447,12 @@ class ContractService {
             throw error;
         }
 
+        await notificationService.notifyAdmins({
+            mensaje: `El cliente solicitó una modificación al contrato #${id}.`,
+            tipo: "modificacion_solicitada",
+            idContract: id
+        });
+
         return await contractModel.getById(id);
     }
 
@@ -434,7 +475,8 @@ class ContractService {
 
         if (decision === "rechazar") {
             const rechazado = await contractModel.updateModification(id, {
-                modificationStatus: "rechazada"
+                modificationStatus: "rechazada",
+                modificationReviewedAt: new Date()
             });
 
             if (!rechazado) {
@@ -444,6 +486,13 @@ class ContractService {
                 error.statusCode = 500;
                 throw error;
             }
+
+            await notificationService.notifyClient({
+                idCli: contract.reservation.idCli,
+                mensaje: `El administrador rechazó la modificación del contrato #${id}. Tus datos vigentes se conservan.`,
+                tipo: "modificacion_rechazada",
+                idContract: id
+            });
 
             return await contractModel.getById(id);
         }
@@ -504,7 +553,8 @@ class ContractService {
         });
 
         const aprobado = await contractModel.updateModification(id, {
-            modificationStatus: "aprobada"
+            modificationStatus: "aprobada",
+            modificationReviewedAt: new Date()
         });
 
         if (!aprobado) {
@@ -514,6 +564,15 @@ class ContractService {
             error.statusCode = 500;
             throw error;
         }
+
+        await contractModel.updateStatus(id, "modificacion_en_curso");
+
+        await notificationService.notifyClient({
+            idCli: contract.reservation.idCli,
+            mensaje: `Tu modificación del contrato #${id} fue aprobada. Revisá y confirmá tus datos nuevamente.`,
+            tipo: "modificacion_aprobada",
+            idContract: id
+        });
 
         const updatedContract = await contractModel.getById(id);
 

@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom";
+import NotificationBell from "../../components/NotificationBell.jsx";
 import "./ClientHome.css";
 
 const IconCalendar = () => (
@@ -162,14 +163,17 @@ function ClientHome() {
                     SALON STYLO
                 </a>
 
-                <button
-                    type="button"
-                    className="client-logout"
-                    onClick={handleLogout}
-                >
-                    <IconLogout />
-                    Cerrar Sesión
-                </button>
+                <div className="client-bar-actions">
+                    <NotificationBell />
+                    <button
+                        type="button"
+                        className="client-logout"
+                        onClick={handleLogout}
+                    >
+                        <IconLogout />
+                        Cerrar Sesión
+                    </button>
+                </div>
 
             </header>
 

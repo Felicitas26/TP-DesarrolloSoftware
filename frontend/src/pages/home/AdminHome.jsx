@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom";
+import NotificationBell from "../../components/NotificationBell.jsx";
 import "./AdminHome.css";
 
 const IconUser = () => (
@@ -129,9 +130,12 @@ function AdminHome() {
 
       <header className="admin-bar">
         <a className="admin-logo">SALON STYLO</a>
-        <button type="button" className="admin-logout" onClick={handleLogout}>
-          <IconLogout /> Cerrar Sesión
-        </button>
+        <div className="admin-bar-actions">
+          <NotificationBell />
+          <button type="button" className="admin-logout" onClick={handleLogout}>
+            <IconLogout /> Cerrar Sesión
+          </button>
+        </div>
       </header>
 
       <main className="admin-content">

@@ -8,7 +8,8 @@ const STATUS_LABEL = {
     en_revision: "En revisión",
     aprobado: "Aprobado — listo para firmar",
     rechazado: "Rechazado — requiere correcciones",
-    firmado: "Firmado"
+    firmado: "Firmado",
+    modificacion_en_curso: "Modificación aprobada — revisá y confirmá"
 };
 
 function MyContracts() {

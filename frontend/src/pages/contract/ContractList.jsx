@@ -9,7 +9,9 @@ const STATUS_OPTIONS = [
     { value: "generado", label: "Generados" },
     { value: "aprobado", label: "Aprobados" },
     { value: "rechazado", label: "Rechazados" },
-    { value: "firmado", label: "Firmados" }
+    { value: "firmado", label: "Firmados" },
+    { value: "con_modificacion", label: "Con modificación" },
+    { value: "mod_pendiente", label: "Solicitudes pendientes" }
 ];
 
 const STATUS_LABEL = {
@@ -17,7 +19,8 @@ const STATUS_LABEL = {
     en_revision: "En revisión",
     aprobado: "Aprobado",
     rechazado: "Rechazado",
-    firmado: "Firmado"
+    firmado: "Firmado",
+    modificacion_en_curso: "Modificación en curso"
 };
 
 function ContractList() {
@@ -70,9 +73,23 @@ function ContractList() {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
-    const filteredContracts = statusFilter === "todas"
-        ? contracts
-        : contracts.filter((c) => c.status === statusFilter);
+    const filteredContracts = (() => {
+        if (statusFilter === "todas") return contracts;
+
+        if (statusFilter === "con_modificacion") {
+            return contracts.filter(
+                (c) =>
+                    c.modificationStatus === "pendiente" ||
+                    c.status === "modificacion_en_curso"
+            );
+        }
+
+        if (statusFilter === "mod_pendiente") {
+            return contracts.filter((c) => c.modificationStatus === "pendiente");
+        }
+
+        return contracts.filter((c) => c.status === statusFilter);
+    })();
 
     const review = async (id, decision) => {
         try {

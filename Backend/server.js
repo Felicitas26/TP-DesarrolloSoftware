@@ -16,6 +16,7 @@ import reservationRoutes from "./src/routes/reservation.routes.js";
 import extraServiceRoutes from "./src/routes/extraService.routes.js";
 import cardDetailRoutes from "./src/routes/cardDetail.routes.js";
 import contractRoutes from "./src/routes/contract.routes.js";
+import notificationRoutes from "./src/routes/notification.routes.js";
 
 const app = express();
 
@@ -36,6 +37,7 @@ app.use("/api/reservation", reservationRoutes);
 app.use("/api/extraService", extraServiceRoutes);
 app.use("/api/cardDetail", cardDetailRoutes);
 app.use("/api/contract", contractRoutes);
+app.use("/api/notificacion", notificationRoutes);
 
 app.listen(3000, () => {
     console.log("Server running on port 3000");

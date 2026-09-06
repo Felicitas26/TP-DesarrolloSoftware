@@ -43,7 +43,8 @@ const STATUS_LABEL = {
     en_revision: "En revisión",
     aprobado: "Aprobado — listo para firma",
     rechazado: "Rechazado (requiere correcciones)",
-    firmado: "Firmado"
+    firmado: "Firmado",
+    modificacion_en_curso: "Modificación aprobada — revisá y confirmá"
 };
 
 const TERMINOS_FIRMA = [
@@ -101,8 +102,10 @@ function ContractDetail() {
     ];
 
     const canEdit = contract && ["generado", "rechazado"].includes(contract.status);
+    const enReModificacion =
+        contract?.status === "modificacion_en_curso" && rol === "cliente";
     const tieneModPendiente = contract?.modificationStatus === "pendiente";
-    const puedeEditar = canEdit || (rol === "cliente" && contract?.status === "firmado" && modificando);
+    const puedeEditar = canEdit || enReModificacion || (rol === "cliente" && contract?.status === "firmado" && modificando);
 
     const showMessage = (type, title, text) => {
         setMessage({ type, title, text });
@@ -794,6 +797,24 @@ function ContractDetail() {
                     </section>
                 )}
 
+                {/* REGISTRO DE MODIFICACION APROBADA (cliente, en curso) */}
+                {rol === "cliente" && enReModificacion && (
+                    <section className="contract-section contract-mod-solicitando">
+                        <h2>Registro de la modificación</h2>
+                        <p>
+                            El administrador aprobó tu solicitud de modificación el {formatDate(contract.modificationReviewedAt)}
+                            (solicitada el {formatDate(contract.modificationRequestedAt)}). Los cambios ya fueron aplicados
+                            y el contrato quedó habilitado para que los confirmes. Enviá el contrato de nuevo
+                            para que vuelva al proceso de aceptación y firmarlo nuevamente.
+                        </p>
+                        {!!contract.modificationComment && (
+                            <p>
+                                <strong>Comentario:</strong> {contract.modificationComment}
+                            </p>
+                        )}
+                    </section>
+                )}
+
                 {/* REVISION DE MODIFICACION (admin) */}
                 {rol === "administrador" && tieneModPendiente && contract.modificationData && (
                     <section className="contract-section">
@@ -872,6 +893,22 @@ function ContractDetail() {
                             <button className="contract-btn-primary" onClick={handleEnviar} disabled={saving}>
                                 Enviar para revisión
                             </button>
+                        </>
+                    )}
+
+                    {rol === "cliente" && enReModificacion && (
+                        <>
+                            <button className="contract-btn-save" onClick={handleSave} disabled={saving}>
+                                {saving ? "Guardando..." : "Guardar cambios"}
+                            </button>
+                            <button className="contract-btn-primary" onClick={handleEnviar} disabled={saving}>
+                                Enviar de nuevo para revisión
+                            </button>
+                            <p className="contract-pending-note">
+                                Tu modificación fue aprobada por el administrador. Revisá los datos y enviá
+                                el contrato de nuevo; volverá al proceso de aceptación y tendrás que firmarlo
+                                otra vez.
+                            </p>
                         </>
                     )}
 

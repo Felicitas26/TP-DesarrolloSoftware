@@ -294,6 +294,12 @@
     color: #86efac;
 }
 
+.my-contract-status.modificacion_en_curso {
+    background: rgba(168, 85, 247, 0.14);
+    border-color: rgba(168, 85, 247, 0.45);
+    color: #d8b4fe;
+}
+
 .my-contract-status.rechazado {
     background: rgba(248, 113, 113, 0.12);
     border-color: rgba(248, 113, 113, 0.4);
