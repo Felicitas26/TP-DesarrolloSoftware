@@ -22,7 +22,12 @@ function ReservationEdit() {
 
         try {
             const response = await fetch(
-                "http://localhost:3000/api/reservation"
+                "http://localhost:3000/api/reservation",
+                {
+                    headers: {
+                        "Authorization": `Bearer ${localStorage.getItem("sty_token")}`
+                    }
+                }
             );
 
             const data = await response.json();
@@ -64,7 +69,12 @@ function ReservationEdit() {
 
         try {
             const response = await fetch(
-                `http://localhost:3000/api/reservation/${id}`
+                `http://localhost:3000/api/reservation/${id}`,
+                {
+                    headers: {
+                        "Authorization": `Bearer ${localStorage.getItem("sty_token")}`
+                    }
+                }
             );
 
             const data = await response.json();
@@ -106,7 +116,8 @@ function ReservationEdit() {
                 {
                     method: "PUT",
                     headers: {
-                        "Content-Type": "application/json"
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${localStorage.getItem("sty_token")}`
                     },
                     body: JSON.stringify({
                         dateEvent: reservation.dateEvent,
@@ -147,7 +158,10 @@ function ReservationEdit() {
             const response = await fetch(
                 `http://localhost:3000/api/reservation/${selectedId}`,
                 {
-                    method: "DELETE"
+                    method: "DELETE",
+                    headers: {
+                        "Authorization": `Bearer ${localStorage.getItem("sty_token")}`
+                    }
                 }
             );
 

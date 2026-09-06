@@ -19,6 +19,7 @@ import ReservationList from "./pages/reservation/ReservationList";
 import ReservationNew from "./pages/reservation/ReservationNew";
 import ReservationEdit from "./pages/reservation/ReservationEdit";
 import MyReservations from "./pages/reservation/MyReservations";
+import EditMyReservation from "./pages/reservation/EditMyReservation";
 import ExtraServiceList from "./pages/extraService/extraServiceList";
 import NewExtraService from "./pages/extraService/newExtraService";
 import CardDetailList from "./pages/cardDetail/cardDetailList";
@@ -60,6 +61,7 @@ function App() {
                 <Route path="/reservation/new" element={<ReservationNew />} />
                 <Route path="/reservation/edit/:id" element={<ReservationEdit />} />
                 <Route path="/my-reservations" element={<MyReservations />} />
+                <Route path="/my-reservations/edit/:id" element={<EditMyReservation />} />
 
                 <Route path="/extraService" element={<ExtraServiceList />} />
                 <Route path="/extraService/new" element={<NewExtraService />} />

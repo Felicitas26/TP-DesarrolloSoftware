@@ -26,6 +26,18 @@ class ReservationController {
     async getById(req, res) {
         try {
             const reservation = await reservationService.getById(req.params.id);
+
+            if (!reservation) {
+                return res.status(404).json({ error: "Reserva no encontrada." });
+            }
+
+            if (
+                req.usuario.rol === "cliente" &&
+                reservation.idCli !== req.usuario.idCli
+            ) {
+                return res.status(403).json({ error: "No tenés acceso a esta reserva." });
+            }
+
             return res.status(200).json(reservation);
         } catch (error) {
             return res.status(error.statusCode || 500).json({ error: error.message });
@@ -47,10 +59,30 @@ class ReservationController {
 
     async update(req, res) {
         try {
+            const reservation = await reservationService.getById(req.params.id);
+
+            if (!reservation) {
+                return res.status(404).json({ error: "Reserva no encontrada." });
+            }
+
+            if (req.usuario.rol === "cliente") {
+                if (reservation.idCli !== req.usuario.idCli) {
+                    return res.status(403).json({ error: "No tenés acceso a esta reserva." });
+                }
+
+                if (reservation.status !== "pendiente") {
+                    return res.status(400).json({ error: "Solo podés editar una reserva en estado pendiente." });
+                }
+            }
+
             const reservationUpdated = await reservationService.update(
                 req.params.id,
                 req.body
             );
+
+            if (!reservationUpdated) {
+                return res.status(404).json({ error: "No se pudo actualizar la reserva." });
+            }
 
             return res.status(200).json({
                 message: "Reserva actualizada correctamente.",
@@ -79,6 +111,19 @@ class ReservationController {
 
     async delete(req, res) {
         try {
+            const reservation = await reservationService.getById(req.params.id);
+
+            if (!reservation) {
+                return res.status(404).json({ error: "Reserva no encontrada." });
+            }
+
+            if (
+                req.usuario.rol === "cliente" &&
+                reservation.idCli !== req.usuario.idCli
+            ) {
+                return res.status(403).json({ error: "No tenés acceso a esta reserva." });
+            }
+
             await reservationService.delete(req.params.id);
 
             return res.status(200).json({

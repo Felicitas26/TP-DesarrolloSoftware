@@ -11,14 +11,26 @@ const IconEye = () => (
     </svg>
 );
 
+const STATUS_OPTIONS = [
+    { value: "todas", label: "Todas" },
+    { value: "pendiente", label: "Pendientes" },
+    { value: "aceptada", label: "Aceptadas" },
+    { value: "confirmada", label: "Confirmadas" },
+    { value: "cancelada", label: "Canceladas" }
+];
+
 function ReservationList() {
 
     const navigate = useNavigate();
 
     const [reservations, setReservations] = useState([]);
+    const [statusFilter, setStatusFilter] = useState("pendiente");
     const [clientToDetail, setClientToDetail] = useState(null);
     const [feedback, setFeedback] = useState(null);
-    const [confirmCancelId, setConfirmCancelId] = useState(null);
+    const [reservationToCancelId, setReservationToCancelId] = useState(null);
+    const [loading, setLoading] = useState(true);
+
+    const token = localStorage.getItem("sty_token");
 
     const showFeedback = (type, title, message) => {
         setFeedback({ type, title, message });
@@ -28,7 +40,12 @@ function ReservationList() {
 
         try {
             const response = await fetch(
-                "http://localhost:3000/api/reservation"
+                "http://localhost:3000/api/reservation",
+                {
+                    headers: {
+                        "Authorization": `Bearer ${token}`
+                    }
+                }
             );
 
             const data = await response.json();
@@ -37,21 +54,29 @@ function ReservationList() {
                 throw new Error(data.error);
             }
 
-            setReservations(
-                data.filter(
-                    (reservation) => reservation.status === "pendiente"
-                )
-            );
+            setReservations(data);
 
         } catch (error) {
             console.error(error);
             showFeedback("error", "Error", error.message);
+        } finally {
+            setLoading(false);
         }
     };
 
     useEffect(() => {
+        if (!token) {
+            showFeedback("error", "Error", "No estás autenticado. Volvé a iniciar sesión.");
+            setLoading(false);
+            return;
+        }
         getReservations();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
+
+    const filteredReservations = statusFilter === "todas"
+        ? reservations
+        : reservations.filter(r => r.status === statusFilter);
 
     const acceptReservation = async (id) => {
 
@@ -62,7 +87,8 @@ function ReservationList() {
                 {
                     method: "PUT",
                     headers: {
-                        "Content-Type": "application/json"
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${token}`
                     },
                     body: JSON.stringify({
                         status: "aceptada"
@@ -88,16 +114,31 @@ function ReservationList() {
         }
     };
 
-    const performCancel = async (id) => {
+    const handleCancelClick = (id) => {
+        setReservationToCancelId(id);
+        setFeedback({
+            type: "confirm",
+            title: "Cancelar reserva",
+            message: "¿Estás seguro de que querés cancelar esta reserva?",
+            confirmLabel: "Cancelar reserva"
+        });
+    };
 
-        setConfirmCancelId(null);
+    const performCancel = async () => {
+
+        const id = reservationToCancelId;
+        setReservationToCancelId(null);
+        setFeedback(null);
 
         try {
 
             const response = await fetch(
                 `http://localhost:3000/api/reservation/${id}`,
                 {
-                    method: "DELETE"
+                    method: "DELETE",
+                    headers: {
+                        "Authorization": `Bearer ${token}`
+                    }
                 }
             );
 
@@ -132,7 +173,7 @@ function ReservationList() {
 
                 <div>
                     <h1>Gestión de Reservas</h1>
-                    <p>Reservas pendientes de aprobación.</p>
+                    <p>Administrá las reservas del salón.</p>
                 </div>
 
                 <div className="reservation-list-header-actions">
@@ -142,15 +183,29 @@ function ReservationList() {
                     >
                         Volver al menú
                     </button>
-                    <span>{reservations.length}</span>
+                    <span>{filteredReservations.length}</span>
                 </div>
 
             </div>
 
-            {reservations.length === 0 ? (
+            <div className="reservation-list-filters">
+                {STATUS_OPTIONS.map((opt) => (
+                    <button
+                        key={opt.value}
+                        className={`reservation-filter-btn ${statusFilter === opt.value ? "active" : ""}`}
+                        onClick={() => setStatusFilter(opt.value)}
+                    >
+                        {opt.label}
+                    </button>
+                ))}
+            </div>
+
+            {loading ? (
+                <p className="reservation-list-empty">Cargando reservas...</p>
+            ) : filteredReservations.length === 0 ? (
 
                 <p className="reservation-list-empty">
-                    No hay reservas pendientes.
+                    No hay reservas en este estado.
                 </p>
 
             ) : (
@@ -176,7 +231,7 @@ function ReservationList() {
 
                         <tbody>
 
-                            {reservations.map((reservation) => (
+                            {filteredReservations.map((reservation) => (
 
                                 <tr key={reservation.idReservation}>
 
@@ -233,27 +288,31 @@ function ReservationList() {
                                                 <IconEye />
                                             </button>
 
-                                            <button
-                                                className="reservation-btn-accept"
-                                                onClick={() =>
-                                                    acceptReservation(
-                                                        reservation.idReservation
-                                                    )
-                                                }
-                                            >
-                                                Aceptar
-                                            </button>
+                                            {reservation.status === "pendiente" && (
+                                                <button
+                                                    className="reservation-btn-accept"
+                                                    onClick={() =>
+                                                        acceptReservation(
+                                                            reservation.idReservation
+                                                        )
+                                                    }
+                                                >
+                                                    Aceptar
+                                                </button>
+                                            )}
 
-                                            <button
-                                                className="reservation-btn-cancel"
-                                                onClick={() =>
-                                                    performCancel(
-                                                        reservation.idReservation
-                                                    )
-                                                }
-                                            >
-                                                Cancelar
-                                            </button>
+                                            {reservation.status === "pendiente" && (
+                                                <button
+                                                    className="reservation-btn-cancel"
+                                                    onClick={() =>
+                                                        handleCancelClick(
+                                                            reservation.idReservation
+                                                        )
+                                                    }
+                                                >
+                                                    Cancelar
+                                                </button>
+                                            )}
 
                                         </div>
 
@@ -327,6 +386,19 @@ function ReservationList() {
                         </div>
                     </div>
                 </div>
+            )}
+
+            {feedback && (
+                <FeedbackModal
+                    type={feedback.type}
+                    title={feedback.title}
+                    message={feedback.message}
+                    confirmLabel={feedback.confirmLabel}
+                    cancelLabel="Volver"
+                    onConfirm={feedback.type === "confirm" ? performCancel : undefined}
+                    onCancel={() => { setFeedback(null); setReservationToCancelId(null); }}
+                    onClose={() => setFeedback(null)}
+                />
             )}
 
         </div>

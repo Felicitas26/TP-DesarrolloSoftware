@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import "./ReservationNew.css";
 
-function ReservationNew() {
+function EditMyReservation() {
     const navigate = useNavigate();
+    const { id } = useParams();
 
     const [reservation, setReservation] = useState({
         dateEvent: "",
@@ -15,6 +16,17 @@ function ReservationNew() {
         idServices: []
     });
 
+    const [lounges, setLounges] = useState([]);
+    const [loungeTypes, setLoungeTypes] = useState([]);
+    const [cardDetails, setCardDetails] = useState([]);
+    const [extraServices, setExtraServices] = useState([]);
+
+    const [message, setMessage] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [saving, setSaving] = useState(false);
+
+    const token = localStorage.getItem("sty_token");
+
     const EVENT_TYPES = [
         "Casamiento",
         "Cumpleaños",
@@ -24,84 +36,86 @@ function ReservationNew() {
         "Otro"
     ];
 
-    const [lounges, setLounges] = useState([]);
-    const [loungeTypes, setLoungeTypes] = useState([]);
-    const [cardDetails, setCardDetails] = useState([]);
-    const [extraServices, setExtraServices] = useState([]);
-
-    const [message, setMessage] = useState(null);
-
     const showMessage = (type, text) => {
         setMessage({ type, text });
     };
 
     useEffect(() => {
 
-        const getLounges = async () => {
+        const getCatalog = async () => {
             try {
-                const response = await fetch(
-                    "http://localhost:3000/api/lounge"
-                );
-                const data = await response.json();
-                setLounges(data);
+                const [loungesRes, typesRes, menusRes, extrasRes] =
+                    await Promise.all([
+                        fetch("http://localhost:3000/api/lounge"),
+                        fetch("http://localhost:3000/api/loungeType"),
+                        fetch("http://localhost:3000/api/cardDetail"),
+                        fetch("http://localhost:3000/api/extraservice")
+                    ]);
+
+                const [loungesData, typesData, menusData, extrasData] =
+                    await Promise.all([
+                        loungesRes.json(),
+                        typesRes.json(),
+                        menusRes.json(),
+                        extrasRes.json()
+                    ]);
+
+                setLounges(loungesData);
+                setLoungeTypes(typesData);
+                setCardDetails(menusData);
+                setExtraServices(extrasData);
             } catch (error) {
-                console.error("Error al obtener los salones:", error);
+                console.error("Error al obtener el catálogo:", error);
             }
         };
 
-        const getLoungeTypes = async () => {
+        const getReservation = async () => {
             try {
                 const response = await fetch(
-                    "http://localhost:3000/api/loungeType"
+                    `http://localhost:3000/api/reservation/${id}`,
+                    {
+                        headers: {
+                            "Authorization": `Bearer ${token}`
+                        }
+                    }
                 );
 
                 const data = await response.json();
-                setLoungeTypes(data);
+
+                if (!response.ok) {
+                    throw new Error(data.error || "No se pudo cargar la reserva.");
+                }
+
+                setReservation({
+                    dateEvent: data.dateEvent
+                        ? data.dateEvent.split("T")[0]
+                        : "",
+                    eventType: data.eventType || "",
+                    cantInvit: data.cantInvit || "",
+                    idLounge: data.idLounge ? String(data.idLounge) : "",
+                    idLoungeType: data.idLoungeType
+                        ? String(data.idLoungeType)
+                        : "",
+                    idCardDetail: data.idCardDetail
+                        ? String(data.idCardDetail)
+                        : "",
+                    idServices:
+                        (data.extraServices || []).map(
+                            (s) => s.idService
+                        ) || []
+                });
+
             } catch (error) {
-                console.error(
-                    "Error al obtener los tipos de salón:",
-                    error
-                );
+                showMessage("error", error.message);
+            } finally {
+                setLoading(false);
             }
         };
 
-        const getCardDetails = async () => {
-            try {
-                const response = await fetch(
-                    "http://localhost:3000/api/cardDetail"
-                );
+        getCatalog();
+        getReservation();
 
-                const data = await response.json();
-                setCardDetails(data);
-            } catch (error) {
-                console.error(
-                    "Error al obtener los menús:",
-                    error
-                );
-            }
-        };
-
-        const getExtraServices = async () => {
-            try {
-                const response = await fetch(
-                    "http://localhost:3000/api/extraservice"
-                );
-
-                const data = await response.json();
-                setExtraServices(data);
-            } catch (error) {
-                console.error(
-                    "Error al obtener los servicios extras:",
-                    error
-                );
-            }
-        };
-
-        getLounges();
-        getLoungeTypes();
-        getCardDetails();
-        getExtraServices();
-    }, []);
+    }, [id]);
 
     const handleChange = (e) => {
         setReservation({
@@ -115,7 +129,7 @@ function ReservationNew() {
 
         if (updatedServices.includes(idService)) {
             updatedServices = updatedServices.filter(
-                (id) => id !== idService
+                (sid) => sid !== idService
             );
         } else {
             updatedServices.push(idService);
@@ -171,18 +185,12 @@ function ReservationNew() {
             return;
         }
 
-        const token = localStorage.getItem("sty_token");
-
-        if (!token) {
-            showMessage("error", "No hay un token de autenticación. Volvé a iniciar sesión.");
-            return;
-        }
-
         const reservationData = {
             dateEvent: reservation.dateEvent,
             eventType: reservation.eventType,
             status: "pendiente",
             cantInvit: cantInvitNum,
+            idCli: Number(localStorage.getItem("sty_idCli")),
             idLounge: selectedLoungeType.idLounge,
             idLoungeType: selectedLoungeType.idLoungeType,
             idCardDetail: reservation.idCardDetail
@@ -191,11 +199,13 @@ function ReservationNew() {
             idServices: reservation.idServices
         };
 
+        setSaving(true);
+
         try {
             const response = await fetch(
-                "http://localhost:3000/api/reservation",
+                `http://localhost:3000/api/reservation/${id}`,
                 {
-                    method: "POST",
+                    method: "PUT",
                     headers: {
                         "Content-Type": "application/json",
                         "Authorization": `Bearer ${token}`
@@ -207,34 +217,35 @@ function ReservationNew() {
             const data = await response.json();
 
             if (!response.ok) {
-                throw new Error(
-                    data.error ||
-                    "No se pudo crear la reserva."
-                );
+                throw new Error(data.error || "No se pudo actualizar la reserva.");
             }
 
-            showMessage("success", "¡Reserva creada correctamente!");
-            navigate("/my-reservations");
+            showMessage("success", "¡Reserva actualizada correctamente!");
+            setTimeout(() => navigate("/my-reservations"), 1000);
 
         } catch (error) {
-            console.error(
-                "Error al crear la reserva:",
-                error
-            );
-            showMessage(
-                "error",
-                error.message || "No se pudo crear la reserva."
-            );
+            console.error("Error al actualizar la reserva:", error);
+            showMessage("error", error.message || "No se pudo actualizar la reserva.");
+        } finally {
+            setSaving(false);
         }
     };
+
+    if (loading) {
+        return (
+            <div className="reservation-new-container">
+                <p> Cargando reserva... </p>
+            </div>
+        );
+    }
 
     return (
         <div className="reservation-new-container">
 
-            <h1>Nueva reserva</h1>
+            <h1>Editar reserva</h1>
 
             <p>
-                Ingresá los datos de tu reserva.
+                Modificá los datos de tu reserva.
             </p>
 
             <form onSubmit={handleSubmit}>
@@ -429,7 +440,6 @@ function ReservationNew() {
                                     String(menu.idCardDetail)
                                 }
                                 onChange={handleChange}
-                                required
                             />
 
                             <span>
@@ -526,14 +536,14 @@ function ReservationNew() {
 
                 <div className="reservation-buttons">
 
-                    <button type="submit">
-                        Continuar
+                    <button type="submit" disabled={saving}>
+                        {saving ? "Guardando..." : "Guardar cambios"}
                     </button>
 
                     <button
                         type="button"
                         className="reservation-back-button"
-                        onClick={() => navigate("/client-home")}
+                        onClick={() => navigate("/my-reservations")}
                     >
                         Volver
                     </button>
@@ -581,4 +591,4 @@ function ReservationNew() {
     );
 }
 
-export default ReservationNew;
+export default EditMyReservation;

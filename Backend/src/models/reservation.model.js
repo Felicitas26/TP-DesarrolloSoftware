@@ -3,7 +3,8 @@ import prisma from "../lib/prisma.js";
 class ReservationModel {
 
     async getAll() {
-        return await prisma.reservation.findMany({
+        const reservations = await prisma.reservation.findMany({
+            orderBy: { dateEvent: "desc" },
             include: {
                 client: {
                     select: {
@@ -27,9 +28,26 @@ class ReservationModel {
                 loungeType: {
                     select: { nameLoungeType: true }
                 },
-                cardDetail: true
+                cardDetail: true,
+                extraServices: {
+                    include: {
+                        extraService: {
+                            select: {
+                                idService: true,
+                                nameService: true,
+                                detailService: true,
+                                cost: true
+                            }
+                        }
+                    }
+                }
             }
         });
+
+        return reservations.map(r => ({
+            ...r,
+            extraServices: r.extraServices.map(es => es.extraService)
+        }));
     }
 
     async getByClient(idCli) {
@@ -70,25 +88,72 @@ class ReservationModel {
     }
 
     async getById(id) {
-        return await prisma.reservation.findUnique({
+        const reservation = await prisma.reservation.findUnique({
             where: { idReservation: Number(id) },
             include: {
                 client: {
                     select: {
                         nameCli: true,
                         surnameCli: true,
-                        dniCli: true
+                        dniCli: true,
+                        phoneCli: true,
+                        emailCli: true,
+                        addressCli: true,
+                        location: {
+                            select: {
+                                city: true,
+                                zipCode: true
+                            }
+                        }
                     }
                 },
                 lounge: {
-                    select: { name: true }
+                    select: { name: true, loungeAddress: true }
                 },
                 loungeType: {
-                    select: { nameLoungeType: true }
+                    select: {
+                        nameLoungeType: true,
+                        minQuantity: true,
+                        maxQuantity: true
+                    }
                 },
-                cardDetail: true
+                cardDetail: true,
+                extraServices: {
+                    include: {
+                        extraService: {
+                            select: {
+                                idService: true,
+                                nameService: true,
+                                detailService: true,
+                                cost: true
+                            }
+                        }
+                    }
+                }
             }
         });
+
+        if (!reservation) return null;
+
+        return {
+            ...reservation,
+            extraServices: reservation.extraServices.map(es => es.extraService)
+        };
+    }
+
+    async isAvailable(idLounge, idLoungeType, dateEvent) {
+        const targetDate = new Date(dateEvent);
+
+        const conflicting = await prisma.reservation.count({
+            where: {
+                idLounge,
+                idLoungeType,
+                dateEvent: targetDate,
+                status: { not: "cancelada" }
+            }
+        });
+
+        return conflicting === 0;
     }
 
     async create(reservation, idCli) {
@@ -141,11 +206,12 @@ class ReservationModel {
             idCli,
             idLounge,
             idLoungeType,
-            idCardDetail
+            idCardDetail,
+            idServices
         } = reservation;
 
         try {
-            return await prisma.reservation.update({
+            const updated = await prisma.reservation.update({
                 where: { idReservation: Number(id) },
                 data: {
                     dateEvent: new Date(dateEvent),
@@ -155,9 +221,21 @@ class ReservationModel {
                     idCli: Number(idCli),
                     idLounge: Number(idLounge),
                     idLoungeType: Number(idLoungeType),
-                    idCardDetail: idCardDetail ? Number(idCardDetail) : null
+                    idCardDetail: idCardDetail ? Number(idCardDetail) : null,
+                    ...(Array.isArray(idServices)
+                        ? {
+                            extraServices: {
+                                deleteMany: {},
+                                create: idServices.map(idService => ({
+                                    idService: Number(idService)
+                                }))
+                            }
+                        }
+                        : {})
                 }
             });
+
+            return updated;
         } catch {
             return null;
         }

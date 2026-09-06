@@ -50,7 +50,7 @@ class ClientService {
                     password: passwordHash,
                     rol: "cliente",
                     idCli: created.idCli,
-                    passwordTemporal: 1
+                    passwordTemporal: true
                 });
             }
         } catch (err) {
