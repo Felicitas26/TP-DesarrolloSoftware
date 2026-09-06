@@ -66,7 +66,7 @@ class UsuarioService {
             password: passwordHash,
             rol: "cliente",
             idCli: client.idCli,
-            passwordTemporal: 0
+            passwordTemporal: false
         });
     }
 
@@ -88,7 +88,7 @@ class UsuarioService {
             password: passwordHash,
             rol: "cliente",
             idCli,
-            passwordTemporal: 1
+            passwordTemporal: true
         });
     }
 
@@ -180,7 +180,7 @@ class UsuarioService {
             password: passwordHash,
             rol: "administrador",
             idCli: null,
-            passwordTemporal: 0
+            passwordTemporal: false
         });
     }
 

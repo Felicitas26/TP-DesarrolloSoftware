@@ -34,6 +34,23 @@ class PriceModel {
         });
     }
 
+    async getActive(idLoungeType, dateEvent) {
+        const prices = await prisma.price.findMany({
+            where: {
+                idLoungeType: Number(idLoungeType),
+                effectiveDate: { lte: new Date(dateEvent) },
+                OR: [
+                    { endDate: null },
+                    { endDate: { gte: new Date(dateEvent) } }
+                ]
+            },
+            orderBy: { effectiveDate: "desc" },
+            take: 1
+        });
+
+        return prices[0] || null;
+    }
+
     async create(price) {
         const { effectiveDate, endDate, value, idLoungeType } = price;
 

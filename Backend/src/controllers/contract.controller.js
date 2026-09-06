@@ -1,11 +1,20 @@
-import contratoService from "../services/contrato.service.js";
+import contractService from "../services/contract.service.js";
 
-class ContratoController {
+class ContractController {
 
     async getAll(req, res) {
         try {
-            const contratos = await contratoService.getAll();
-            return res.status(200).json(contratos);
+            const contracts = await contractService.getAll();
+            return res.status(200).json(contracts);
+        } catch (error) {
+            return res.status(error.statusCode || 500).json({ error: error.message });
+        }
+    }
+
+    async getByClient(req, res) {
+        try {
+            const contracts = await contractService.getByClient(req.usuario.idCli);
+            return res.status(200).json(contracts);
         } catch (error) {
             return res.status(error.statusCode || 500).json({ error: error.message });
         }
@@ -13,17 +22,22 @@ class ContratoController {
 
     async getById(req, res) {
         try {
-            const contrato = await contratoService.getById(req.params.id);
-            return res.status(200).json(contrato);
-        } catch (error) {
-            return res.status(error.statusCode || 500).json({ error: error.message });
-        }
-    }
+            const contract = await contractService.getById(req.params.id);
 
-    async create(req, res) {
-        try {
-            const newContrato = await contratoService.create(req.body);
-            return res.status(201).json(newContrato);
+            if (!contract) {
+                return res.status(404).json({ error: "Contrato no encontrado." });
+            }
+
+            if (
+                req.usuario.rol === "cliente" &&
+                contract.reservation.idCli !== req.usuario.idCli
+            ) {
+                return res.status(403).json({ error: "No tenés acceso a este contrato." });
+            }
+
+            const calc = await contractService.calcValues(contract, contract.reservation);
+
+            return res.status(200).json({ ...contract, calc });
         } catch (error) {
             return res.status(error.statusCode || 500).json({ error: error.message });
         }
@@ -31,24 +45,114 @@ class ContratoController {
 
     async update(req, res) {
         try {
-            const contratoUpdated = await contratoService.update(req.params.id, req.body);
+            const contract = await contractService.getById(req.params.id);
+
+            if (!contract) {
+                return res.status(404).json({ error: "Contrato no encontrado." });
+            }
+
+            if (
+                req.usuario.rol === "cliente" &&
+                contract.reservation.idCli !== req.usuario.idCli
+            ) {
+                return res.status(403).json({ error: "No tenés acceso a este contrato." });
+            }
+
+            const updated = await contractService.update(req.params.id, req.body);
+
             return res.status(200).json({
                 message: "Contrato actualizado correctamente.",
-                contrato: contratoUpdated
+                contract: updated
             });
         } catch (error) {
             return res.status(error.statusCode || 500).json({ error: error.message });
         }
     }
 
-    async delete(req, res) {
+    async enviar(req, res) {
         try {
-            await contratoService.delete(req.params.id);
-            return res.status(200).json({ message: "Contrato eliminado correctamente." });
+            const contract = await contractService.getById(req.params.id);
+
+            if (!contract) {
+                return res.status(404).json({ error: "Contrato no encontrado." });
+            }
+
+            if (
+                req.usuario.rol === "cliente" &&
+                contract.reservation.idCli !== req.usuario.idCli
+            ) {
+                return res.status(403).json({ error: "No tenés acceso a este contrato." });
+            }
+
+            const sent = await contractService.enviar(req.params.id);
+
+            return res.status(200).json({
+                message: "Contrato enviado para revisión correctamente.",
+                contract: sent
+            });
+        } catch (error) {
+            return res.status(error.statusCode || 500).json({ error: error.message });
+        }
+    }
+
+    async review(req, res) {
+        try {
+            const { decision } = req.body;
+
+            if (!["aprobar", "rechazar"].includes(decision)) {
+                return res.status(400).json({ error: "La decisión debe ser 'aprobar' o 'rechazar'." });
+            }
+
+            const reviewed = await contractService.review(req.params.id, decision);
+
+            return res.status(200).json({
+                message: decision === "aprobar"
+                    ? "Revisión aprobada. El contrato quedó listo para la firma."
+                    : "Revisión rechazada. El cliente debe corregir el contrato.",
+                contract: reviewed
+            });
+        } catch (error) {
+            return res.status(error.statusCode || 500).json({ error: error.message });
+        }
+    }
+
+    async firmar(req, res) {
+        try {
+            const contract = await contractService.getById(req.params.id);
+
+            if (!contract) {
+                return res.status(404).json({ error: "Contrato no encontrado." });
+            }
+
+            if (
+                req.usuario.rol === "cliente" &&
+                contract.reservation.idCli !== req.usuario.idCli
+            ) {
+                return res.status(403).json({ error: "No tenés acceso a este contrato." });
+            }
+
+            const signed = await contractService.firmar(req.params.id);
+
+            return res.status(200).json({
+                message: "¡Contrato aceptado! Firmaste la conformidad del contrato.",
+                contract: signed
+            });
+        } catch (error) {
+            return res.status(error.statusCode || 500).json({ error: error.message });
+        }
+    }
+
+    async cancelar(req, res) {
+        try {
+            await contractService.cancelar(req.params.id);
+
+            return res.status(200).json({
+                message: "Contrato eliminado y reserva asociada cancelada."
+            });
         } catch (error) {
             return res.status(error.statusCode || 500).json({ error: error.message });
         }
     }
 }
 
-export default new ContratoController();
+export default new ContractController();

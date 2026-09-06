@@ -13,6 +13,8 @@
     align-items: center;
     justify-content: space-between;
     margin-bottom: 24px;
+    gap: 16px;
+    flex-wrap: wrap;
 }
 
 .contract-list-header h1 {
@@ -27,7 +29,13 @@
     font-size: 0.9rem;
 }
 
-.contract-list-header span {
+.contract-list-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.contract-list-header-actions span {
     min-width: 28px;
     height: 28px;
     padding: 0 8px;
@@ -39,6 +47,39 @@
     justify-content: center;
     font-size: 0.8rem;
     font-weight: 700;
+}
+
+.contract-btn-back {
+    padding: 8px 14px;
+    border: 1px solid #cbd5e1;
+    background-color: #ffffff;
+    color: #334155;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.85rem;
+}
+
+.contract-list-filters {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.contract-filter-btn {
+    padding: 7px 14px;
+    border: 1px solid #e2e8f0;
+    background-color: #ffffff;
+    color: #475569;
+    border-radius: 999px;
+    cursor: pointer;
+    font-size: 0.82rem;
+}
+
+.contract-filter-btn.active {
+    background-color: #0284c7;
+    border-color: #0284c7;
+    color: #ffffff;
 }
 
 .contract-list-table-container {
@@ -75,4 +116,75 @@
     text-align: center;
     color: #64748b;
     font-size: 0.85rem;
+}
+
+.contract-list-status {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    background-color: #e2e8f0;
+    color: #334155;
+}
+
+.contract-list-status.en_revision {
+    background-color: #fef3c7;
+    color: #92400e;
+}
+
+.contract-list-status.aprobado,
+.contract-list-status.firmado {
+    background-color: #dcfce7;
+    color: #166534;
+}
+
+.contract-list-status.rechazado {
+    background-color: #fee2e2;
+    color: #991b1b;
+}
+
+.contract-actions-row {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.contract-action-view,
+.contract-action-approve,
+.contract-action-reject,
+.contract-action-delete {
+    padding: 6px 10px;
+    border: 1px solid #cbd5e1;
+    background-color: #ffffff;
+    color: #334155;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.78rem;
+}
+
+.contract-action-view:hover {
+    background-color: #f1f5f9;
+}
+
+.contract-action-approve {
+    border-color: #16a34a;
+    color: #166534;
+    background-color: #f0fdf4;
+}
+
+.contract-action-reject {
+    border-color: #dc2626;
+    color: #991b1b;
+    background-color: #fef2f2;
+}
+
+.contract-action-delete {
+    border-color: #dc2626;
+    color: #991b1b;
+    background-color: #ffffff;
+}
+
+.contract-action-delete:hover {
+    background-color: #fee2e2;
 }

@@ -291,10 +291,12 @@ CREATE TABLE reservationextraservice (
 
 CREATE TABLE contract (
     idContract INT NOT NULL AUTO_INCREMENT,
-    eventStartTime TIME NOT NULL,
-    eventEndTime TIME NOT NULL,
+    eventStartTime TIME DEFAULT NULL,
+    eventEndTime TIME DEFAULT NULL,
     dateContract DATE NOT NULL,
     finalValue DECIMAL(10,2) NOT NULL,
+    status VARCHAR(50) NOT NULL DEFAULT 'generado',
+    cantExactaInvit INT DEFAULT NULL,
     idReservation INT NOT NULL,
     PRIMARY KEY (idContract),
     UNIQUE KEY uq_contract_reservation (idReservation),

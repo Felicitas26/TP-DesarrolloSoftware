@@ -1,4 +1,5 @@
 import reservationService from "../services/reservation.service.js";
+import contractService from "../services/contract.service.js";
 
 class ReservationController {
 
@@ -100,9 +101,20 @@ class ReservationController {
                 req.body.status
             );
 
+            let contract = null;
+
+            if (req.body.status === "aceptada" && reservationUpdated) {
+                contract = await contractService.generateForReservation(
+                    reservationUpdated.idReservation
+                );
+            }
+
             return res.status(200).json({
-                message: "Estado de la reserva actualizado correctamente.",
-                reservation: reservationUpdated
+                message: contract
+                    ? "Reserva aceptada y contrato generado correctamente."
+                    : "Estado de la reserva actualizado correctamente.",
+                reservation: reservationUpdated,
+                contract
             });
         } catch (error) {
             return res.status(error.statusCode || 500).json({ error: error.message });

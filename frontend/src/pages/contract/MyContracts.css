@@ -1,0 +1,148 @@
+.my-contracts-container {
+    min-height: 100vh;
+    background-color: #0b1020;
+    color: #e2e8f0;
+    display: flex;
+    flex-direction: column;
+    font-family: "Segoe UI", system-ui, sans-serif;
+}
+
+.my-contracts-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 40px;
+    background-color: rgba(255, 255, 255, 0.04);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.my-contracts-logo {
+    font-size: 1.4rem;
+    font-weight: 800;
+    letter-spacing: 3px;
+    color: #ffffff;
+}
+
+.my-contracts-back-button {
+    padding: 9px 18px;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    border-radius: 8px;
+    background: transparent;
+    color: #e2e8f0;
+    cursor: pointer;
+    font-size: 0.9rem;
+}
+
+.my-contracts-content {
+    flex: 1;
+    max-width: 880px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 40px 24px;
+}
+
+.my-contracts-title h1 {
+    margin: 0;
+    font-size: 2rem;
+    color: #ffffff;
+}
+
+.my-contracts-title p {
+    margin: 8px 0 0;
+    color: #94a3b8;
+    font-size: 0.95rem;
+}
+
+.my-contracts-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-top: 28px;
+}
+
+.my-contract-card {
+    background-color: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 14px;
+    padding: 22px;
+}
+
+.my-contract-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+}
+
+.my-contract-card-header h2 {
+    margin: 0;
+    font-size: 1.15rem;
+    color: #7dd3fc;
+}
+
+.my-contract-view {
+    padding: 8px 14px;
+    border: none;
+    border-radius: 8px;
+    background-color: #0284c7;
+    color: #ffffff;
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.my-contract-view:hover {
+    background-color: #0369a1;
+}
+
+.my-contract-card p {
+    margin: 6px 0;
+    color: #cbd5e1;
+    font-size: 0.9rem;
+}
+
+.my-contract-status {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 999px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    background-color: #334155;
+    color: #e2e8f0;
+}
+
+.my-contract-status.en_revision {
+    background-color: #b45309;
+    color: #ffedd5;
+}
+
+.my-contract-status.aprobado {
+    background-color: #15803d;
+    color: #dcfce7;
+}
+
+.my-contract-status.firmado {
+    background-color: #166534;
+    color: #dcfce7;
+}
+
+.my-contract-status.rechazado {
+    background-color: #b91c1c;
+    color: #fee2e2;
+}
+
+.my-contracts-empty,
+.my-contracts-message {
+    margin-top: 40px;
+    text-align: center;
+    color: #94a3b8;
+    font-size: 0.95rem;
+}
+
+.my-contracts-footer {
+    padding: 18px 40px;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    text-align: center;
+    color: #64748b;
+    font-size: 0.8rem;
+}

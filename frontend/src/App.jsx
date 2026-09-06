@@ -25,6 +25,9 @@ import NewExtraService from "./pages/extraService/newExtraService";
 import CardDetailList from "./pages/cardDetail/cardDetailList";
 import NewCardDetail from "./pages/cardDetail/newCardDetail";
 import EditCardDetail from "./pages/cardDetail/editCardDetail";
+import ContractList from "./pages/contract/ContractList";
+import ContractDetail from "./pages/contract/ContractDetail";
+import MyContracts from "./pages/contract/MyContracts";
 
 import "./App.css";
 
@@ -69,6 +72,10 @@ function App() {
                 <Route path="/cardDetail" element={<CardDetailList />} />
                 <Route path="/cardDetail/new" element={<NewCardDetail />} />
                 <Route path="/cardDetail/edit/:id" element={<EditCardDetail />} />
+
+                <Route path="/contract" element={<ContractList />} />
+                <Route path="/contract/:id" element={<ContractDetail />} />
+                <Route path="/my-contracts" element={<MyContracts />} />
 
             </Routes>
 

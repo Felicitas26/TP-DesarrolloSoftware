@@ -129,10 +129,12 @@ model ReservationExtraService {
 
 model Contract {
   idContract    Int      @id @default(autoincrement())
-  eventStartTime DateTime @db.Time(6)
-  eventEndTime   DateTime @db.Time(6)
+  eventStartTime DateTime? @db.Time(6)
+  eventEndTime   DateTime? @db.Time(6)
   dateContract   DateTime @db.Date
   finalValue     Decimal  @db.Decimal(10, 2)
+  status         String   @db.VarChar(50) @default("generado")
+  cantExactaInvit Int?
   idReservation  Int
 
   reservation    Reservation          @relation(fields: [idReservation], references: [idReservation])

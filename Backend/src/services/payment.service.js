@@ -1,89 +1,49 @@
-import db from "../config/db.js";
+import paymentModel from "../models/payment.model.js";
 
 class PaymentService {
 
     async getAll() {
-        const [payments] = await db.query(
-            "SELECT * FROM payment"
-        );
-
-        return payments;
+        return await paymentModel.getAll();
     }
 
     async getById(id) {
-        const [payments] = await db.query(
-            "SELECT * FROM payment WHERE idPayment = ?",
-            [id]
-        );
+        const payment = await paymentModel.getById(id);
 
-        if (payments.length === 0) {
+        if (!payment) {
             const error = new Error("Pago no encontrado.");
             error.statusCode = 404;
             throw error;
         }
 
-        return payments[0];
+        return payment;
     }
 
-    async create(data) {
-        const {
-            value,
-            statusPayment,
-            datePayment,
-            idContract
-        } = data;
-
-        const [result] = await db.query(
-            `INSERT INTO payment
-            (value, statusPayment, datePayment, idContract)
-            VALUES (?, ?, ?, ?)`,
-            [
-                value,
-                statusPayment,
-                datePayment,
-                idContract
-            ]
-        );
-
-        return await this.getById(result.insertId);
+    async create(payment) {
+        return await paymentModel.create(payment);
     }
 
-    async update(id, data) {
+    async update(id, payment) {
         await this.getById(id);
 
-        const {
-            value,
-            statusPayment,
-            datePayment,
-            idContract
-        } = data;
+        const updated = await paymentModel.update(id, payment);
 
-        await db.query(
-            `UPDATE payment
-            SET value = ?,
-                statusPayment = ?,
-                datePayment = ?,
-                idContract = ?
-            WHERE idPayment = ?`,
-            [
-                value,
-                statusPayment,
-                datePayment,
-                idContract,
-                id
-            ]
-        );
+        if (!updated) {
+            const error = new Error("No se pudo actualizar el pago.");
+            error.statusCode = 400;
+            throw error;
+        }
 
-        return await this.getById(id);
+        return updated;
     }
 
     async delete(id) {
-        await this.getById(id);
+        const deleted = await paymentModel.delete(id);
 
-        await db.query(
-            "DELETE FROM payment WHERE idPayment = ?",
-            [id]
-        );
+        if (!deleted) {
+            const error = new Error("No se pudo eliminar el pago.");
+            error.statusCode = 400;
+            throw error;
+        }
 
         return true;
     }
