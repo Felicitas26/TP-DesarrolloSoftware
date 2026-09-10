@@ -140,6 +140,7 @@ model Contract {
   modificationComment   String?  @db.VarChar(500)
   modificationRequestedAt DateTime?
   modificationReviewedAt  DateTime?
+  clausulas             Json?
   idReservation  Int
 
   reservation    Reservation          @relation(fields: [idReservation], references: [idReservation])

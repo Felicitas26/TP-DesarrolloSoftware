@@ -201,42 +201,6 @@ CREATE TABLE extraservice (
     PRIMARY KEY (idService)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
-INSERT INTO extraservice (
-    nameService,
-    detailService,
-    cost
-) VALUES
-(
-    'DJ',
-    'Servicio de música y animación durante el evento',
-    50000.00
-),
-(
-    'Fotografía',
-    'Servicio de fotografía profesional durante el evento',
-    40000.00
-),
-(
-    'Decoración',
-    'Decoración temática del salón',
-    35000.00
-),
-(
-    'Catering',
-    'Servicio adicional de comida y bebidas',
-    60000.00
-),
-(
-    'Sonido e iluminación',
-    'Equipamiento profesional de sonido e iluminación',
-    45000.00
-),
-(
-    'Pantalla y proyector',
-    'Pantalla y proyector para presentaciones o videos',
-    30000.00
-);
-
 
 CREATE TABLE reservationextraservice (
     idReservation INT NOT NULL,
@@ -260,6 +224,7 @@ CREATE TABLE contract (
     finalValue DECIMAL(10,2) NOT NULL,
     status VARCHAR(50) NOT NULL DEFAULT 'generado',
     cantExactaInvit INT DEFAULT NULL,
+    clausulas JSON DEFAULT NULL,
     idReservation INT NOT NULL,
     PRIMARY KEY (idContract),
     UNIQUE KEY uq_contract_reservation (idReservation),

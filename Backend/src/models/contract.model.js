@@ -1,4 +1,5 @@
 import prisma from "../lib/prisma.js";
+import DEFAULT_CONTRACT_CONTENT from "../data/contractContent.js";
 
 const CONTRACT_INCLUDE = {
     reservation: {
@@ -131,6 +132,7 @@ class ContractModel {
                     finalValue: Number(finalValue),
                     status: "generado",
                     idReservation: Number(idReservation),
+                    clausulas: DEFAULT_CONTRACT_CONTENT,
                     ...(extraIds && extraIds.length > 0
                         ? {
                             extraServices: {
