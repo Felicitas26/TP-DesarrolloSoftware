@@ -3,6 +3,9 @@
   "scripts": {
     "start": "node server.js",
     "dev": "nodemon server.js",
+    "predev": "npm run setup",
+    "setup": "node scripts/setup.js",
+    "seed:all": "node scripts/seedLocations.js && node scripts/seedLounges.js && node scripts/seedCardDetails.js && node scripts/seedExtraServices.js && node scripts/seedUsuarios.js && node scripts/seedPrices.js",
     "seed:locations": "node scripts/seedLocations.js",
     "seed:usuarios": "node scripts/seedUsuarios.js",
     "seed:prices": "node scripts/seedPrices.js",
@@ -20,6 +23,7 @@
     "express": "^5.2.1",
     "jsonwebtoken": "^9.0.3",
     "multer": "^2.3.0",
+    "mysql2": "^3.24.4",
     "react-router-dom": "^7.18.2"
   }
 }

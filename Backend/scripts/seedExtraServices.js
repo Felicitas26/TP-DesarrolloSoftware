@@ -35,37 +35,30 @@ const EXTRA_SERVICES = [
 
 async function seed() {
     let inserted = 0;
-    let updated = 0;
+    let skipped = 0;
 
     for (const svc of EXTRA_SERVICES) {
         const existing = await prisma.extraService.findFirst({
             where: { nameService: svc.nameService }
         });
 
-        const data = {
-            detailService: svc.detailService,
-            cost: svc.cost
-        };
-
         if (existing) {
-            await prisma.extraService.update({
-                where: { idService: existing.idService },
-                data
-            });
-            updated++;
-        } else {
-            await prisma.extraService.create({
-                data: {
-                    nameService: svc.nameService,
-                    ...data
-                }
-            });
-            inserted++;
+            skipped++;
+            continue;
         }
+
+        await prisma.extraService.create({
+            data: {
+                nameService: svc.nameService,
+                detailService: svc.detailService,
+                cost: svc.cost
+            }
+        });
+        inserted++;
     }
 
     console.log(
-        `Seed de servicios extra finalizado: ${inserted} insertados, ${updated} actualizados.`
+        `Seed de servicios extra finalizado: ${inserted} insertados, ${skipped} omitidos (ya existían).`
     );
 
     await prisma.$disconnect();

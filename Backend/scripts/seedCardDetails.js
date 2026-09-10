@@ -32,41 +32,34 @@ const CARD_DETAILS = [
 
 async function seed() {
     let inserted = 0;
-    let updated = 0;
+    let skipped = 0;
 
     for (const card of CARD_DETAILS) {
         const existing = await prisma.cardDetail.findFirst({
             where: { menuStage: card.menuStage }
         });
 
-        const data = {
-            detail: card.detail,
-            budget: card.budget,
-            imageUrl: card.imageUrl,
-            starter: card.starter,
-            mainCourse: card.mainCourse,
-            dessert: card.dessert
-        };
-
         if (existing) {
-            await prisma.cardDetail.update({
-                where: { idCardDetail: existing.idCardDetail },
-                data
-            });
-            updated++;
-        } else {
-            await prisma.cardDetail.create({
-                data: {
-                    menuStage: card.menuStage,
-                    ...data
-                }
-            });
-            inserted++;
+            skipped++;
+            continue;
         }
+
+        await prisma.cardDetail.create({
+            data: {
+                menuStage: card.menuStage,
+                detail: card.detail,
+                budget: card.budget,
+                imageUrl: card.imageUrl,
+                starter: card.starter,
+                mainCourse: card.mainCourse,
+                dessert: card.dessert
+            }
+        });
+        inserted++;
     }
 
     console.log(
-        `Seed de menús finalizado: ${inserted} insertados, ${updated} actualizados.`
+        `Seed de menús finalizado: ${inserted} insertados, ${skipped} omitidos (ya existían).`
     );
 
     await prisma.$disconnect();
