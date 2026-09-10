@@ -40,14 +40,6 @@ CREATE TABLE location (
     PRIMARY KEY (idLocation)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
-INSERT INTO location (
-    city,
-    zipCode
-) VALUES (
-    'Rosario',
-    '2000'
-);
-
 
 CREATE TABLE lounge (
     idLounge INT NOT NULL AUTO_INCREMENT,
@@ -60,27 +52,6 @@ CREATE TABLE lounge (
         FOREIGN KEY (idLocation)
         REFERENCES location (idLocation)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
-INSERT INTO lounge (
-    name,
-    loungeAddress,
-    idLocation
-) VALUES
-(
-    'Stylo Funes',
-    'Av Pellegrini 31',
-    1
-),
-(
-    'Stylo zona norte',
-    'Urquiza 3455',
-    1
-),
-(
-    'Stylo Roldán',
-    'Av Pellegrini 3124',
-    1
-);
 
 
 CREATE TABLE loungetype (
@@ -97,37 +68,6 @@ CREATE TABLE loungetype (
         REFERENCES lounge (idLounge)
         ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
-INSERT INTO loungetype (
-    nameLoungeType,
-    minQuantity,
-    maxQuantity,
-    idLounge
-) VALUES
-(
-    'Reina',
-    52,
-    123,
-    1
-),
-(
-    'Princesa',
-    100,
-    150,
-    2
-),
-(
-    'Grande',
-    90,
-    130,
-    3
-),
-(
-    'Chico',
-    70,
-    90,
-    3
-);
 
 
 CREATE TABLE price (
@@ -277,20 +217,6 @@ CREATE TABLE usuario (
         FOREIGN KEY (idCli)
         REFERENCES client (idCli)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
-INSERT INTO usuario (
-    username,
-    password,
-    rol,
-    idCli,
-    passwordTemporal
-) VALUES (
-    'admin',
-    '$2b$10$e0BPxUoATIG7JALND7Q.re6WGOEoo/aF3Xb4Evq5k7st/slvHh182',
-    'administrador',
-    NULL,
-    0
-);
 
 
 SET FOREIGN_KEY_CHECKS = 1;

@@ -1,27 +1,27 @@
 import prisma from "../src/lib/prisma.js";
 
 const PRICES = [
-    { idLoungeType: 3, value: 1200000 },
-    { idLoungeType: 4, value: 1500000 },
-    { idLoungeType: 5, value: 1300000 },
-    { idLoungeType: 6, value: 900000 }
+    { nameLoungeType: "Grande", value: 1200000 },
+    { nameLoungeType: "Chico", value: 1500000 }
 ];
 
 const EFFECTIVE_DATE = "2026-01-01";
 
 async function seed() {
     const loungeTypes = await prisma.loungeType.findMany({
-        select: { idLoungeType: true, nameLoungeType: true }
+        select: { idLoungeType: true, nameLoungeType: true, idLounge: true }
     });
-
-    const loungeTypeIds = new Set(loungeTypes.map((lt) => lt.idLoungeType));
 
     let inserted = 0;
     const skipped = [];
 
     for (const price of PRICES) {
-        if (!loungeTypeIds.has(price.idLoungeType)) {
-            skipped.push(`Tipo de salón ${price.idLoungeType} inexistente`);
+        const loungeType = loungeTypes.find(
+            (lt) => lt.nameLoungeType === price.nameLoungeType
+        );
+
+        if (!loungeType) {
+            skipped.push(`Tipo de salón "${price.nameLoungeType}" inexistente`);
             continue;
         }
 
@@ -29,13 +29,13 @@ async function seed() {
             where: {
                 effectiveDate_idLoungeType: {
                     effectiveDate: new Date(EFFECTIVE_DATE),
-                    idLoungeType: price.idLoungeType
+                    idLoungeType: loungeType.idLoungeType
                 }
             }
         });
 
         if (existing) {
-            skipped.push(`Precio del tipo de salón ${price.idLoungeType} ya existe`);
+            skipped.push(`Precio del tipo de salón "${price.nameLoungeType}" ya existe`);
             continue;
         }
 
@@ -44,7 +44,7 @@ async function seed() {
                 effectiveDate: new Date(EFFECTIVE_DATE),
                 endDate: null,
                 value: price.value,
-                idLoungeType: price.idLoungeType
+                idLoungeType: loungeType.idLoungeType
             }
         });
         inserted++;
