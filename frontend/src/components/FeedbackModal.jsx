@@ -1,3 +1,4 @@
+import { createPortal } from "react-dom";
 import "./FeedbackModal.css";
 
 function FeedbackModal({
@@ -11,10 +12,12 @@ function FeedbackModal({
     onCancel
 }) {
 
-    return (
+    const handleClose = onCancel || onClose;
+
+    return createPortal(
         <div
             className="feedback-modal-backdrop"
-            onClick={onCancel || onClose}
+            onClick={handleClose}
         >
             <div
                 className={`feedback-modal ${type}`}
@@ -22,7 +25,7 @@ function FeedbackModal({
             >
                 <button
                     className="feedback-modal-close"
-                    onClick={onCancel || onClose}
+                    onClick={handleClose}
                 >
                     ✕
                 </button>
@@ -63,7 +66,8 @@ function FeedbackModal({
                 </div>
 
             </div>
-        </div>
+        </div>,
+        document.body
     );
 }
 

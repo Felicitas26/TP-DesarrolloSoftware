@@ -13,6 +13,10 @@
     margin: 0 auto;
 }
 
+.client-dashboard.table-list-dashboard {
+    max-width: none;
+}
+
 .dashboard-header-flex {
     display: flex;
     justify-content: space-between;

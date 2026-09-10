@@ -14,17 +14,17 @@ const IconArrowLeft = () => (
   </svg>
 );
 
-const IconLayers = () => (
-  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/>
+const IconLounge = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M3 9l1.5-5h15L21 9"/>
+    <path d="M3 9h18v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9z"/>
+    <path d="M7 15v3m10-3v3"/>
   </svg>
 );
 
-const IconLogout = () => (
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
-    <polyline points="16 17 21 12 16 7"/>
-    <line x1="21" y1="12" x2="9" y2="12"/>
+const IconLayers = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/>
   </svg>
 );
 
@@ -58,13 +58,6 @@ function LoungeList() {
 
   const [deleting, setDeleting] = useState(false);
   const [savingEdit, setSavingEdit] = useState(false);
-
-  const handleLogout = () => {
-    localStorage.removeItem("sty_token");
-    localStorage.removeItem("sty_rol");
-    localStorage.removeItem("sty_idUsuario");
-    navigate("/");
-  };
 
   // Cargar salones y localidades al iniciar
   useEffect(() => {
@@ -154,37 +147,29 @@ function LoungeList() {
   };
 
   return (
-    <div className="gestion-page">
-      <div className="gestion-background" aria-hidden="true">
-        <div className="gestion-glow gestion-glow-purple" />
-        <div className="gestion-glow gestion-glow-cyan" />
-        <div className="gestion-grid-overlay" />
-      </div>
-      <div className="gestion-overlay" />
+    <div className="page-wrapper">
+      <div className="client-dashboard table-list-dashboard">
+        {/* Header */}
+        <header className="dashboard-header-flex">
+          <div className="header-title-group">
+            <div className="header-icon">
+              <IconLounge />
+            </div>
+            <div>
+              <h1>Salones Registrados</h1>
+              <p>Gestión y administración de los salones de STYLO</p>
+            </div>
+          </div>
 
-      <header className="gestion-bar">
-        <span className="gestion-logo">GESTIONAR SALONES</span>
-        <button type="button" className="gestion-logout" onClick={handleLogout}>
-          <IconLogout /> Cerrar Sesión
-        </button>
-      </header>
-
-      <div className="gestion-dashboard">
-        <div className="gestion-panel">
-          <h1>Salones Registrados</h1>
-          <p>Gestión y administración de espacios de STYLO</p>
-        </div>
-
-        <div className="gestion-header-flex">
-          <div className="gestion-actions">
-            <button className="gestion-btn-back" onClick={() => navigate("/admin-home")}>
+          <div className="header-actions">
+            <button className="btn-back-panel" onClick={() => navigate("/admin-home")}>
               <IconArrowLeft /> Volver al Panel
             </button>
-            <button className="gestion-btn-primary" onClick={() => navigate("/lounge/new")}>
+            <button className="btn-submit-cyan" onClick={() => navigate("/lounge/new")}>
               <IconPlus /> Nuevo Salón
             </button>
           </div>
-        </div>
+        </header>
 
         {/* Tabla */}
         <div className="form-card full-width">
@@ -192,7 +177,7 @@ function LoungeList() {
             {loading ? (
               <p className="loading-text">Cargando salones...</p>
             ) : (
-              <table className="lounges-table">
+              <table className="clients-table">
                 <thead>
                   <tr>
                     <th>Nombre del Salón</th>
@@ -206,7 +191,7 @@ function LoungeList() {
                   {lounges.length > 0 ? (
                     lounges.map((lounge) => {
                       const idKey = lounge.id_lounge || lounge.idLounge || lounge.id;
-                     
+
                       const locationName = lounge.cityName || lounge.city || locations.find(loc => String(loc.idLocation || loc.id) === String(lounge.idLocation || lounge.id_location))?.city || "No asignada";
 
                       return (
@@ -284,10 +269,10 @@ function LoungeList() {
                 </div>
                 <div className="form-group full-width">
                   <label>Localidad</label>
-                  <select 
-                    name="idLocation" 
-                    value={loungeToEdit.idLocation || loungeToEdit.id_location || ""} 
-                    onChange={handleEditChange} 
+                  <select
+                    name="idLocation"
+                    value={loungeToEdit.idLocation || loungeToEdit.id_location || ""}
+                    onChange={handleEditChange}
                     className="form-control"
                     required
                   >

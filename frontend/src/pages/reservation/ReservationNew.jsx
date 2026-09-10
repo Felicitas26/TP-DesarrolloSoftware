@@ -178,6 +178,24 @@ function ReservationNew() {
             return;
         }
 
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        if (!reservation.dateEvent) {
+            showMessage("error", "Seleccioná la fecha del evento.");
+            return;
+        }
+
+        const eventDate = new Date(`${reservation.dateEvent}T00:00:00`);
+
+        if (eventDate < today) {
+            showMessage(
+                "error",
+                "La fecha del evento no puede ser anterior a la fecha actual."
+            );
+            return;
+        }
+
         const selectedLoungeType = loungeTypes.find(
             (type) =>
                 String(type.idLoungeType) === String(reservation.idLoungeType)
@@ -289,6 +307,7 @@ function ReservationNew() {
                         type="date"
                         name="dateEvent"
                         value={reservation.dateEvent}
+                        min={new Date().toISOString().split("T")[0]}
                         onChange={handleChange}
                         required
                     />

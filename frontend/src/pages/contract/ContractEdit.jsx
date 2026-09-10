@@ -1,6 +1,21 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import FeedbackModal from "../../components/FeedbackModal";
 import "./ContractEdit.css";
+
+const IconEdit = () => (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+    </svg>
+);
+
+const IconArrowLeft = () => (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <line x1="19" y1="12" x2="5" y2="12" />
+        <polyline points="12 19 5 12 12 5" />
+    </svg>
+);
 
 const fmtTime = (value) => {
     if (!value) return "";
@@ -15,6 +30,7 @@ const fmtTime = (value) => {
 
 function ContractEdit() {
 
+    const navigate = useNavigate();
     const [contracts, setContracts] = useState([]);
     const [selectedId, setSelectedId] = useState("");
     const [contract, setContract] = useState({
@@ -188,99 +204,119 @@ function ContractEdit() {
     };
 
     return (
-        <div className="contract-edit-container">
+        <div className="page-wrapper">
 
-            <h1>Editar contrato</h1>
-            <p>Seleccioná el contrato que querés modificar. El valor final se recalcula automáticamente.</p>
+            <div className="client-dashboard contract-form-dashboard">
 
-            <div className="contract-edit-field">
+                {/* Header */}
+                <header className="dashboard-header-flex">
 
-                <label>Contrato</label>
+                    <div className="header-title-group">
+                        <div className="header-icon">
+                            <IconEdit />
+                        </div>
+                        <div>
+                            <h1>Editar contrato</h1>
+                            <p>Seleccioná el contrato que querés modificar. El valor final se recalcula automáticamente.</p>
+                        </div>
+                    </div>
 
-                <select
-                    value={selectedId}
-                    onChange={handleSelect}
-                >
-                    <option value="">
-                        Seleccionar contrato
-                    </option>
-
-                    {contracts.map((item) => (
-                        <option
-                            key={item.idContract}
-                            value={item.idContract}
+                    <div className="header-actions">
+                        <button
+                            className="btn-back-panel"
+                            onClick={() => navigate("/contract")}
                         >
-                            Contrato #{item.idContract}
-                        </option>
-                    ))}
+                            <IconArrowLeft /> Volver
+                        </button>
+                    </div>
 
-                </select>
+                </header>
+
+                {/* Formulario */}
+                <div className="form-card">
+                    <form onSubmit={handleUpdate} className="contract-form">
+
+                        <div className="form-group">
+                            <label>Contrato</label>
+                            <select
+                                value={selectedId}
+                                onChange={handleSelect}
+                            >
+                                <option value="">
+                                    Seleccionar contrato
+                                </option>
+
+                                {contracts.map((item) => (
+                                    <option
+                                        key={item.idContract}
+                                        value={item.idContract}
+                                    >
+                                        Contrato #{item.idContract}
+                                    </option>
+                                ))}
+
+                            </select>
+                        </div>
+
+                        {selectedId && (
+                            <>
+                                <div className="form-group">
+                                    <label>Hora de inicio</label>
+                                    <input
+                                        type="time"
+                                        name="eventStartTime"
+                                        value={contract.eventStartTime}
+                                        onChange={handleChange}
+                                        required
+                                    />
+                                </div>
+
+                                <div className="form-group">
+                                    <label>Hora de finalización</label>
+                                    <input
+                                        type="time"
+                                        name="eventEndTime"
+                                        value={contract.eventEndTime}
+                                        onChange={handleChange}
+                                        required
+                                    />
+                                </div>
+
+                                <div className="form-group">
+                                    <label>Cantidad exacta de invitados</label>
+                                    <input
+                                        type="number"
+                                        name="cantExactaInvit"
+                                        value={contract.cantExactaInvit}
+                                        onChange={handleChange}
+                                        min="0"
+                                        required
+                                    />
+                                </div>
+
+                                <div className="form-actions">
+                                    <button
+                                        type="submit"
+                                        className="btn-submit-cyan"
+                                    >
+                                        Guardar cambios
+                                    </button>
+
+                                    <button
+                                        type="button"
+                                        className="btn-danger"
+                                        onClick={handleDeleteClick}
+                                    >
+                                        Eliminar contrato
+                                    </button>
+                                </div>
+                            </>
+                        )}
+
+                    </form>
+                </div>
 
             </div>
-
-            {selectedId && (
-
-                <form onSubmit={handleUpdate}>
-
-                    <div className="contract-edit-field">
-                        <label>Hora de inicio</label>
-
-                        <input
-                            type="time"
-                            name="eventStartTime"
-                            value={contract.eventStartTime}
-                            onChange={handleChange}
-                            required
-                        />
-                    </div>
-
-                    <div className="contract-edit-field">
-                        <label>Hora de finalización</label>
-
-                        <input
-                            type="time"
-                            name="eventEndTime"
-                            value={contract.eventEndTime}
-                            onChange={handleChange}
-                            required
-                        />
-                    </div>
-
-                    <div className="contract-edit-field">
-                        <label>Cantidad exacta de invitados</label>
-
-                        <input
-                            type="number"
-                            name="cantExactaInvit"
-                            value={contract.cantExactaInvit}
-                            onChange={handleChange}
-                            min="0"
-                            required
-                        />
-                    </div>
-
-                    <div className="contract-edit-buttons">
-
-                        <button
-                            type="submit"
-                            className="contract-update-button"
-                        >
-                            Guardar cambios
-                        </button>
-
-                        <button
-                            type="button"
-                            className="contract-delete-button"
-                            onClick={handleDeleteClick}
-                        >
-                            Eliminar contrato
-                        </button>
-
-                    </div>
-
-                </form>
-
-            )}
 
             {feedback && (
                 <FeedbackModal

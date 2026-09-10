@@ -3,6 +3,23 @@ import { useNavigate } from "react-router-dom";
 import "./ContractList.css";
 import FeedbackModal from "../../components/FeedbackModal.jsx";
 
+const IconContract = () => (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+        <polyline points="14 2 14 8 20 8" />
+        <line x1="16" y1="13" x2="8" y2="13" />
+        <line x1="16" y1="17" x2="8" y2="17" />
+        <polyline points="10 9 9 9 8 9" />
+    </svg>
+);
+
+const IconArrowLeft = () => (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <line x1="19" y1="12" x2="5" y2="12" />
+        <polyline points="12 19 5 12 12 5" />
+    </svg>
+);
+
 const STATUS_OPTIONS = [
     { value: "todas", label: "Todas" },
     { value: "en_revision", label: "En revisión" },
@@ -139,41 +156,50 @@ function ContractList() {
     };
 
     return (
-        <div className="contract-list-container">
+        <div className="page-wrapper">
 
-            <main className="contract-list-panel">
+            <div className="client-dashboard table-list-dashboard">
 
-                <div className="contract-list-header">
+                {/* Header */}
+                <header className="dashboard-header-flex">
 
-                    <div>
-                        <h1>Gestión de Contratos</h1>
-                        <p>Revisá y gestioná los contratos generados.</p>
+                    <div className="header-title-group">
+                        <div className="header-icon">
+                            <IconContract />
+                        </div>
+                        <div>
+                            <h1>Gestión de Contratos</h1>
+                            <p>Revisá y gestioná los contratos generados.</p>
+                        </div>
                     </div>
 
-                    <div className="contract-list-header-actions">
+                    <div className="header-actions">
                         <button
-                            className="contract-btn-back"
+                            className="btn-back-panel"
+                            onClick={() => navigate("/admin-home")}
+                        >
+                            <IconArrowLeft /> Volver al Panel
+                        </button>
+                        <button
+                            className="btn-submit-cyan"
                             onClick={() => navigate("/contract/new")}
                         >
                             Nuevo contrato
                         </button>
                         <button
-                            className="contract-btn-back"
+                            className="btn-submit-cyan"
                             onClick={() => navigate("/contract/edit")}
                         >
                             Editar contrato
                         </button>
-                        <button
-                            className="contract-btn-back"
-                            onClick={() => navigate("/admin-home")}
-                        >
-                            Volver al menú
-                        </button>
-                        <span>{filteredContracts.length}</span>
+                        <div className="count-pill">
+                            {filteredContracts.length}
+                        </div>
                     </div>
 
-                </div>
+                </header>
 
+                {/* Filtros */}
                 <div className="contract-list-filters">
                     {STATUS_OPTIONS.map((opt) => (
                         <button
@@ -186,91 +212,98 @@ function ContractList() {
                     ))}
                 </div>
 
-                {loading ? (
-                    <p className="contract-list-empty">Cargando contratos...</p>
-                ) : filteredContracts.length === 0 ? (
-                    <p className="contract-list-empty">No hay contratos en este estado.</p>
-                ) : (
-                    <div className="contract-list-table-container">
-                        <table className="contract-list-table">
-                            <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Cliente</th>
-                                    <th>Fecha evento</th>
-                                    <th>Invitados</th>
-                                    <th>Valor final</th>
-                                    <th>Estado</th>
-                                    <th>Acciones</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {filteredContracts.map((contract) => (
-                                    <tr key={contract.idContract}>
-                                        <td>{contract.idContract}</td>
-                                        <td>
-                                            {contract.reservation?.client?.nameCli}{" "}
-                                            {contract.reservation?.client?.surnameCli}
-                                        </td>
-                                        <td>{formatDate(contract.reservation?.dateEvent)}</td>
-                                        <td>
-                                            {contract.reservation
-                                                ? `${contract.reservation.cantInvit} - ${contract.reservation.maxCantInvit}`
-                                                : ""}
-                                        </td>
-                                        <td>{currency(contract.finalValue)}</td>
-                                        <td>
-                                            <div className="contract-list-status-wrap">
-                                                <span className={`contract-list-status ${contract.status}`}>
-                                                    {STATUS_LABEL[contract.status] || contract.status}
-                                                </span>
-                                                {contract.modificationStatus === "pendiente" && (
-                                                    <span className="contract-list-modbadge">
-                                                        Modif. pendiente
-                                                    </span>
-                                                )}
-                                                {contract.modificationStatus === "aprobada" && (
-                                                    <span className="contract-list-modbadge approved">
-                                                        Modif. aplicada
-                                                    </span>
-                                                )}
-                                            </div>
-                                        </td>
-                                        <td>
-                                            <div className="contract-actions-row">
-                                                <button
-                                                    className="contract-action-view"
-                                                    onClick={() => navigate(`/contract/${contract.idContract}`)}
-                                                >
-                                                    Ver
-                                                </button>
+                {/* Tabla */}
+                <div className="form-card full-width">
 
-                                                {contract.status === "en_revision" && (
-                                                    <>
-                                                        <button
-                                                            className="contract-action-approve"
-                                                            onClick={() => review(contract.idContract, "aprobar")}
-                                                        >
-                                                            Aprobar
-                                                        </button>
-                                                        <button
-                                                            className="contract-action-reject"
-                                                            onClick={() => review(contract.idContract, "rechazar")}
-                                                        >
-                                                            Rechazar
-                                                        </button>
-                                                    </>
-                                                )}
-                                            </div>
-                                        </td>
+                    <div className="card-body-table">
+
+                        {loading ? (
+                            <p className="loading-text">Cargando contratos...</p>
+                        ) : filteredContracts.length === 0 ? (
+                            <p className="contract-list-empty">No hay contratos en este estado.</p>
+                        ) : (
+                            <table className="contract-list-table">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Cliente</th>
+                                        <th>Fecha evento</th>
+                                        <th>Invitados</th>
+                                        <th>Valor final</th>
+                                        <th>Estado</th>
+                                        <th style={{ textAlign: "center" }}>Acciones</th>
                                     </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
-                )}
+                                </thead>
+                                <tbody>
+                                    {filteredContracts.map((contract) => (
+                                        <tr key={contract.idContract}>
+                                            <td>{contract.idContract}</td>
+                                            <td className="font-semibold">
+                                                {contract.reservation?.client?.nameCli}{" "}
+                                                {contract.reservation?.client?.surnameCli}
+                                            </td>
+                                            <td>{formatDate(contract.reservation?.dateEvent)}</td>
+                                            <td>
+                                                {contract.reservation
+                                                    ? `${contract.reservation.cantInvit} - ${contract.reservation.maxCantInvit}`
+                                                    : ""}
+                                            </td>
+                                            <td>{currency(contract.finalValue)}</td>
+                                            <td>
+                                                <div className="contract-list-status-wrap">
+                                                    <span className={`contract-list-status ${contract.status}`}>
+                                                        {STATUS_LABEL[contract.status] || contract.status}
+                                                    </span>
+                                                    {contract.modificationStatus === "pendiente" && (
+                                                        <span className="contract-list-modbadge">
+                                                            Modif. pendiente
+                                                        </span>
+                                                    )}
+                                                    {contract.modificationStatus === "aprobada" && (
+                                                        <span className="contract-list-modbadge approved">
+                                                            Modif. aplicada
+                                                        </span>
+                                                    )}
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div className="actions-cell">
+                                                    <button
+                                                        className="contract-action-view"
+                                                        onClick={() => navigate(`/contract/${contract.idContract}`)}
+                                                    >
+                                                        Ver
+                                                    </button>
 
-            </main>
+                                                    {contract.status === "en_revision" && (
+                                                        <>
+                                                            <button
+                                                                className="contract-action-approve"
+                                                                onClick={() => review(contract.idContract, "aprobar")}
+                                                            >
+                                                                Aprobar
+                                                            </button>
+                                                            <button
+                                                                className="contract-action-reject"
+                                                                onClick={() => review(contract.idContract, "rechazar")}
+                                                            >
+                                                                Rechazar
+                                                            </button>
+                                                        </>
+                                                    )}
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        )}
+
+                    </div>
+
+                </div>
+
+            </div>
 
             {feedback && (
                 <FeedbackModal
