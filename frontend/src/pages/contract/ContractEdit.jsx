@@ -40,6 +40,8 @@ function ContractEdit() {
     });
 
     const [feedback, setFeedback] = useState(null);
+    const [deleteOpen, setDeleteOpen] = useState(false);
+    const [deleteMotivo, setDeleteMotivo] = useState("");
 
     const token = localStorage.getItem("sty_token");
 
@@ -174,19 +176,25 @@ function ContractEdit() {
     };
 
     const handleDeleteClick = () => {
-        setFeedback({ type: "confirm", title: "Eliminar contrato", message: "¿Está seguro de que desea eliminar este contrato? El evento asociado quedará dado de baja.", confirmLabel: "Eliminar", onConfirm: handleDeleteConfirm, onCancel: () => setFeedback(null) });
+        setDeleteOpen(true);
     };
 
     const handleDeleteConfirm = async () => {
 
-        setFeedback(null);
+        if (!deleteMotivo.trim()) {
+            setFeedback({ type: "error", title: "Falta el motivo", message: "Escribí el motivo de la eliminación para notificarlo al cliente." });
+            return;
+        }
+
+        setDeleteOpen(false);
 
         try {
             const response = await fetch(
                 `http://localhost:3000/api/contract/${selectedId}`,
                 {
                     method: "DELETE",
-                    headers: authHeaders()
+                    headers: authHeaders(true),
+                    body: JSON.stringify({ motivo: deleteMotivo.trim() })
                 }
             );
 
@@ -196,7 +204,9 @@ function ContractEdit() {
                 throw new Error(data.error);
             }
 
-            setFeedback({ type: "success", title: "Contrato eliminado", message: "El contrato se eliminó correctamente." });
+            setFeedback({ type: "success", title: "Contrato eliminado", message: "El contrato se eliminó correctamente y el cliente fue notificado." });
+
+            setDeleteMotivo("");
 
             setSelectedId("");
 
@@ -328,6 +338,37 @@ function ContractEdit() {
                 </div>
 
             </div>
+
+            {deleteOpen && (
+                <div className="edit-confirm-backdrop" onClick={() => setDeleteOpen(false)}>
+                    <div className="edit-confirm-modal" onClick={(e) => e.stopPropagation()}>
+                        <button className="edit-confirm-close" onClick={() => setDeleteOpen(false)} aria-label="Cerrar">✕</button>
+                        <h3>Eliminar contrato</h3>
+                        <p className="edit-confirm-intro">
+                            Esta acción da de baja el contrato y cancela el evento. Indicá el
+                            <strong> motivo</strong> de la eliminación: se lo notificaremos al cliente.
+                        </p>
+                        <textarea
+                            className="edit-confirm-textarea"
+                            value={deleteMotivo}
+                            onChange={(e) => setDeleteMotivo(e.target.value)}
+                            placeholder="Motivo de la eliminación..."
+                            rows="4"
+                        />
+                        <div className="edit-confirm-actions">
+                            <button className="btn-submit-cyan" onClick={() => setDeleteOpen(false)}>
+                                Volver
+                            </button>
+                            <button
+                                className="btn-danger"
+                                onClick={handleDeleteConfirm}
+                            >
+                                Eliminar contrato
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
 
             {feedback && (
                 <FeedbackModal

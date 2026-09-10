@@ -252,6 +252,9 @@ class ContractModel {
                 await tx.contractExtraService.deleteMany({
                     where: { idContract: Number(id) }
                 });
+                await tx.notification.deleteMany({
+                    where: { idContract: Number(id) }
+                });
                 await tx.contract.delete({
                     where: { idContract: Number(id) }
                 });

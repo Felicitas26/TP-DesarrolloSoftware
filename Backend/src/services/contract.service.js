@@ -457,7 +457,7 @@ class ContractService {
         return await contractModel.getById(id);
     }
 
-    async revisarModificacion(id, decision) {
+    async revisarModificacion(id, decision, motivo) {
         const contract = await contractModel.getById(id);
 
         if (!contract) {
@@ -475,6 +475,14 @@ class ContractService {
         }
 
         if (decision === "rechazar") {
+            if (!(typeof motivo === "string" && motivo.trim())) {
+                const error = new Error(
+                    "Debés indicar el motivo del rechazo de la modificación para notificar al cliente."
+                );
+                error.statusCode = 400;
+                throw error;
+            }
+
             const rechazado = await contractModel.updateModification(id, {
                 modificationStatus: "rechazada",
                 modificationReviewedAt: new Date()
@@ -490,7 +498,7 @@ class ContractService {
 
             await notificationService.notifyClient({
                 idCli: contract.reservation.idCli,
-                mensaje: `El administrador rechazó la modificación del contrato #${id}. Tus datos vigentes se conservan.`,
+                mensaje: `El administrador rechazó la modificación del contrato #${id} por la siguiente razón: ${motivo.trim()}. Tus datos vigentes se conservan.`,
                 tipo: "modificacion_rechazada",
                 idContract: id
             });
@@ -592,13 +600,30 @@ class ContractService {
         };
     }
 
-    async cancelar(id) {
+    async cancelar(id, motivo) {
         const contract = await contractModel.getById(id);
 
         if (!contract) {
             const error = new Error("Contrato no encontrado.");
             error.statusCode = 404;
             throw error;
+        }
+
+        if (motivo !== undefined && !(typeof motivo === "string" && motivo.trim())) {
+            const error = new Error(
+                "Debés indicar el motivo de la cancelación del contrato."
+            );
+            error.statusCode = 400;
+            throw error;
+        }
+
+        if (typeof motivo === "string" && motivo.trim()) {
+            await notificationService.notifyClient({
+                idCli: contract.reservation.idCli,
+                mensaje: `El administrador canceló el contrato #${id} por la siguiente razón: ${motivo.trim()}. Tu evento fue dado de baja.`,
+                tipo: "contrato_cancelado",
+                idContract: null
+            });
         }
 
         await contractModel.remove(id);

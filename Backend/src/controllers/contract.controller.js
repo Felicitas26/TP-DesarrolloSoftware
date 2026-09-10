@@ -122,7 +122,15 @@ class ContractController {
                 return res.status(404).json({ error: "Contrato no encontrado." });
             }
 
-            await contractService.cancelar(req.params.id);
+            const motivo = req.body?.motivo?.trim();
+
+            if (!motivo) {
+                return res.status(400).json({
+                    error: "Debés indicar el motivo de la eliminación del contrato para notificar al cliente."
+                });
+            }
+
+            await contractService.cancelar(req.params.id, motivo);
 
             return res.status(200).json({
                 message: "Contrato eliminado y evento dado de baja correctamente."
@@ -236,7 +244,7 @@ class ContractController {
 
     async revisarModificacion(req, res) {
         try {
-            const { decision } = req.body;
+            const { decision, motivo } = req.body;
 
             if (!["aprobar", "rechazar"].includes(decision)) {
                 return res.status(400).json({ error: "La decisión debe ser 'aprobar' o 'rechazar'." });
@@ -244,7 +252,8 @@ class ContractController {
 
             const reviewed = await contractService.revisarModificacion(
                 req.params.id,
-                decision
+                decision,
+                motivo
             );
 
             return res.status(200).json({

@@ -59,6 +59,8 @@ function ContractDetail() {
     const [commentMod, setCommentMod] = useState("");
     const [showTerminos, setShowTerminos] = useState(false);
     const [confirmCancelar, setConfirmCancelar] = useState(false);
+    const [rejectOpen, setRejectOpen] = useState(false);
+    const [rejectMotivo, setRejectMotivo] = useState("");
     const [pendingRedirect, setPendingRedirect] = useState(false);
     const [activePrice, setActivePrice] = useState(null);
 
@@ -410,7 +412,7 @@ const canEdit = contract && ["generado", "rechazado"].includes(contract.status);
         }
     };
 
-    const handleRevisarMod = async (decision) => {
+    const handleRevisarMod = async (decision, motivo) => {
         setMessage(null);
         setSaving(true);
 
@@ -423,7 +425,9 @@ const canEdit = contract && ["generado", "rechazado"].includes(contract.status);
                         "Content-Type": "application/json",
                         "Authorization": `Bearer ${token}`
                     },
-                    body: JSON.stringify({ decision })
+                    body: JSON.stringify(
+                        decision === "rechazar" ? { decision, motivo } : { decision }
+                    )
                 }
             );
 
@@ -444,6 +448,17 @@ const canEdit = contract && ["generado", "rechazado"].includes(contract.status);
         } finally {
             setSaving(false);
         }
+    };
+
+    const handleConfirmRechazo = () => {
+        if (!rejectMotivo.trim()) {
+            showMessage("error", "Falta el motivo", "Escribí el motivo del rechazo para notificar al cliente.");
+            return;
+        }
+
+        setRejectOpen(false);
+        handleRevisarMod("rechazar", rejectMotivo.trim());
+        setRejectMotivo("");
     };
 
     const handleContinuarContrato = async () => {
@@ -1214,9 +1229,9 @@ const canEdit = contract && ["generado", "rechazado"].includes(contract.status);
                         </div>
 
                         <div className="contract-actions contract-mod-actions">
-                            <button className="contract-btn-reject" onClick={() => handleRevisarMod("rechazar")} disabled={saving}>
-                                Rechazar modificación
-                            </button>
+<button className="contract-btn-reject" onClick={() => setRejectOpen(true)} disabled={saving}>
+                        Rechazar modificación
+                    </button>
                             <button className="contract-btn-accept" onClick={() => handleRevisarMod("aprobar")} disabled={saving}>
                                 Aprobar modificación
                             </button>
@@ -1448,6 +1463,34 @@ const canEdit = contract && ["generado", "rechazado"].includes(contract.status);
                             </button>
                             <button className="contract-btn-reject" onClick={handleCancelarEvento} disabled={saving}>
                                 {saving ? "Cancelando..." : "Sí, cancelar el evento"}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {rejectOpen && (
+                <div className="contract-terms-backdrop" onClick={() => setRejectOpen(false)}>
+                    <div className="contract-terms-modal" onClick={(e) => e.stopPropagation()}>
+                        <button className="contract-terms-close" onClick={() => setRejectOpen(false)} aria-label="Cerrar">✕</button>
+                        <h3>Rechazar modificación</h3>
+                        <p className="contract-terms-intro">
+                            Indicá el <strong>motivo</strong> del rechazo. Se lo notificaremos al cliente
+                            junto con el aviso de que sus datos vigentes se conservan.
+                        </p>
+                        <textarea
+                            className="contract-reason-textarea"
+                            value={rejectMotivo}
+                            onChange={(e) => setRejectMotivo(e.target.value)}
+                            placeholder="Escribí el motivo del rechazo..."
+                            rows="4"
+                        />
+                        <div className="contract-terms-actions">
+                            <button className="contract-btn-save" onClick={() => setRejectOpen(false)} disabled={saving}>
+                                Volver
+                            </button>
+                            <button className="contract-btn-reject" onClick={handleConfirmRechazo} disabled={saving}>
+                                {saving ? "Rechazando..." : "Confirmar rechazo"}
                             </button>
                         </div>
                     </div>

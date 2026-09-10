@@ -1,5 +1,6 @@
 import reservationService from "../services/reservation.service.js";
 import contractService from "../services/contract.service.js";
+import notificationService from "../services/notification.service.js";
 
 class ReservationController {
 
@@ -134,6 +135,23 @@ class ReservationController {
                 reservation.idCli !== req.usuario.idCli
             ) {
                 return res.status(403).json({ error: "No tenés acceso a esta reserva." });
+            }
+
+            if (req.usuario.rol === "administrador") {
+                const motivo = req.body?.motivo?.trim();
+
+                if (!motivo) {
+                    return res.status(400).json({
+                        error: "Debés indicar el motivo de la eliminación de la reserva para notificar al cliente."
+                    });
+                }
+
+                await notificationService.notifyClient({
+                    idCli: reservation.idCli,
+                    mensaje: `El administrador eliminó la reserva #${reservation.idReservation} por la siguiente razón: ${motivo}. Tu evento fue cancelado.`,
+                    tipo: "reserva_cancelada",
+                    idContract: null
+                });
             }
 
             await reservationService.delete(req.params.id);

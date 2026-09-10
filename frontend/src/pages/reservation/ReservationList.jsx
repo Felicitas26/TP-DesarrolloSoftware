@@ -50,6 +50,8 @@ function ReservationList() {
     const [clientToDetail, setClientToDetail] = useState(null);
     const [feedback, setFeedback] = useState(null);
     const [reservationToCancelId, setReservationToCancelId] = useState(null);
+    const [cancelOpen, setCancelOpen] = useState(false);
+    const [cancelMotivo, setCancelMotivo] = useState("");
     const [loading, setLoading] = useState(true);
 
     const token = localStorage.getItem("sty_token");
@@ -136,19 +138,19 @@ function ReservationList() {
 
     const handleCancelClick = (id) => {
         setReservationToCancelId(id);
-        setFeedback({
-            type: "confirm",
-            title: "Cancelar reserva",
-            message: "¿Estás seguro de que querés cancelar esta reserva?",
-            confirmLabel: "Cancelar reserva"
-        });
+        setCancelOpen(true);
     };
 
     const performCancel = async () => {
 
+        if (!cancelMotivo.trim()) {
+            showFeedback("error", "Falta el motivo", "Escribí el motivo de la eliminación para notificarlo al cliente.");
+            return;
+        }
+
         const id = reservationToCancelId;
         setReservationToCancelId(null);
-        setFeedback(null);
+        setCancelOpen(false);
 
         try {
 
@@ -157,8 +159,10 @@ function ReservationList() {
                 {
                     method: "DELETE",
                     headers: {
+                        "Content-Type": "application/json",
                         "Authorization": `Bearer ${token}`
-                    }
+                    },
+                    body: JSON.stringify({ motivo: cancelMotivo.trim() })
                 }
             );
 
@@ -168,7 +172,8 @@ function ReservationList() {
                 throw new Error(data.error);
             }
 
-            showFeedback("success", "Reserva cancelada", "Reserva cancelada correctamente.");
+            setCancelMotivo("");
+            showFeedback("success", "Reserva cancelada", "Reserva cancelada correctamente. El cliente fue notificado.");
 
         } catch (error) {
 
@@ -419,6 +424,37 @@ function ReservationList() {
                                 onClick={() => setClientToDetail(null)}
                             >
                                 Cerrar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {cancelOpen && (
+                <div className="res-cancel-backdrop" onClick={() => setCancelOpen(false)}>
+                    <div className="res-cancel-modal" onClick={(e) => e.stopPropagation()}>
+                        <button className="res-cancel-close" onClick={() => setCancelOpen(false)} aria-label="Cerrar">✕</button>
+                        <h3>Cancelar reserva</h3>
+                        <p className="res-cancel-intro">
+                            Esta acción da de baja la reserva y el evento. Indicá el
+                            <strong> motivo</strong> de la eliminación: se lo notificaremos al cliente.
+                        </p>
+                        <textarea
+                            className="res-cancel-textarea"
+                            value={cancelMotivo}
+                            onChange={(e) => setCancelMotivo(e.target.value)}
+                            placeholder="Motivo de la eliminación..."
+                            rows="4"
+                        />
+                        <div className="res-cancel-actions">
+                            <button className="btn-submit-cyan" onClick={() => setCancelOpen(false)}>
+                                Volver
+                            </button>
+                            <button
+                                className="btn-j-danger"
+                                onClick={performCancel}
+                            >
+                                Cancelar reserva
                             </button>
                         </div>
                     </div>

@@ -9,7 +9,8 @@ const NOTIFICATION_LABEL = {
     contrato_revisado: "Revisión de contrato",
     contrato_firmado: "Contrato firmado",
     modificacion_descartada: "Modificación descartada",
-    contrato_cancelado: "Evento cancelado"
+    contrato_cancelado: "Evento cancelado",
+    reserva_cancelada: "Reserva cancelada"
 };
 
 const IconBell = () => (

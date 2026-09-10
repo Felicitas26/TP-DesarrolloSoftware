@@ -643,6 +643,30 @@
     line-height: 1.6;
 }
 
+.contract-reason-textarea {
+    width: 100%;
+    padding: 13px 15px;
+    margin-bottom: 18px;
+    resize: vertical;
+    font-family: "Montserrat", system-ui, sans-serif;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    color: #ffffff;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 10px;
+    outline: none;
+    box-sizing: border-box;
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.contract-reason-textarea:focus {
+    border-color: rgba(34, 211, 238, 0.7);
+    box-shadow: 0 0 18px rgba(0, 229, 255, 0.15);
+}
+
 .contract-terms-list {
     margin: 0 0 22px;
     padding: 0;
