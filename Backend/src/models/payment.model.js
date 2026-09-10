@@ -34,22 +34,17 @@ class PaymentModel {
     }
 
     async update(id, payment) {
-        const {
-            value,
-            statusPayment,
-            datePayment,
-            idContract
-        } = payment;
+        const data = {};
+
+        if (payment.value !== undefined) data.value = Number(payment.value);
+        if (payment.statusPayment !== undefined) data.statusPayment = payment.statusPayment;
+        if (payment.datePayment !== undefined) data.datePayment = new Date(payment.datePayment);
+        if (payment.idContract !== undefined) data.idContract = Number(payment.idContract);
 
         try {
             return await prisma.payment.update({
                 where: { idPayment: Number(id) },
-                data: {
-                    value: Number(value),
-                    statusPayment,
-                    datePayment: new Date(datePayment),
-                    idContract: Number(idContract)
-                }
+                data
             });
         } catch {
             return null;

@@ -49,7 +49,8 @@ const CONTRACT_INCLUDE = {
                 }
             }
         }
-    }
+    },
+    payments: true
 };
 
 export function timeToDate(value) {
@@ -124,7 +125,7 @@ class ContractModel {
 
     async createFromReservation(idReservation, finalValue, extraIds) {
         return await prisma.$transaction(async (tx) => {
-            return await tx.contract.create({
+            const contract = await tx.contract.create({
                 data: {
                     dateContract: new Date(),
                     finalValue: Number(finalValue),
@@ -141,6 +142,17 @@ class ContractModel {
                         : {})
                 }
             });
+
+            await tx.payment.create({
+                data: {
+                    value: Number(finalValue),
+                    statusPayment: "pendiente",
+                    datePayment: new Date(),
+                    idContract: contract.idContract
+                }
+            });
+
+            return contract;
         });
     }
 
@@ -148,7 +160,7 @@ class ContractModel {
         const { eventStartTime, eventEndTime, cantExactaInvit, finalValue } = data;
 
         try {
-            return await prisma.contract.update({
+            const updated = await prisma.contract.update({
                 where: { idContract: Number(id) },
                 data: {
                     eventStartTime: timeToDate(eventStartTime),
@@ -162,6 +174,15 @@ class ContractModel {
                     finalValue: Number(finalValue)
                 }
             });
+
+            if (finalValue !== undefined) {
+                await prisma.payment.updateMany({
+                    where: { idContract: Number(id) },
+                    data: { value: Number(finalValue) }
+                });
+            }
+
+            return updated;
         } catch {
             return null;
         }

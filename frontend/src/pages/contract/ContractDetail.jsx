@@ -47,6 +47,12 @@ const STATUS_LABEL = {
     modificacion_en_curso: "Modificación aprobada — revisá y confirmá"
 };
 
+const PAYMENT_STATUS_LABEL = {
+    pendiente: "Pendiente de abono",
+    seña: "Seña abonada",
+    pagado: "Saldo abonado"
+};
+
 const TERMINOS_FIRMA = [
     "El presente contrato constituye el acuerdo definitivo entre el CLIENTE y SALON STYLO para la realización del evento detallado en la reserva.",
     "Al aceptar, el CLIENTE se compromete al cumplimiento de todas las cláusulas del contrato, incluidas las condiciones de pago, los horarios y la cantidad de invitados informada.",
@@ -540,6 +546,49 @@ const canEdit = contract && ["generado", "rechazado"].includes(contract.status);
         }
     };
 
+    const handleCambiarPago = async (statusPayment) => {
+        if (!payment) return;
+        setMessage(null);
+        setSaving(true);
+
+        try {
+            const response = await fetch(
+                `http://localhost:3000/api/payment/${payment.idPayment}`,
+                {
+                    method: "PUT",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ statusPayment })
+                }
+            );
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.error || "No se pudo actualizar el pago.");
+            }
+
+            setContract({
+                ...contract,
+                payments: [{ ...payment, statusPayment }]
+            });
+
+            showMessage(
+                "success",
+                "Pago actualizado",
+                statusPayment === "pagado"
+                    ? "El saldo fue marcado como abonado."
+                    : "El pago volvió a estado pendiente."
+            );
+        } catch (error) {
+            showMessage("error", "Error", error.message);
+        } finally {
+            setSaving(false);
+        }
+    };
+
     const handleAceptar = async () => {
         setMessage(null);
         setSaving(true);
@@ -590,6 +639,8 @@ const canEdit = contract && ["generado", "rechazado"].includes(contract.status);
     }
 
     const reservation = contract.reservation;
+
+    const payment = contract.payments?.[0] || null;
 
     const fecEvento = form.dateEvent ||
         (reservation?.dateEvent ? reservation.dateEvent.split("T")[0] : "");
@@ -978,6 +1029,56 @@ const canEdit = contract && ["generado", "rechazado"].includes(contract.status);
                         </small>
                     )}
                 </section>
+
+                {/* PAGO (solo admin) */}
+                {rol === "administrador" && (
+                    <section className="contract-section">
+                        <h2>Pago</h2>
+
+                        {payment ? (
+                            <>
+                                <div className="contract-fields">
+                                    <div className="contract-field">
+                                        <label>Valor</label>
+                                        <span>{currency(payment.value)}</span>
+                                    </div>
+                                    <div className="contract-field">
+                                        <label>Estado</label>
+                                        <span className={`contract-status ${payment.statusPayment}`}>
+                                            {PAYMENT_STATUS_LABEL[payment.statusPayment] || payment.statusPayment}
+                                        </span>
+                                    </div>
+                                    <div className="contract-field">
+                                        <label>Fecha</label>
+                                        <span>{formatDate(payment.datePayment)}</span>
+                                    </div>
+                                </div>
+
+                                {payment.statusPayment !== "pagado" ? (
+                                    <button
+                                        className="contract-btn-accept"
+                                        onClick={() => handleCambiarPago("pagado")}
+                                        disabled={saving}
+                                    >
+                                        {saving ? "Procesando..." : "Marcar saldo como abonado"}
+                                    </button>
+                                ) : (
+                                    <button
+                                        className="contract-btn-save"
+                                        onClick={() => handleCambiarPago("pendiente")}
+                                        disabled={saving}
+                                    >
+                                        {saving ? "Procesando..." : "Reabrir como pendiente"}
+                                    </button>
+                                )}
+                            </>
+                        ) : (
+                            <p className="contract-mod-meta">
+                                Este contrato no tiene un pago registrado.
+                            </p>
+                        )}
+                    </section>
+                )}
 
                 {/* MODIFICACION APROBADA — PENDIENTE DE FIRMA (cliente) */}
                 {rol === "cliente" &&

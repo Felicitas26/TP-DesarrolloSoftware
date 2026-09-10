@@ -1,6 +1,8 @@
 import paymentModel from "../models/payment.model.js";
 import contractModel from "../models/contract.model.js";
 
+const ALLOWED_STATUS = ["pendiente", "seña", "pagado"];
+
 class PaymentService {
 
     async getAll() {
@@ -54,6 +56,12 @@ class PaymentService {
 
     async update(id, payment) {
         await this.getById(id);
+
+        if (payment.statusPayment && !ALLOWED_STATUS.includes(payment.statusPayment)) {
+            const error = new Error("Estado de pago inválido.");
+            error.statusCode = 400;
+            throw error;
+        }
 
         const updated = await paymentModel.update(id, payment);
 
