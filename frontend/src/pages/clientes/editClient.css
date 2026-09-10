@@ -378,3 +378,32 @@
         width: 100%;
     }
 }
+
+.city-suggestions {
+    list-style: none;
+    margin: 4px 0 0;
+    padding: 0;
+    position: absolute;
+    z-index: 10;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: #1e1e2f;
+    border: 1px solid rgba(138, 43, 226, 0.3);
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+.city-suggestions li {
+    padding: 10px 14px;
+    cursor: pointer;
+    color: #e0e0e0;
+    font-size: 0.9rem;
+    transition: background 0.2s;
+}
+
+.city-suggestions li:hover {
+    background: rgba(138, 43, 226, 0.2);
+    color: #fff;
+}

@@ -3,16 +3,27 @@ import prisma from "../lib/prisma.js";
 class ClientModel {
 
     async getAll() {
-        return await prisma.client.findMany({
+        const clients = await prisma.client.findMany({
             include: { location: true }
         });
+        return clients.map(c => ({
+            ...c,
+            city: c.location?.city || "",
+            zipCode: c.location?.zipCode || ""
+        }));
     }
 
     async getById(id) {
-        return await prisma.client.findUnique({
+        const client = await prisma.client.findUnique({
             where: { idCli: Number(id) },
             include: { location: true }
         });
+        if (!client) return null;
+        return {
+            ...client,
+            city: client.location?.city || "",
+            zipCode: client.location?.zipCode || ""
+        };
     }
 
     async create(client) {

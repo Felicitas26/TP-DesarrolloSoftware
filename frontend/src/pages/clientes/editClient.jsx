@@ -20,10 +20,21 @@ function EditClient() {
   });
 
   const [locations, setLocations] = useState([]);
+  const [cityInput, setCityInput] = useState("");
+  const [postalCode, setPostalCode] = useState("");
+  const [suggestions, setSuggestions] = useState([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
 
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(null);
+
+  const normalizeText = (value) =>
+    String(value || "")
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .trim();
 
   useEffect(() => {
     const loadData = async () => {
@@ -71,6 +82,12 @@ function EditClient() {
           idLocation: clientData.idLocation || ""
         });
 
+        const matchedLoc = locsData.find(
+          (l) => l.idLocation === clientData.idLocation
+        );
+        setCityInput(matchedLoc?.city || clientData.city || "");
+        setPostalCode(matchedLoc?.zipCode || clientData.zipCode || "");
+
         setLocations(locsData);
 
       } catch (err) {
@@ -93,14 +110,69 @@ function EditClient() {
     }));
   };
 
+  const handleCityChange = (e) => {
+    const value = e.target.value;
+    setCityInput(value);
+    const matches = locations.filter((loc) =>
+      normalizeText(loc.city).includes(normalizeText(value))
+    );
+    setSuggestions(value.trim() ? matches.slice(0, 5) : []);
+    setShowSuggestions(value.trim().length > 0);
+
+    if (normalizeText(locations.find((l) => l.idLocation === client.idLocation)?.city) === normalizeText(value)) {
+      return;
+    }
+    setPostalCode("");
+    setClient((prev) => ({ ...prev, idLocation: "" }));
+  };
+
+  const handleSelectCity = (loc) => {
+    setCityInput(loc.city);
+    setPostalCode(loc.zipCode);
+    setClient((prev) => ({ ...prev, idLocation: loc.idLocation }));
+    setSuggestions([]);
+    setShowSuggestions(false);
+  };
+
+  const handlePostalChange = (e) => {
+    setPostalCode(e.target.value);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     setSubmitting(true);
     setError(null);
 
+    if (!cityInput.trim()) {
+      setError("La ciudad es obligatoria.");
+      setSubmitting(false);
+      return;
+    }
+
     if (!client.idLocation) {
-      setError("Debe seleccionar una ciudad.");
+      setError("La ciudad ingresada no existe en la base de ciudades de Argentina.");
+      setSubmitting(false);
+      return;
+    }
+
+    if (!postalCode.trim()) {
+      setError("El código postal es obligatorio.");
+      setSubmitting(false);
+      return;
+    }
+
+    if (!/^\d+$/.test(postalCode.trim())) {
+      setError("El código postal solo puede contener números.");
+      setSubmitting(false);
+      return;
+    }
+
+    const matchedLocation = locations.find(
+      (l) => l.idLocation === client.idLocation
+    );
+    if (matchedLocation && String(matchedLocation.zipCode) !== String(postalCode.trim())) {
+      setError(`El código postal no coincide. Para ${matchedLocation.city} el código es ${matchedLocation.zipCode}.`);
       setSubmitting(false);
       return;
     }
@@ -287,31 +359,59 @@ function EditClient() {
           />
         </div>
 
-        <div className="form-group">
-          <label htmlFor="idLocation">
-            Ciudad y Código Postal *
+        <div className="form-group" style={{ position: "relative" }}>
+          <label htmlFor="cityInput">
+            Ciudad *
           </label>
 
-          <select
-            id="idLocation"
-            name="idLocation"
-            value={client.idLocation || ""}
-            onChange={handleChange}
+          <input
+            id="cityInput"
+            type="text"
+            value={cityInput}
+            onChange={handleCityChange}
+            onFocus={() => {
+              if (cityInput.trim()) {
+                const matches = locations.filter((loc) =>
+                  normalizeText(loc.city).includes(normalizeText(cityInput))
+                );
+                setSuggestions(matches.slice(0, 5));
+                setShowSuggestions(true);
+              }
+            }}
+            onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
+            placeholder="Ej: Rosario"
+            autoComplete="off"
             required
-          >
-            <option value="" disabled>
-              Seleccione una ubicación...
-            </option>
+          />
 
-            {locations.map((loc) => (
-              <option
-                key={loc.idLocation}
-                value={loc.idLocation}
-              >
-                {loc.city} - CP: {loc.zipCode}
-              </option>
-            ))}
-          </select>
+          {showSuggestions && suggestions.length > 0 && (
+            <ul className="city-suggestions">
+              {suggestions.map((loc) => (
+                <li
+                  key={loc.idLocation}
+                  onMouseDown={() => handleSelectCity(loc)}
+                >
+                  {loc.city} - CP: {loc.zipCode}
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+
+        <div className="form-group">
+          <label htmlFor="postalCode">
+            Código Postal *
+          </label>
+
+          <input
+            id="postalCode"
+            type="text"
+            value={postalCode}
+            onChange={handlePostalChange}
+            placeholder="Ej: 2000"
+            autoComplete="off"
+            required
+          />
         </div>
 
         <div className="form-actions">
