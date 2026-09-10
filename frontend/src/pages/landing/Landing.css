@@ -1,3 +1,8 @@
+.landing section[id],
+.landing footer[id] {
+  scroll-margin-top: 90px;
+}
+
 .landing-contact {
   display: flex;
   flex-direction: column;

@@ -33,7 +33,9 @@ function ChangePassword() {
     passwordNueva: "",
     confirmar: ""
   });
-  const [show, setShow] = useState(false);
+  const [showActual, setShowActual] = useState(false);
+  const [showNueva, setShowNueva] = useState(false);
+  const [showConfirmar, setShowConfirmar] = useState(false);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -103,12 +105,6 @@ function ChangePassword() {
     <div className="changepass-page">
       <div className="changepass-card">
         <div className="changepass-logo">STYLO</div>
-        <h1 className="changepass-title">Cambiar Contraseña</h1>
-        <p className="changepass-subtitle">
-          Tu contraseña es provisoria. Definí una nueva para tu cuenta.
-        </p>
-
-        {error && <div className="changepass-error">{error}</div>}
 
         {success ? (
           <div className="changepass-success">
@@ -116,29 +112,45 @@ function ChangePassword() {
             <button
               type="button"
               className="changepass-btn-primary"
-              onClick={() => navigate("/client")}
+              onClick={() => navigate("/client-home")}
             >
               Continuar
             </button>
           </div>
         ) : (
-          <form className="changepass-form" onSubmit={handleSubmit} noValidate>
+          <>
+            <h1 className="changepass-title">Cambiar Contraseña</h1>
+            <p className="changepass-subtitle">
+              Tu contraseña es provisoria. Definí una nueva para tu cuenta.
+            </p>
+
+            {error && <div className="changepass-error">{error}</div>}
+
+            <form className="changepass-form" onSubmit={handleSubmit} noValidate>
             <div className="changepass-field">
               <span className="changepass-icon"><IconLock /></span>
               <input
-                type={show ? "text" : "password"}
+                type={showActual ? "text" : "password"}
                 name="passwordActual"
                 placeholder="Contraseña actual (provisoria)"
                 value={form.passwordActual}
                 onChange={handleChange}
                 autoComplete="current-password"
               />
+              <button
+                type="button"
+                className="changepass-eye"
+                onClick={() => setShowActual((prev) => !prev)}
+                aria-label={showActual ? "Ocultar" : "Mostrar"}
+              >
+                {showActual ? <IconEyeOff /> : <IconEye />}
+              </button>
             </div>
 
             <div className="changepass-field">
               <span className="changepass-icon"><IconLock /></span>
               <input
-                type={show ? "text" : "password"}
+                type={showNueva ? "text" : "password"}
                 name="passwordNueva"
                 placeholder="Nueva contraseña"
                 value={form.passwordNueva}
@@ -148,29 +160,38 @@ function ChangePassword() {
               <button
                 type="button"
                 className="changepass-eye"
-                onClick={() => setShow((prev) => !prev)}
-                aria-label={show ? "Ocultar" : "Mostrar"}
+                onClick={() => setShowNueva((prev) => !prev)}
+                aria-label={showNueva ? "Ocultar" : "Mostrar"}
               >
-                {show ? <IconEyeOff /> : <IconEye />}
+                {showNueva ? <IconEyeOff /> : <IconEye />}
               </button>
             </div>
 
             <div className="changepass-field">
               <span className="changepass-icon"><IconLock /></span>
               <input
-                type={show ? "text" : "password"}
+                type={showConfirmar ? "text" : "password"}
                 name="confirmar"
                 placeholder="Confirmar nueva contraseña"
                 value={form.confirmar}
                 onChange={handleChange}
                 autoComplete="new-password"
               />
+              <button
+                type="button"
+                className="changepass-eye"
+                onClick={() => setShowConfirmar((prev) => !prev)}
+                aria-label={showConfirmar ? "Ocultar" : "Mostrar"}
+              >
+                {showConfirmar ? <IconEyeOff /> : <IconEye />}
+              </button>
             </div>
 
             <button type="submit" className="changepass-btn-primary" disabled={submitting}>
               {submitting ? "Guardando..." : "Cambiar Contraseña"}
             </button>
-          </form>
+            </form>
+          </>
         )}
       </div>
     </div>

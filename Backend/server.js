@@ -4,6 +4,9 @@ dotenv.config();
 import express from "express";
 import cors from "cors";
 import path from "path";
+import { fileURLToPath } from "url";
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 import clientRoutes from "./src/routes/client.routes.js";
 import loungeRoutes from "./src/routes/lounge.routes.js";
@@ -25,7 +28,7 @@ app.use(cors());
 
 app.use(express.json());
 
-app.use("/uploads", express.static(path.resolve("uploads")));
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 app.use("/api/client", clientRoutes);
 app.use("/api/lounge", loungeRoutes);

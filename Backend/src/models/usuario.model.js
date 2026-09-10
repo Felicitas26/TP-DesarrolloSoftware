@@ -29,6 +29,25 @@ class UsuarioModel {
         });
     }
 
+    async findByEmail(email) {
+        const normalized = String(email).trim().toLowerCase();
+
+        return await prisma.usuario.findFirst({
+            where: {
+                OR: [
+                    { username: normalized },
+                    {
+                        client: {
+                            emailCli: {
+                                equals: normalized
+                            }
+                        }
+                    }
+                ]
+            }
+        });
+    }
+
     async findByDni(dni) {
         return await prisma.client.findFirst({
             where: { dniCli: Number(dni) }

@@ -90,22 +90,7 @@
   font-size: 0.85rem;
   line-height: 1.6;
   color: rgba(255, 255, 255, 0.72);
-  margin: 0 0 18px;
-}
-
-.event-link {
-  font-family: "Montserrat", system-ui, sans-serif;
-  font-size: 0.8rem;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  color: #22d3ee;
-  text-decoration: none;
-  transition: text-shadow 0.18s ease, color 0.18s ease;
-}
-
-.event-link:hover {
-  color: #00e5ff;
-  text-shadow: 0 0 14px rgba(0, 229, 255, 0.8);
+  margin: 0;
 }
 
 @media (max-width: 900px) {

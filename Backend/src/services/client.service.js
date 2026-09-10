@@ -37,6 +37,11 @@ class ClientService {
             throw { statusCode: 400, message: "El teléfono solo puede contener números." };
         }
 
+        const existingEmail = await clientModel.findByEmail(emailCli);
+        if (existingEmail) {
+            throw { statusCode: 400, message: "El email ingresado ya está registrado." };
+        }
+
         const created = await clientModel.create(client);
 
         try {

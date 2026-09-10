@@ -92,6 +92,34 @@ class UsuarioService {
         });
     }
 
+    async resetPassword({ email, passwordNueva }) {
+        if (!email || !passwordNueva) {
+            throw {
+                statusCode: 400,
+                message: "Debe ingresar el email y la nueva contraseña."
+            };
+        }
+
+        const usuario = await usuarioModel.findByEmail(email);
+
+        if (!usuario) {
+            throw {
+                statusCode: 404,
+                message: "No existe una cuenta asociada a ese email."
+            };
+        }
+
+        const passwordHash =
+            await bcrypt.hash(passwordNueva, SALT_ROUNDS);
+
+        await usuarioModel.updatePassword(
+            usuario.idUsuario,
+            passwordHash
+        );
+
+        return { message: "Contraseña restablecida con éxito." };
+    }
+
     async cambiarPassword(idUsuario, { passwordActual, passwordNueva }) {
         if (!passwordActual || !passwordNueva) {
             throw {

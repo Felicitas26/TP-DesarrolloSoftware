@@ -5,6 +5,7 @@ import { authenticate } from "../middlewares/auth.middleware.js";
 const router = Router();
 
 router.get("/", clientController.getAll);
+router.get("/check-email", clientController.checkEmail);
 router.get("/me", authenticate, clientController.getMyProfile);
 router.put("/me", authenticate, clientController.updateMyProfile);
 router.get("/:id", clientController.getById);

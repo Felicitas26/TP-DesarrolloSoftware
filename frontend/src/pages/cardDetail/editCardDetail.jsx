@@ -34,9 +34,9 @@ function EditCardDetail() {
         menuStage: "",
         detail: "",
         budget: "",
-        entrada: "",
-        platoPrincipal: "",
-        postre: ""
+        starter: "",
+        mainCourse: "",
+        dessert: ""
     });
 
     const [imageUrl, setImageUrl] = useState(null);
@@ -73,9 +73,9 @@ function EditCardDetail() {
                 menuStage: data.menuStage || "",
                 detail: data.detail || "",
                 budget: data.budget || "",
-                entrada: data.entrada || "",
-                platoPrincipal: data.platoPrincipal || "",
-                postre: data.postre || ""
+                starter: data.starter || "",
+                mainCourse: data.mainCourse || "",
+                dessert: data.dessert || ""
             });
 
             setImageUrl(data.imageUrl || "");
@@ -129,9 +129,9 @@ function EditCardDetail() {
             formData.append("menuStage", form.menuStage);
             formData.append("detail", form.detail);
             formData.append("budget", form.budget);
-            formData.append("entrada", form.entrada);
-            formData.append("platoPrincipal", form.platoPrincipal);
-            formData.append("postre", form.postre);
+            formData.append("starter", form.starter);
+            formData.append("mainCourse", form.mainCourse);
+            formData.append("dessert", form.dessert);
 
             if (imageFile) {
                 formData.append("image", imageFile);
@@ -346,8 +346,8 @@ function EditCardDetail() {
                                     <label>Entrada</label>
 
                                     <textarea
-                                        name="entrada"
-                                        value={form.entrada}
+                                        name="starter"
+                                        value={form.starter}
                                         onChange={handleChange}
                                         placeholder="Descripción de la entrada..."
                                     />
@@ -359,8 +359,8 @@ function EditCardDetail() {
                                     <label>Plato Principal</label>
 
                                     <textarea
-                                        name="platoPrincipal"
-                                        value={form.platoPrincipal}
+                                        name="mainCourse"
+                                        value={form.mainCourse}
                                         onChange={handleChange}
                                         placeholder="Descripción del plato principal..."
                                     />
@@ -372,8 +372,8 @@ function EditCardDetail() {
                                     <label>Postre</label>
 
                                     <textarea
-                                        name="postre"
-                                        value={form.postre}
+                                        name="dessert"
+                                        value={form.dessert}
                                         onChange={handleChange}
                                         placeholder="Descripción del postre..."
                                     />

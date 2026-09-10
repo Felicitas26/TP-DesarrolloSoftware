@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import "./newClient.css";
 
@@ -64,6 +64,9 @@ const emptyClient = {
   const [submitting, setSubmitting] = useState(false);
   const [globalError, setGlobalError] = useState(null);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [lastRegistered, setLastRegistered] = useState(null);
+  const [emailAvailable, setEmailAvailable] = useState(null);
+  const emailTimerRef = useRef(null);
 
   // Normaliza mayúsculas y acentos para comparar nombres de ciudades
   const normalizeText = (value) =>
@@ -98,6 +101,33 @@ const emptyClient = {
   useEffect(() => {
     fetchLocations();
   }, []);
+
+  useEffect(() => {
+    if (emailTimerRef.current) clearTimeout(emailTimerRef.current);
+
+    if (!client.emailCli.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(client.emailCli)) {
+      setEmailAvailable(null);
+      return;
+    }
+
+    setEmailAvailable(null);
+
+    emailTimerRef.current = setTimeout(async () => {
+      try {
+        const res = await fetch(
+          `http://localhost:3000/api/client/check-email?email=${encodeURIComponent(client.emailCli)}`
+        );
+        const data = await res.json();
+        setEmailAvailable(data.available);
+      } catch {
+        setEmailAvailable(null);
+      }
+    }, 500);
+
+    return () => {
+      if (emailTimerRef.current) clearTimeout(emailTimerRef.current);
+    };
+  }, [client.emailCli]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -205,6 +235,12 @@ const emptyClient = {
 
     if (!validateForm()) return;
 
+    if (emailAvailable === false) {
+      setFieldErrors((prev) => ({ ...prev, emailCli: "Este email ya está registrado por otro cliente." }));
+      setSubmitting(false);
+      return;
+    }
+
     setSubmitting(true);
 
     try {
@@ -230,6 +266,7 @@ const emptyClient = {
       }
 
       setShowSuccessModal(true);
+      setLastRegistered({ username: client.username, password: client.password });
       setClient(emptyClient);
       setCityInput("");
       setPostalCode("");
@@ -335,7 +372,7 @@ const emptyClient = {
                   {fieldErrors.phoneCli && <span className="error-message">{fieldErrors.phoneCli}</span>}
                 </div>
 
-                <div className={`form-group ${fieldErrors.emailCli ? "has-error" : ""}`}>
+                <div className={`form-group ${fieldErrors.emailCli || emailAvailable === false ? "has-error" : ""}`}>
                   <label htmlFor="emailCli">Email *</label>
                   <input
                     id="emailCli"
@@ -347,6 +384,9 @@ const emptyClient = {
                     className={isFieldComplete("emailCli") ? "input-complete" : ""}
                   />
                   {fieldErrors.emailCli && <span className="error-message">{fieldErrors.emailCli}</span>}
+                  {!fieldErrors.emailCli && emailAvailable === false && (
+                    <span className="error-message">Este email ya está registrado por otro cliente.</span>
+                  )}
                 </div>
               </div>
             </div>
@@ -493,27 +533,19 @@ const emptyClient = {
               </div>
               <div className="modal-content-j">
                 <p className="modal-text-j">
-                  ¡Cliente registrado con éxito en la base de datos!
+                  ¡Cliente registrado con éxito!
                 </p>
 
                 <p className="modal-text-account">
-                  Usuario: {client.username || "—"} · Contraseña provisoria: {client.password || "—"}
+                  Usuario: {lastRegistered?.username || "—"} · Contraseña provisoria: {lastRegistered?.password || "—"}
                 </p>
 
                 <button
                   type="button"
                   className="btn-j-primary"
-                  onClick={() => navigate(origin === "login" ? "/" : "/client")}
+                  onClick={() => navigate("/")}
                 >
-                  {origin === "login" ? "Ir a la página principal" : "Ir al listado"}
-                </button>
-
-                <button
-                  type="button"
-                  className="btn-j-link"
-                  onClick={() => setShowSuccessModal(false)}
-                >
-                  Cargar otro cliente
+                  Ir a la página principal
                 </button>
               </div>
             </div>

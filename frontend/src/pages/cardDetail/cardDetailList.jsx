@@ -309,29 +309,29 @@ function CardDetailList() {
                                 </span>
                             </div>
 
-                            {cardDetailToView.entrada && (
+                            {cardDetailToView.starter && (
                                 <div className="detail-item">
                                     <label>Entrada:</label>
                                     <span>
-                                        {cardDetailToView.entrada}
+                                        {cardDetailToView.starter}
                                     </span>
                                 </div>
                             )}
 
-                            {cardDetailToView.platoPrincipal && (
+                            {cardDetailToView.mainCourse && (
                                 <div className="detail-item">
                                     <label>Plato Principal:</label>
                                     <span>
-                                        {cardDetailToView.platoPrincipal}
+                                        {cardDetailToView.mainCourse}
                                     </span>
                                 </div>
                             )}
 
-                            {cardDetailToView.postre && (
+                            {cardDetailToView.dessert && (
                                 <div className="detail-item">
                                     <label>Postre:</label>
                                     <span>
-                                        {cardDetailToView.postre}
+                                        {cardDetailToView.dessert}
                                     </span>
                                 </div>
                             )}

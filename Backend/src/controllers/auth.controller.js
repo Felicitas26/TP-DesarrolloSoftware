@@ -50,6 +50,21 @@ class AuthController {
         }
     }
 
+    async resetPassword(req, res) {
+        try {
+            const { email, passwordNueva } = req.body;
+
+            const result = await usuarioService.resetPassword({
+                email,
+                passwordNueva
+            });
+
+            return res.status(200).json(result);
+        } catch (error) {
+            return res.status(error.statusCode || 500).json({ error: error.message });
+        }
+    }
+
     async register(req, res) {
         try {
             const { dniCli, password } = req.body;

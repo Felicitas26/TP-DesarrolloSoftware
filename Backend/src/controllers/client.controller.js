@@ -1,4 +1,5 @@
 import clientService from "../services/client.service.js";
+import clientModel from "../models/client.model.js";
 
 class ClientController {
 
@@ -75,6 +76,19 @@ class ClientController {
             return res.status(200).json({ message: "Cliente eliminado correctamente." });
         } catch (error) {
             return res.status(error.statusCode || 500).json({ error: error.message });
+        }
+    }
+
+    async checkEmail(req, res) {
+        try {
+            const { email } = req.query;
+            if (!email) {
+                return res.status(400).json({ error: "El parámetro email es requerido." });
+            }
+            const existing = await clientModel.findByEmail(email);
+            return res.status(200).json({ available: !existing });
+        } catch (error) {
+            return res.status(500).json({ error: error.message });
         }
     }
 }

@@ -1,9 +1,14 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import "./ReservationNew.css";
 
 function ReservationNew() {
     const navigate = useNavigate();
+    const location = useLocation();
+
+    const initialMenu = location.state?.idCardDetail
+        ? String(location.state.idCardDetail)
+        : "";
 
     const [reservation, setReservation] = useState({
         dateEvent: "",
@@ -12,7 +17,7 @@ function ReservationNew() {
         maxCantInvit: "",
         idLounge: "",
         idLoungeType: "",
-        idCardDetail: "",
+        idCardDetail: initialMenu,
         idServices: []
     });
 

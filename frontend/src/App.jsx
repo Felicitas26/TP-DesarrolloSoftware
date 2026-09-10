@@ -5,6 +5,7 @@ import AdminHome from "./pages/home/AdminHome";
 import ClientHome from "./pages/home/ClientHome";
 import Login from "./pages/auth/Login";
 import ChangePassword from "./pages/auth/ChangePassword";
+import ForgotPassword from "./pages/auth/ForgotPassword";
 import ClientList from "./pages/clientes/clientList";
 import NewClient from "./pages/clientes/newClient";
 import EditClient from "./pages/clientes/editClient";
@@ -47,6 +48,7 @@ function App() {
 
                 <Route path="/login" element={<Login />} />
                 <Route path="/cambiar-password" element={<ChangePassword />} />
+                <Route path="/recuperar-password" element={<ForgotPassword />} />
 
                 <Route path="/client" element={<ClientList />} />
                 <Route path="/client/new" element={<NewClient />} />

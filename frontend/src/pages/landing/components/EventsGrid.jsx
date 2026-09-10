@@ -34,9 +34,6 @@ function EventsGrid() {
             <div className="event-body">
               <h3 className="event-title">{event.title}</h3>
               <p className="event-description">{event.description}</p>
-              <a href="#reservas" className="event-link">
-                Ver Detalles
-              </a>
             </div>
           </article>
         ))}

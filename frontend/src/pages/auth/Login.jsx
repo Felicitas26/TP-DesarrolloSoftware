@@ -94,7 +94,16 @@ function Login() {
       } else if (data.rol === "administrador") {
         navigate("/admin-home");
       } else {
-        navigate("/client-home");
+        const pendingMenu = localStorage.getItem("sty_pending_menu");
+
+        if (pendingMenu) {
+          localStorage.removeItem("sty_pending_menu");
+          navigate("/reservation/new", {
+            state: { idCardDetail: pendingMenu }
+          });
+        } else {
+          navigate("/client-home");
+        }
       }
     } catch (err) {
       setError(err.message);
@@ -159,7 +168,17 @@ function Login() {
           </div>
 
           <div className="login-links">
-            <a href="#olvido" className="login-link-left">Olvido su contraseña?</a>
+            <span
+              className="login-link-left"
+              role="button"
+              tabIndex="0"
+              onClick={() => navigate("/recuperar-password")}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") navigate("/recuperar-password");
+              }}
+            >
+              ¿Olvidó su contraseña?
+            </span>
             <span
               className="login-link-right"
               role="button"

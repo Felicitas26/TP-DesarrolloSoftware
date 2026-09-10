@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import "./MenusSection.css";
 
 const fallbackMenus = [
@@ -48,8 +49,24 @@ const defaultCourses = {
 
 function MenusSection() {
 
+    const navigate = useNavigate();
     const [menus, setMenus] = useState([]);
     const [loading, setLoading] = useState(true);
+
+    const handleConsultarMenu = (idCardDetail) => {
+        const token = localStorage.getItem("sty_token");
+
+        if (!token) {
+            localStorage.setItem(
+                "sty_pending_menu",
+                String(idCardDetail)
+            );
+            navigate("/login");
+            return;
+        }
+
+        navigate("/reservation/new", { state: { idCardDetail } });
+    };
 
     useEffect(() => {
         const loadMenus = async () => {
@@ -94,11 +111,11 @@ function MenusSection() {
                 {menusToShow.map((menu) => {
 
                     const courses = menu.courses ||
-                        (menu.entrada && menu.platoPrincipal && menu.postre
+                        (menu.starter && menu.mainCourse && menu.dessert
                             ? [
-                                { label: "Entrada", text: menu.entrada },
-                                { label: "Plato Principal", text: menu.platoPrincipal },
-                                { label: "Postre", text: menu.postre }
+                                { label: "Entrada", text: menu.starter },
+                                { label: "Plato Principal", text: menu.mainCourse },
+                                { label: "Postre", text: menu.dessert }
                             ]
                             : defaultCourses[menu.menuStage] || [
                                 { label: "Entrada", text: "A confirmar con el equipo de STYLO." },
@@ -155,7 +172,14 @@ function MenusSection() {
 
                             </div>
 
-                            <button className="menu-cta-button">
+                            <button
+                                className="menu-cta-button"
+                                onClick={() =>
+                                    handleConsultarMenu(
+                                        menu.idCardDetail ?? menu.id
+                                    )
+                                }
+                            >
                                 Consultar por este Menú
                             </button>
 

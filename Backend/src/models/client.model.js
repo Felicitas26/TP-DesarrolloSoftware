@@ -26,6 +26,12 @@ class ClientModel {
         };
     }
 
+    async findByEmail(email) {
+        return await prisma.client.findFirst({
+            where: { emailCli: email }
+        });
+    }
+
     async create(client) {
         const {
             nameCli,

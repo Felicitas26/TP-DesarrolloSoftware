@@ -25,9 +25,9 @@ function NewCardDetail() {
         menuStage: "",
         detail: "",
         budget: "",
-        entrada: "",
-        platoPrincipal: "",
-        postre: ""
+        starter: "",
+        mainCourse: "",
+        dessert: ""
     });
 
     const [imageFile, setImageFile] = useState(null);
@@ -69,9 +69,9 @@ function NewCardDetail() {
             formData.append("menuStage", form.menuStage);
             formData.append("detail", form.detail);
             formData.append("budget", form.budget);
-            formData.append("entrada", form.entrada);
-            formData.append("platoPrincipal", form.platoPrincipal);
-            formData.append("postre", form.postre);
+            formData.append("starter", form.starter);
+            formData.append("mainCourse", form.mainCourse);
+            formData.append("dessert", form.dessert);
 
             if (imageFile) {
                 formData.append("image", imageFile);
@@ -225,8 +225,8 @@ function NewCardDetail() {
                                     <label>Entrada</label>
 
                                     <textarea
-                                        name="entrada"
-                                        value={form.entrada}
+                                        name="starter"
+                                        value={form.starter}
                                         onChange={handleChange}
                                         placeholder="Descripción de la entrada..."
                                     />
@@ -238,8 +238,8 @@ function NewCardDetail() {
                                     <label>Plato Principal</label>
 
                                     <textarea
-                                        name="platoPrincipal"
-                                        value={form.platoPrincipal}
+                                        name="mainCourse"
+                                        value={form.mainCourse}
                                         onChange={handleChange}
                                         placeholder="Descripción del plato principal..."
                                     />
@@ -251,8 +251,8 @@ function NewCardDetail() {
                                     <label>Postre</label>
 
                                     <textarea
-                                        name="postre"
-                                        value={form.postre}
+                                        name="dessert"
+                                        value={form.dessert}
                                         onChange={handleChange}
                                         placeholder="Descripción del postre..."
                                     />

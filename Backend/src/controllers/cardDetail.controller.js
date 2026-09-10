@@ -1,6 +1,10 @@
 import cardDetailService from "../services/cardDetail.service.js";
 import fs from "fs";
 import path from "path";
+import { fileURLToPath } from "url";
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const uploadsDir = path.join(__dirname, "..", "..", "uploads");
 
 const removeUploadedFile = (imageUrl) => {
     if (!imageUrl || !imageUrl.startsWith("/uploads/")) {
@@ -8,7 +12,7 @@ const removeUploadedFile = (imageUrl) => {
     }
 
     const filename = path.basename(imageUrl);
-    const filePath = path.resolve("uploads", filename);
+    const filePath = path.join(uploadsDir, filename);
 
     fs.unlink(filePath, () => {});
 };
