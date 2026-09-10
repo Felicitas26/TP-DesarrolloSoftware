@@ -179,7 +179,7 @@ function ExtraServiceList() {
 
   return (
     <div className="page-wrapper">
-      <div className="client-dashboard">
+      <div className="client-dashboard table-list-dashboard">
 
         <header className="dashboard-header-flex">
 

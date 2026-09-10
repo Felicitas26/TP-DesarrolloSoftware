@@ -3,6 +3,23 @@ import { useNavigate } from "react-router-dom";
 import FeedbackModal from "../../components/FeedbackModal";
 import "./ContractNew.css";
 
+const IconContract = () => (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+        <polyline points="14 2 14 8 20 8" />
+        <line x1="16" y1="13" x2="8" y2="13" />
+        <line x1="16" y1="17" x2="8" y2="17" />
+        <polyline points="10 9 9 9 8 9" />
+    </svg>
+);
+
+const IconArrowLeft = () => (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <line x1="19" y1="12" x2="5" y2="12" />
+        <polyline points="12 19 5 12 12 5" />
+    </svg>
+);
+
 function ContractNew() {
 
     const [idReservation, setIdReservation] = useState("");
@@ -53,31 +70,59 @@ function ContractNew() {
     };
 
     return (
-        <div className="contract-new-container">
+        <div className="page-wrapper">
 
-            <h1>Nuevo contrato</h1>
-            <p>Generá el contrato a partir de una reserva aceptada.</p>
+            <div className="client-dashboard contract-form-dashboard">
 
-            <form onSubmit={handleSubmit}>
+                {/* Header */}
+                <header className="dashboard-header-flex">
 
-                <div className="contract-new-field">
-                    <label>ID de reserva</label>
-                    <input
-                        type="number"
-                        name="idReservation"
-                        value={idReservation}
-                        onChange={(e) => setIdReservation(e.target.value)}
-                        min="1"
-                        required
-                        placeholder="Ingresá el ID de la reserva"
-                    />
+                    <div className="header-title-group">
+                        <div className="header-icon">
+                            <IconContract />
+                        </div>
+                        <div>
+                            <h1>Nuevo contrato</h1>
+                            <p>Generá el contrato a partir de una reserva aceptada.</p>
+                        </div>
+                    </div>
+
+                    <div className="header-actions">
+                        <button
+                            className="btn-back-panel"
+                            onClick={() => navigate("/contract")}
+                        >
+                            <IconArrowLeft /> Volver
+                        </button>
+                    </div>
+
+                </header>
+
+                {/* Formulario */}
+                <div className="form-card">
+                    <form onSubmit={handleSubmit} className="contract-form">
+
+                        <div className="form-group">
+                            <label>ID de reserva</label>
+                            <input
+                                type="number"
+                                name="idReservation"
+                                value={idReservation}
+                                onChange={(e) => setIdReservation(e.target.value)}
+                                min="1"
+                                required
+                                placeholder="Ingresá el ID de la reserva"
+                            />
+                        </div>
+
+                        <button type="submit" className="btn-submit-cyan" disabled={submitting}>
+                            {submitting ? "Generando..." : "Crear contrato"}
+                        </button>
+
+                    </form>
                 </div>
 
-                <button type="submit" disabled={submitting}>
-                    {submitting ? "Generando..." : "Crear contrato"}
-                </button>
-
-            </form>
+            </div>
 
             {feedback && (
                 <FeedbackModal

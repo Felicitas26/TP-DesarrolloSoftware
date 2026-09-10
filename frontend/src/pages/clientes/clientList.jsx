@@ -228,7 +228,7 @@ function ClientList() {
 
   return (
     <div className="page-wrapper">
-      <div className="client-dashboard">
+      <div className="client-dashboard table-list-dashboard">
         {/* Header */}
         <header className="dashboard-header-flex">
           <div className="header-title-group">

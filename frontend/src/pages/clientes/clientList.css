@@ -99,6 +99,10 @@
     margin: 0 auto;
 }
 
+.client-dashboard.table-list-dashboard {
+    max-width: none;
+}
+
 /* HEADER */
 
 .dashboard-header-flex {
