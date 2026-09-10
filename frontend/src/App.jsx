@@ -30,7 +30,6 @@ import NewCardDetail from "./pages/cardDetail/newCardDetail";
 import EditCardDetail from "./pages/cardDetail/editCardDetail";
 import ContractList from "./pages/contract/ContractList";
 import ContractDetail from "./pages/contract/ContractDetail";
-import ContractNew from "./pages/contract/ContractNew";
 import ContractEdit from "./pages/contract/ContractEdit";
 import MyContracts from "./pages/contract/MyContracts";
 
@@ -83,7 +82,6 @@ function App() {
                 <Route path="/cardDetail/edit/:id" element={<EditCardDetail />} />
 
                 <Route path="/contract" element={<ContractList />} />
-                <Route path="/contract/new" element={<ContractNew />} />
                 <Route path="/contract/edit" element={<ContractEdit />} />
                 <Route path="/contract/:id" element={<ContractDetail />} />
                 <Route path="/my-contracts" element={<MyContracts />} />

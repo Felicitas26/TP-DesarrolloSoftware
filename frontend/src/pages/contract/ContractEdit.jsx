@@ -77,6 +77,17 @@ function ContractEdit() {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
+    const contractLabel = (item) => {
+        const date = item.reservation?.dateEvent
+            ? new Date(item.reservation.dateEvent).toLocaleDateString("es-AR")
+            : "";
+        const type = item.reservation?.loungeType?.nameLoungeType;
+
+        if (!date && !type) return `Contrato #${item.idContract}`;
+
+        return [date, type].filter(Boolean).join(" · ");
+    };
+
     const handleSelect = async (e) => {
 
         const id = e.target.value;
@@ -251,7 +262,7 @@ function ContractEdit() {
                                         key={item.idContract}
                                         value={item.idContract}
                                     >
-                                        Contrato #{item.idContract}
+                                        {contractLabel(item)}
                                     </option>
                                 ))}
 

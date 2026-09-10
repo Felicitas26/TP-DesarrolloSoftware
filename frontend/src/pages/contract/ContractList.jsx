@@ -182,12 +182,6 @@ function ContractList() {
                         </button>
                         <button
                             className="btn-submit-cyan"
-                            onClick={() => navigate("/contract/new")}
-                        >
-                            Nuevo contrato
-                        </button>
-                        <button
-                            className="btn-submit-cyan"
                             onClick={() => navigate("/contract/edit")}
                         >
                             Editar contrato
