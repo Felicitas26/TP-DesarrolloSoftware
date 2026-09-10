@@ -23,6 +23,8 @@ import MyReservations from "./pages/reservation/MyReservations";
 import EditMyReservation from "./pages/reservation/EditMyReservation";
 import ExtraServiceList from "./pages/extraService/extraServiceList";
 import NewExtraService from "./pages/extraService/newExtraService";
+import PriceList from "./pages/price/priceList";
+import NewPrice from "./pages/price/newPrice";
 import CardDetailList from "./pages/cardDetail/cardDetailList";
 import NewCardDetail from "./pages/cardDetail/newCardDetail";
 import EditCardDetail from "./pages/cardDetail/editCardDetail";
@@ -72,6 +74,9 @@ function App() {
 
                 <Route path="/extraService" element={<ExtraServiceList />} />
                 <Route path="/extraService/new" element={<NewExtraService />} />
+
+                <Route path="/price" element={<PriceList />} />
+                <Route path="/price/new" element={<NewPrice />} />
 
                 <Route path="/cardDetail" element={<CardDetailList />} />
                 <Route path="/cardDetail/new" element={<NewCardDetail />} />

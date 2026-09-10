@@ -1,8 +1,10 @@
 import prisma from "../src/lib/prisma.js";
 
 const PRICES = [
-    { nameLoungeType: "Grande", value: 1200000 },
-    { nameLoungeType: "Chico", value: 1500000 }
+    { nameLoungeType: "Reina", value: 1200000 },
+    { nameLoungeType: "Princesa", value: 1500000 },
+    { nameLoungeType: "Grande", value: 1300000 },
+    { nameLoungeType: "Chico", value: 900000 }
 ];
 
 const EFFECTIVE_DATE = "2026-01-01";
