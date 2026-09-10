@@ -85,7 +85,7 @@ function ReservationNew() {
         const getExtraServices = async () => {
             try {
                 const response = await fetch(
-                    "http://localhost:3000/api/extraservice"
+                    "http://localhost:3000/api/extraService"
                 );
 
                 const data = await response.json();

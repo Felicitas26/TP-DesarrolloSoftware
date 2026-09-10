@@ -50,7 +50,7 @@ function EditMyReservation() {
                         fetch("http://localhost:3000/api/lounge"),
                         fetch("http://localhost:3000/api/loungeType"),
                         fetch("http://localhost:3000/api/cardDetail"),
-                        fetch("http://localhost:3000/api/extraservice")
+                        fetch("http://localhost:3000/api/extraService")
                     ]);
 
                 const [loungesData, typesData, menusData, extrasData] =

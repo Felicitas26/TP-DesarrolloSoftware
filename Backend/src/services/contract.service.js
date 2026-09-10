@@ -91,7 +91,7 @@ class ContractService {
         };
     }
 
-    async update(id, data) {
+    async update(id, data, { admin = false } = {}) {
         const contract = await contractModel.getById(id);
 
         if (!contract) {
@@ -100,7 +100,7 @@ class ContractService {
             throw error;
         }
 
-        if (!EDITABLE_STATUSES.includes(contract.status)) {
+        if (!admin && !EDITABLE_STATUSES.includes(contract.status)) {
             const error = new Error(
                 "Este contrato no admite modificaciones en su estado actual."
             );

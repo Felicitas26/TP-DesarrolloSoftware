@@ -69,7 +69,7 @@ function ExtraServiceList() {
       setLoading(true);
 
       const response = await fetch(
-        "http://localhost:3000/api/extraservice"
+        "http://localhost:3000/api/extraService"
       );
 
       if (response.ok) {
@@ -94,7 +94,7 @@ function ExtraServiceList() {
 
     try {
       const response = await fetch(
-        `http://localhost:3000/api/extraservice/${serviceToDelete.idService}`,
+        `http://localhost:3000/api/extraService/${serviceToDelete.idService}`,
         {
           method: "DELETE",
           headers: {
@@ -139,7 +139,7 @@ function ExtraServiceList() {
 
     try {
       const response = await fetch(
-        `http://localhost:3000/api/extraservice/${serviceToEdit.idService}`,
+        `http://localhost:3000/api/extraService/${serviceToEdit.idService}`,
         {
           method: "PUT",
           headers: {
@@ -210,7 +210,7 @@ function ExtraServiceList() {
 
             <button
               className="btn-submit-cyan"
-              onClick={() => navigate("/extraservice/new")}
+              onClick={() => navigate("/extraService/new")}
             >
               <IconPlus />
               Nuevo Servicio

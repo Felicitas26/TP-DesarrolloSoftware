@@ -99,7 +99,7 @@ function AdminHome() {
     {
       title: "Gestionar Servicios Extras",
       description: "Listado, alta y edición de servicios extras",
-      route: "/extraservice",
+      route: "/extraService",
       icon: <IconSparkles />,
       enabled: true
     },

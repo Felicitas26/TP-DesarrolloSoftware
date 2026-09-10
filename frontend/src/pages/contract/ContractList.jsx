@@ -153,6 +153,18 @@ function ContractList() {
                     <div className="contract-list-header-actions">
                         <button
                             className="contract-btn-back"
+                            onClick={() => navigate("/contract/new")}
+                        >
+                            Nuevo contrato
+                        </button>
+                        <button
+                            className="contract-btn-back"
+                            onClick={() => navigate("/contract/edit")}
+                        >
+                            Editar contrato
+                        </button>
+                        <button
+                            className="contract-btn-back"
                             onClick={() => navigate("/admin-home")}
                         >
                             Volver al menú

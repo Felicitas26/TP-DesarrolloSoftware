@@ -42,7 +42,7 @@ function NewExtraService() {
 
     try {
       const response = await fetch(
-        "http://localhost:3000/api/extraservice",
+        "http://localhost:3000/api/extraService",
         {
           method: "POST",
           headers: {
@@ -65,7 +65,7 @@ function NewExtraService() {
         );
       }
 
-      navigate("/extraservice");
+      navigate("/extraService");
 
     } catch (error) {
       alert(error.message);
@@ -98,7 +98,7 @@ function NewExtraService() {
 
           <button
             className="btn-back-panel"
-            onClick={() => navigate("/extraservice")}
+            onClick={() => navigate("/extraService")}
           >
             <IconArrowLeft />
             Volver a Servicios
@@ -166,7 +166,7 @@ function NewExtraService() {
                 <button
                   type="button"
                   className="btn-j-link-secondary"
-                  onClick={() => navigate("/extraservice")}
+                  onClick={() => navigate("/extraService")}
                 >
                   Cancelar
                 </button>

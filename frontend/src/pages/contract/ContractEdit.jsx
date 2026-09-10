@@ -2,6 +2,17 @@ import { useEffect, useState } from "react";
 import FeedbackModal from "../../components/FeedbackModal";
 import "./ContractEdit.css";
 
+const fmtTime = (value) => {
+    if (!value) return "";
+    const str = String(value);
+    if (/^\d{2}:\d{2}/.test(str)) return str.slice(0, 5);
+    const d = new Date(value);
+    if (Number.isNaN(d.getTime())) return "";
+    const hh = String(d.getUTCHours()).padStart(2, "0");
+    const mm = String(d.getUTCMinutes()).padStart(2, "0");
+    return `${hh}:${mm}`;
+};
+
 function ContractEdit() {
 
     const [contracts, setContracts] = useState([]);
@@ -9,17 +20,26 @@ function ContractEdit() {
     const [contract, setContract] = useState({
         eventStartTime: "",
         eventEndTime: "",
-        finalValue: "",
-        idReservation: ""
+        cantExactaInvit: ""
     });
 
     const [feedback, setFeedback] = useState(null);
+
+    const token = localStorage.getItem("sty_token");
+
+    const authHeaders = (withBody = false) => ({
+        ...(withBody ? { "Content-Type": "application/json" } : {}),
+        ...(token ? { Authorization: `Bearer ${token}` } : {})
+    });
 
     const getContracts = async () => {
 
         try {
             const response = await fetch(
-                "http://localhost:3000/api/contract"
+                "http://localhost:3000/api/contract",
+                {
+                    headers: authHeaders()
+                }
             );
 
             const data = await response.json();
@@ -38,6 +58,7 @@ function ContractEdit() {
 
     useEffect(() => {
         getContracts();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const handleSelect = async (e) => {
@@ -50,8 +71,7 @@ function ContractEdit() {
             setContract({
                 eventStartTime: "",
                 eventEndTime: "",
-                finalValue: "",
-                idReservation: ""
+                cantExactaInvit: ""
             });
 
             return;
@@ -59,7 +79,10 @@ function ContractEdit() {
 
         try {
             const response = await fetch(
-                `http://localhost:3000/api/contract/${id}`
+                `http://localhost:3000/api/contract/${id}`,
+                {
+                    headers: authHeaders()
+                }
             );
 
             const data = await response.json();
@@ -69,10 +92,9 @@ function ContractEdit() {
             }
 
             setContract({
-                eventStartTime: data.eventStartTime,
-                eventEndTime: data.eventEndTime,
-                finalValue: data.finalValue,
-                idReservation: data.idReservation
+                eventStartTime: fmtTime(data.eventStartTime),
+                eventEndTime: fmtTime(data.eventEndTime),
+                cantExactaInvit: data.cantExactaInvit ?? ""
             });
 
         } catch (error) {
@@ -94,17 +116,16 @@ function ContractEdit() {
 
         try {
             const response = await fetch(
-                `http://localhost:3000/api/contract/${selectedId}`,
+                `http://localhost:3000/api/contract/${selectedId}/edit`,
                 {
                     method: "PUT",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
+                    headers: authHeaders(true),
                     body: JSON.stringify({
                         eventStartTime: contract.eventStartTime,
                         eventEndTime: contract.eventEndTime,
-                        finalValue: Number(contract.finalValue),
-                        idReservation: Number(contract.idReservation)
+                        cantExactaInvit: contract.cantExactaInvit === ""
+                            ? null
+                            : Number(contract.cantExactaInvit)
                     })
                 }
             );
@@ -126,7 +147,7 @@ function ContractEdit() {
     };
 
     const handleDeleteClick = () => {
-        setFeedback({ type: "confirm", title: "Eliminar contrato", message: "¿Está seguro de que desea eliminar este contrato?", confirmLabel: "Eliminar", onConfirm: handleDeleteConfirm, onCancel: () => setFeedback(null) });
+        setFeedback({ type: "confirm", title: "Eliminar contrato", message: "¿Está seguro de que desea eliminar este contrato? El evento asociado quedará dado de baja.", confirmLabel: "Eliminar", onConfirm: handleDeleteConfirm, onCancel: () => setFeedback(null) });
     };
 
     const handleDeleteConfirm = async () => {
@@ -137,7 +158,8 @@ function ContractEdit() {
             const response = await fetch(
                 `http://localhost:3000/api/contract/${selectedId}`,
                 {
-                    method: "DELETE"
+                    method: "DELETE",
+                    headers: authHeaders()
                 }
             );
 
@@ -154,8 +176,7 @@ function ContractEdit() {
             setContract({
                 eventStartTime: "",
                 eventEndTime: "",
-                finalValue: "",
-                idReservation: ""
+                cantExactaInvit: ""
             });
 
             await getContracts();
@@ -170,7 +191,7 @@ function ContractEdit() {
         <div className="contract-edit-container">
 
             <h1>Editar contrato</h1>
-            <p>Seleccioná el contrato que querés modificar.</p>
+            <p>Seleccioná el contrato que querés modificar. El valor final se recalcula automáticamente.</p>
 
             <div className="contract-edit-field">
 
@@ -226,28 +247,14 @@ function ContractEdit() {
                     </div>
 
                     <div className="contract-edit-field">
-                        <label>Valor final</label>
+                        <label>Cantidad exacta de invitados</label>
 
                         <input
                             type="number"
-                            name="finalValue"
-                            value={contract.finalValue}
+                            name="cantExactaInvit"
+                            value={contract.cantExactaInvit}
                             onChange={handleChange}
                             min="0"
-                            step="0.01"
-                            required
-                        />
-                    </div>
-
-                    <div className="contract-edit-field">
-                        <label>ID de reserva</label>
-
-                        <input
-                            type="number"
-                            name="idReservation"
-                            value={contract.idReservation}
-                            onChange={handleChange}
-                            min="1"
                             required
                         />
                     </div>

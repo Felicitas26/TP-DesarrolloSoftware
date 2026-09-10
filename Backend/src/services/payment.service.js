@@ -1,4 +1,5 @@
 import paymentModel from "../models/payment.model.js";
+import contractModel from "../models/contract.model.js";
 
 class PaymentService {
 
@@ -19,7 +20,36 @@ class PaymentService {
     }
 
     async create(payment) {
-        return await paymentModel.create(payment);
+        const value = Number(payment.value);
+
+        if (!value || value <= 0) {
+            const error = new Error(
+                "El valor del pago debe ser un número mayor a 0."
+            );
+            error.statusCode = 400;
+            throw error;
+        }
+
+        if (!payment.idContract) {
+            const error = new Error("Indicá el contrato asociado al pago.");
+            error.statusCode = 400;
+            throw error;
+        }
+
+        const contract = await contractModel.getById(payment.idContract);
+
+        if (!contract) {
+            const error = new Error("El contrato indicado no existe.");
+            error.statusCode = 404;
+            throw error;
+        }
+
+        return await paymentModel.create({
+            value,
+            statusPayment: payment.statusPayment || "pendiente",
+            datePayment: payment.datePayment || new Date(),
+            idContract: payment.idContract
+        });
     }
 
     async update(id, payment) {

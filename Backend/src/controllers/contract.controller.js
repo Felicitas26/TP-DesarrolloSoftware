@@ -69,6 +69,69 @@ class ContractController {
         }
     }
 
+    async create(req, res) {
+        try {
+            const { idReservation } = req.body;
+
+            if (!idReservation) {
+                return res.status(400).json({ error: "Indicá la reserva para generar el contrato." });
+            }
+
+            const contract = await contractService.generateForReservation(idReservation);
+
+            if (!contract) {
+                return res.status(404).json({ error: "La reserva indicada no existe." });
+            }
+
+            const full = await contractService.getById(contract.idContract);
+            const calc = await contractService.calcValues(full, full.reservation);
+
+            return res.status(201).json({
+                message: "Contrato generado correctamente.",
+                contract: { ...full, calc }
+            });
+        } catch (error) {
+            return res.status(error.statusCode || 500).json({ error: error.message });
+        }
+    }
+
+    async updateAdmin(req, res) {
+        try {
+            const contract = await contractService.getById(req.params.id);
+
+            if (!contract) {
+                return res.status(404).json({ error: "Contrato no encontrado." });
+            }
+
+            const updated = await contractService.update(req.params.id, req.body, { admin: true });
+
+            return res.status(200).json({
+                message: "Contrato actualizado correctamente.",
+                contract: updated
+            });
+        } catch (error) {
+            return res.status(error.statusCode || 500).json({ error: error.message });
+        }
+    }
+
+    async delete(req, res) {
+        try {
+            const contract = await contractService.getById(req.params.id);
+
+            if (!contract) {
+                return res.status(404).json({ error: "Contrato no encontrado." });
+            }
+
+            await contractService.cancelar(req.params.id);
+
+            return res.status(200).json({
+                message: "Contrato eliminado y evento dado de baja correctamente."
+            });
+        } catch (error) {
+            return res.status(error.statusCode || 500).json({ error: error.message });
+        }
+    }
+
     async enviar(req, res) {
         try {
             const contract = await contractService.getById(req.params.id);
