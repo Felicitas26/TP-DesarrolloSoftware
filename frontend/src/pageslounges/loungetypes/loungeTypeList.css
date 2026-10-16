@@ -85,10 +85,11 @@
   position: relative;
   z-index: 10;
   display: flex;
-  align-items: center;
+  flex-direction: column;
+  align-items: flex-start;
   justify-content: space-between;
   gap: 16px;
-  padding: 26px 48px;
+  padding: 22px 24px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
@@ -163,7 +164,7 @@
 
 .gestion-header-flex {
   display: flex;
-  justify-content: flex-end;
+  justify-content: flex-start;
   margin: 24px 0;
 }
 
@@ -588,14 +589,14 @@
   }
 }
 
-@media (max-width: 820px) {
+@media (min-width: 1024px) {
   .gestion-bar {
-    flex-direction: column;
-    align-items: flex-start;
-    padding: 22px 24px;
+    flex-direction: row;
+    align-items: center;
+    padding: 26px 48px;
   }
 
   .gestion-header-flex {
-    justify-content: flex-start;
+    justify-content: flex-end;
   }
 }

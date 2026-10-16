@@ -1,6 +1,6 @@
 .lounges-section {
     position: relative;
-    padding: 100px 24px;
+    padding: 75px 20px;
     background-color: #0b0f19;
     color: #ffffff;
 }
@@ -23,7 +23,7 @@
 .lounges-header h2 {
     margin: 0;
     font-family: "Playfair Display", serif;
-    font-size: 2.5rem;
+    font-size: 2rem;
     letter-spacing: 0.08em;
 }
 
@@ -37,7 +37,7 @@
 
 .lounges-grid {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: 1fr;
     gap: 28px;
     max-width: 1000px;
     margin: 0 auto;
@@ -46,7 +46,7 @@
 .lounge-card {
     position: relative;
     min-height: 300px;
-    padding: 36px;
+    padding: 28px;
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 18px;
     background: rgba(255, 255, 255, 0.035);
@@ -127,20 +127,20 @@
     color: rgba(255, 255, 255, 0.5);
 }
 
-@media (max-width: 700px) {
+@media (min-width: 1024px) {
     .lounges-section {
-        padding: 75px 20px;
+        padding: 100px 24px;
     }
 
     .lounges-grid {
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
     .lounges-header h2 {
-        font-size: 2rem;
+        font-size: 2.5rem;
     }
 
     .lounge-card {
-        padding: 28px;
+        padding: 36px;
     }
 }

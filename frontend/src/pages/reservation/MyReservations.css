@@ -127,10 +127,11 @@
     position: relative;
     z-index: 10;
     display: flex;
-    align-items: center;
+    flex-direction: column;
+    align-items: flex-start;
     justify-content: space-between;
     gap: 16px;
-    padding: 28px 48px;
+    padding: 22px 24px;
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
@@ -179,7 +180,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 60px 24px;
+    padding: 40px 16px;
 }
 
 .my-reservations-title {
@@ -189,7 +190,7 @@
 
 .my-reservations-title h1 {
     font-family: "Playfair Display", Georgia, serif;
-    font-size: clamp(2rem, 4.5vw, 3.2rem);
+    font-size: 2rem;
     font-weight: 800;
     letter-spacing: 0.04em;
     line-height: 1.1;
@@ -220,7 +221,7 @@
 
 .my-reservation-card {
     width: 100%;
-    padding: 30px;
+    padding: 22px;
     background: rgba(255, 255, 255, 0.05);
     border: 1px solid rgba(255, 255, 255, 0.14);
     border-radius: 18px;
@@ -320,7 +321,8 @@
 
 .my-reservation-header {
     display: flex;
-    align-items: center;
+    flex-direction: column;
+    align-items: flex-start;
     justify-content: space-between;
     gap: 20px;
     margin-bottom: 25px;
@@ -353,7 +355,7 @@
 
 .my-reservation-info {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: 1fr;
     gap: 20px;
 }
 
@@ -445,32 +447,32 @@
 
 /* RESPONSIVE */
 
-@media (max-width: 700px) {
+@media (min-width: 1024px) {
 
     .my-reservations-bar {
-        flex-direction: column;
-        align-items: flex-start;
-        padding: 22px 24px;
+        flex-direction: row;
+        align-items: center;
+        padding: 28px 48px;
     }
 
     .my-reservations-content {
-        padding: 40px 16px;
+        padding: 60px 24px;
     }
 
     .my-reservations-title h1 {
-        font-size: 2rem;
+        font-size: clamp(2rem, 4.5vw, 3.2rem);
     }
 
     .my-reservation-card {
-        padding: 22px;
+        padding: 30px;
     }
 
     .my-reservation-info {
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(2, 1fr);
     }
 
     .my-reservation-header {
-        align-items: flex-start;
-        flex-direction: column;
+        flex-direction: row;
+        align-items: center;
     }
 }

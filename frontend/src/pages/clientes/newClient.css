@@ -1,7 +1,7 @@
 .page-wrapper {
     min-height: 100vh;
     background: #0b0f19;
-    padding: 40px 24px;
+    padding: 22px 12px;
     box-sizing: border-box;
     position: relative;
     overflow: hidden;
@@ -66,21 +66,20 @@
     z-index: 1;
 }
 
-
 .dashboard-header {
     margin-bottom: 30px;
 }
 
 .header-title-group {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     gap: 16px;
 }
 
 .header-icon {
-    width: 52px;
-    height: 52px;
-    min-width: 52px;
+    width: 46px;
+    height: 46px;
+    min-width: 46px;
 
     display: flex;
     align-items: center;
@@ -101,7 +100,7 @@
     margin: 0;
 
     font-family: "Playfair Display", serif;
-    font-size: 2rem;
+    font-size: 1.45rem;
     font-weight: 700;
     letter-spacing: 0.01em;
 
@@ -112,12 +111,11 @@
     margin: 5px 0 0;
 
     font-family: "Montserrat", sans-serif;
-    font-size: 0.85rem;
+    font-size: 0.78rem;
     line-height: 1.5;
 
     color: #94a3b8;
 }
-
 
 .alert-inline {
     display: flex;
@@ -142,17 +140,15 @@
     box-shadow: 0 0 20px rgba(239, 68, 68, 0.04);
 }
 
-
 .cards-grid {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: 1fr;
     gap: 20px;
 }
 
 .full-width {
-    grid-column: 1 / -1;
+    grid-column: auto;
 }
-
 
 .form-card {
     overflow: hidden;
@@ -184,13 +180,12 @@
         inset 0 1px 0 rgba(255, 255, 255, 0.04);
 }
 
-
 .card-header {
     display: flex;
     align-items: center;
     gap: 11px;
 
-    padding: 17px 20px;
+    padding: 15px 17px;
 
     background: rgba(255, 255, 255, 0.025);
     border-bottom: 1px solid rgba(148, 163, 184, 0.10);
@@ -214,9 +209,8 @@
     color: #e2e8f0;
 }
 
-
 .card-body {
-    padding: 22px;
+    padding: 17px;
 
     display: flex;
     flex-direction: column;
@@ -225,7 +219,7 @@
 
 .grid-2-cols {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: 1fr;
     gap: 17px;
 }
 
@@ -306,7 +300,6 @@
     transition: background-color 9999s ease-in-out 0s;
 }
 
-
 .form-group.has-error input {
     border-color: rgba(248, 113, 113, 0.75);
 
@@ -322,7 +315,6 @@
     color: #f87171;
 }
 
-
 .account-hint {
     font-family: "Montserrat", sans-serif;
     font-size: 0.75rem;
@@ -334,14 +326,14 @@
     padding-top: 2px;
 }
 
-
 .form-submit-wrapper {
     display: flex;
-    justify-content: flex-end;
+    justify-content: stretch;
     align-items: center;
     gap: 12px;
 
     margin-top: 25px;
+    flex-direction: column-reverse;
 }
 
 .btn-secondary-outline,
@@ -366,6 +358,7 @@
         box-shadow 0.2s ease,
         background 0.2s ease,
         border-color 0.2s ease;
+    width: 100%;
 }
 
 /* Cancelar */
@@ -415,7 +408,6 @@
     box-shadow: none;
 }
 
-
 .modal-backdrop {
     position: fixed;
     inset: 0;
@@ -438,12 +430,11 @@
     z-index: 99999;
 }
 
-
 .modal-card-j {
     width: 90%;
     max-width: 470px;
 
-    padding: 28px;
+    padding: 24px;
 
     box-sizing: border-box;
 
@@ -466,8 +457,9 @@
     display: flex;
     align-items: center;
     gap: 22px;
+    flex-direction: column;
+    text-align: center;
 }
-
 
 .modal-icon-circle {
     width: 68px;
@@ -496,7 +488,6 @@
     flex-direction: column;
     align-items: center;
 }
-
 
 .modal-text-j {
     margin: 0 0 16px;
@@ -532,7 +523,6 @@
     border: 1px solid rgba(34, 211, 238, 0.18);
     border-radius: 10px;
 }
-
 
 .btn-j-primary {
     width: 100%;
@@ -591,7 +581,6 @@
     text-decoration: underline;
 }
 
-
 @keyframes fadeInModal {
     from {
         opacity: 0;
@@ -604,86 +593,130 @@
     }
 }
 
-
-@media (max-width: 760px) {
-
+@media (min-width: 600px) {
     .page-wrapper {
         padding: 28px 16px;
     }
 
     .cards-grid {
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
     .full-width {
-        grid-column: auto;
+        grid-column: 1 / -1;
     }
 
     .grid-2-cols {
-        grid-template-columns: 1fr;
-    }
-
-    .header-title-group h1 {
-        font-size: 1.65rem;
-    }
-
-    .form-submit-wrapper {
-        justify-content: stretch;
-    }
-
-    .btn-secondary-outline,
-    .btn-submit-cyan {
-        flex: 1;
-    }
-
-    .modal-body-j {
-        flex-direction: column;
-        text-align: center;
-    }
-
-    .modal-card-j {
-        padding: 24px;
-    }
-}
-
-@media (max-width: 480px) {
-
-    .page-wrapper {
-        padding: 22px 12px;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
     .header-title-group {
-        align-items: flex-start;
+        align-items: center;
     }
 
     .header-icon {
-        width: 46px;
-        height: 46px;
-        min-width: 46px;
+        width: 52px;
+        height: 52px;
+        min-width: 52px;
     }
 
     .header-title-group h1 {
-        font-size: 1.45rem;
+        font-size: 2rem;
     }
 
     .header-title-group p {
-        font-size: 0.78rem;
+        font-size: 0.85rem;
     }
 
     .card-body {
-        padding: 17px;
+        padding: 22px;
     }
 
     .card-header {
-        padding: 15px 17px;
+        padding: 17px 20px;
     }
 
     .form-submit-wrapper {
-        flex-direction: column-reverse;
+        justify-content: flex-end;
+        flex-direction: row;
     }
 
     .btn-secondary-outline,
     .btn-submit-cyan {
-        width: 100%;
+        width: auto;
+        flex: 0 0 auto;
+    }
+
+    .modal-body-j {
+        flex-direction: row;
+        text-align: left;
+    }
+
+    .modal-card-j {
+        padding: 28px;
+    }
+}
+
+@media (min-width: 1024px) {
+    .page-wrapper {
+        padding: 40px 24px;
+    }
+
+    .cards-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .full-width {
+        grid-column: 1 / -1;
+    }
+
+    .grid-2-cols {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .header-title-group {
+        align-items: center;
+    }
+
+    .header-icon {
+        width: 52px;
+        height: 52px;
+        min-width: 52px;
+    }
+
+    .header-title-group h1 {
+        font-size: 2rem;
+    }
+
+    .header-title-group p {
+        font-size: 0.85rem;
+    }
+
+    .card-body {
+        padding: 22px;
+    }
+
+    .card-header {
+        padding: 17px 20px;
+    }
+
+    .form-submit-wrapper {
+        justify-content: flex-end;
+        flex-direction: row;
+    }
+
+    .btn-secondary-outline,
+    .btn-submit-cyan {
+        width: auto;
+        flex: 0 0 auto;
+    }
+
+    .modal-body-j {
+        flex-direction: row;
+        text-align: left;
+    }
+
+    .modal-card-j {
+        padding: 28px;
     }
 }

@@ -51,7 +51,7 @@
 .bell-dropdown {
     position: absolute;
     top: calc(100% + 12px);
-    right: 0;
+    right: -60px;
     width: min(380px, calc(100vw - 32px));
     background: #0d1226;
     border: 1px solid rgba(34, 211, 238, 0.35);
@@ -162,8 +162,8 @@
     }
 }
 
-@media (max-width: 480px) {
+@media (min-width: 1024px) {
     .bell-dropdown {
-        right: -60px;
+        right: 0;
     }
 }

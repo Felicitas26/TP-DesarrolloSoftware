@@ -1,7 +1,7 @@
 .page-wrapper {
   min-height: 100vh;
   width: 100%;
-  padding: 40px 24px;
+  padding: 30px 16px;
 
   background-color: #0b0f19;
   color: #ffffff;
@@ -108,7 +108,7 @@
 .dashboard-header-flex {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
 
   margin-bottom: 28px;
 
@@ -118,13 +118,14 @@
 
 .header-title-group {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 16px;
 }
 
 .header-icon {
-  width: 50px;
-  height: 50px;
+  width: 42px;
+  height: 42px;
+  min-width: 42px;
 
   display: flex;
   align-items: center;
@@ -146,7 +147,7 @@
 
   font-family: "Playfair Display", Georgia, serif;
 
-  font-size: clamp(1.8rem, 4vw, 2.5rem);
+  font-size: 1.7rem;
   font-weight: 800;
 
   letter-spacing: 0.03em;
@@ -160,7 +161,7 @@
 .header-title-group p {
   margin: 6px 0 0;
 
-  font-size: 0.75rem;
+  font-size: 0.68rem;
   font-weight: 500;
 
   letter-spacing: 0.08em;
@@ -173,12 +174,14 @@
 .header-actions {
   display: flex;
   align-items: center;
+  width: 100%;
   gap: 10px;
 
   flex-wrap: wrap;
 }
 
 .btn-submit-cyan {
+  flex: 1;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -224,6 +227,7 @@
 }
 
 .btn-back-panel {
+  flex: 1;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -528,10 +532,10 @@
 .modal-card-form {
   position: relative;
 
-  width: 90%;
+  width: 95%;
   max-width: 780px;
 
-  padding: 28px;
+  padding: 22px 18px;
 
   background: rgba(20, 26, 46, 0.94);
 
@@ -623,8 +627,9 @@
 
 .detail-item {
   display: flex;
+  flex-direction: column;
   justify-content: space-between;
-  gap: 20px;
+  gap: 4px;
 
   padding: 10px 0;
 
@@ -644,19 +649,24 @@
   font-size: 0.85rem;
   font-weight: 500;
 
-  text-align: right;
+  text-align: left;
 }
 
 /* FOOTER MODAL */
 
 .modal-footer-right {
   display: flex;
+  flex-direction: column-reverse;
   justify-content: flex-end;
   align-items: center;
 
   gap: 12px;
 
   margin-top: 24px;
+}
+
+.modal-footer-right button {
+  width: 100%;
 }
 
 .btn-j-primary {
@@ -903,7 +913,7 @@
 
 /* RESPONSIVE */
 
-@media (max-width: 800px) {
+@media (min-width: 600px) {
 
   .page-wrapper {
     padding: 30px 16px;
@@ -923,45 +933,62 @@
   }
 }
 
-@media (max-width: 600px) {
+@media (min-width: 1024px) {
+
+  .page-wrapper {
+    padding: 40px 24px;
+  }
+
+  .dashboard-header-flex {
+    align-items: center;
+  }
+
+  .header-actions {
+    width: auto;
+  }
+
+  .btn-back-panel,
+  .btn-submit-cyan {
+    flex: 0 1 auto;
+  }
 
   .header-title-group {
-    align-items: flex-start;
+    align-items: center;
   }
 
   .header-icon {
-    width: 42px;
-    height: 42px;
-    min-width: 42px;
+    width: 50px;
+    height: 50px;
+    min-width: auto;
   }
 
   .header-title-group h1 {
-    font-size: 1.7rem;
+    font-size: clamp(1.8rem, 4vw, 2.5rem);
   }
 
   .header-title-group p {
-    font-size: 0.68rem;
+    font-size: 0.75rem;
   }
 
   .modal-card-form {
-    width: 95%;
-    padding: 22px 18px;
+    width: 90%;
+    padding: 28px;
   }
 
   .modal-footer-right {
-    flex-direction: column-reverse;
+    flex-direction: row;
   }
 
   .modal-footer-right button {
-    width: 100%;
+    width: auto;
   }
 
   .detail-item {
-    flex-direction: column;
-    gap: 4px;
+    flex-direction: row;
+    gap: 20px;
   }
 
   .detail-item span {
-    text-align: left;
+    text-align: right;
   }
 }

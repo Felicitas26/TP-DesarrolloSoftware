@@ -8,7 +8,7 @@
     color: #ffffff;
     width: 100%;
     font-family: "Montserrat", system-ui, sans-serif;
-    padding: 60px 24px;
+    padding: 40px 16px;
     overflow-x: hidden;
 }
 
@@ -90,7 +90,7 @@
     z-index: 1;
 
     font-family: "Playfair Display", Georgia, serif;
-    font-size: clamp(2rem, 4.5vw, 3.2rem);
+    font-size: 2rem;
     font-weight: 800;
     letter-spacing: 0.04em;
     line-height: 1.1;
@@ -266,7 +266,7 @@
     flex-direction: column;
     gap: 28px;
 
-    padding: 40px;
+    padding: 28px 20px;
 
     background: rgba(255, 255, 255, 0.05);
     border: 1px solid rgba(255, 255, 255, 0.14);
@@ -428,18 +428,18 @@
 
 /* RESPONSIVE */
 
-@media (max-width: 700px) {
+@media (min-width: 1024px) {
 
     .reservation-new-container {
-        padding: 40px 16px;
+        padding: 60px 24px;
     }
 
     .reservation-new-container form {
-        padding: 28px 20px;
+        padding: 40px;
     }
 
     .reservation-new-container h1 {
-        font-size: 2rem;
+        font-size: clamp(2rem, 4.5vw, 3.2rem);
     }
 }
 

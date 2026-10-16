@@ -5,9 +5,9 @@
   right: 0;
   z-index: 50;
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 22px 48px;
+  flex-direction: column;
+  gap: 18px;
+  padding: 18px 20px;
   background: linear-gradient(
     180deg,
     rgba(11, 15, 25, 0.95),
@@ -38,7 +38,9 @@
 .navbar-links {
   display: flex;
   align-items: center;
-  gap: 34px;
+  gap: 22px;
+  flex-wrap: wrap;
+  justify-content: center;
 }
 
 .navbar-link {
@@ -92,16 +94,16 @@
   box-shadow: 0 0 32px rgba(0, 229, 255, 0.7);
 }
 
-@media (max-width: 820px) {
+@media (min-width: 1024px) {
   .navbar {
-    flex-direction: column;
-    gap: 18px;
-    padding: 18px 20px;
+    flex-direction: row;
+    gap: 0;
+    padding: 22px 48px;
   }
 
   .navbar-links {
-    gap: 22px;
-    flex-wrap: wrap;
-    justify-content: center;
+    gap: 34px;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
   }
 }

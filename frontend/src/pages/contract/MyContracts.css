@@ -87,10 +87,11 @@
     position: relative;
     z-index: 10;
     display: flex;
-    align-items: center;
+    flex-direction: column;
+    align-items: flex-start;
     justify-content: space-between;
     gap: 16px;
-    padding: 28px 48px;
+    padding: 22px 24px;
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
@@ -137,7 +138,7 @@
     width: 100%;
     max-width: 880px;
     margin: 0 auto;
-    padding: 60px 24px;
+    padding: 40px 16px;
 }
 
 .my-contracts-title {
@@ -147,7 +148,7 @@
 
 .my-contracts-title h1 {
     font-family: "Playfair Display", Georgia, serif;
-    font-size: clamp(2rem, 4.5vw, 3.2rem);
+    font-size: 2rem;
     font-weight: 800;
     letter-spacing: 0.04em;
     line-height: 1.1;
@@ -177,7 +178,7 @@
 
 .my-contract-card {
     width: 100%;
-    padding: 28px 30px;
+    padding: 22px;
     background: rgba(255, 255, 255, 0.05);
     border: 1px solid rgba(255, 255, 255, 0.14);
     border-radius: 18px;
@@ -200,7 +201,8 @@
 
 .my-contract-card-header {
     display: flex;
-    align-items: center;
+    flex-direction: column;
+    align-items: flex-start;
     justify-content: space-between;
     gap: 20px;
     margin-bottom: 18px;
@@ -243,9 +245,10 @@
 
 .my-contract-card p {
     display: flex;
+    flex-direction: column;
     justify-content: space-between;
-    align-items: center;
-    gap: 16px;
+    align-items: flex-start;
+    gap: 6px;
     margin: 0;
     padding: 11px 14px;
     color: rgba(255, 255, 255, 0.85);
@@ -370,34 +373,34 @@
 
 /* RESPONSIVE */
 
-@media (max-width: 700px) {
+@media (min-width: 1024px) {
 
     .my-contracts-bar {
-        flex-direction: column;
-        align-items: flex-start;
-        padding: 22px 24px;
+        flex-direction: row;
+        align-items: center;
+        padding: 28px 48px;
     }
 
     .my-contracts-content {
-        padding: 40px 16px;
+        padding: 60px 24px;
     }
 
     .my-contracts-title h1 {
-        font-size: 2rem;
+        font-size: clamp(2rem, 4.5vw, 3.2rem);
     }
 
     .my-contract-card {
-        padding: 22px;
+        padding: 28px 30px;
     }
 
     .my-contract-card-header {
-        align-items: flex-start;
-        flex-direction: column;
+        flex-direction: row;
+        align-items: center;
     }
 
     .my-contract-card p {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 6px;
+        flex-direction: row;
+        align-items: center;
+        gap: 16px;
     }
 }

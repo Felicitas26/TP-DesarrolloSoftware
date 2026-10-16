@@ -103,7 +103,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 28px 50px;
+    padding: 22px 20px;
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
     background: rgba(11, 15, 25, 0.3);
     backdrop-filter: blur(12px);
@@ -112,11 +112,15 @@
 
 .my-profile-logo {
     font-family: "Playfair Display", Georgia, serif;
-    font-size: 1.15rem;
+    font-size: 0.95rem;
     font-weight: 800;
     letter-spacing: 0.12em;
     color: #ffffff;
     text-shadow: 0 0 20px rgba(0, 229, 255, 0.25);
+}
+
+.my-profile-bar .my-profile-back-button {
+    display: none;
 }
 
 /* CONTENIDO */
@@ -127,7 +131,7 @@
     width: 100%;
     max-width: 850px;
     margin: 0 auto;
-    padding: 65px 24px;
+    padding: 45px 16px;
     flex: 1;
 }
 
@@ -140,7 +144,7 @@
 
 .my-profile-title h1 {
     font-family: "Playfair Display", Georgia, serif;
-    font-size: clamp(2rem, 4.5vw, 3.2rem);
+    font-size: 2rem;
     font-weight: 800;
     letter-spacing: 0.04em;
     line-height: 1.1;
@@ -161,9 +165,9 @@
 
 .my-profile-card {
     width: 100%;
-    padding: 40px;
+    padding: 28px 20px;
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr;
     gap: 20px;
 
     background: rgba(255, 255, 255, 0.05);
@@ -211,12 +215,10 @@
 /* BOTONES */
 
 .my-profile-buttons {
-    grid-column: 1 / -1;
-
+    grid-column: auto;
     display: flex;
     flex-direction: column;
     gap: 12px;
-
     margin-top: 10px;
 }
 
@@ -293,9 +295,7 @@
 .my-profile-message {
     position: relative;
     z-index: 1;
-
     margin: auto;
-
     color: rgba(255, 255, 255, 0.75);
     font-size: 0.9rem;
 }
@@ -305,49 +305,42 @@
 .my-profile-footer {
     position: relative;
     z-index: 1;
-
     width: 100%;
     padding: 22px;
-
     text-align: center;
-
     border-top: 1px solid rgba(255, 255, 255, 0.08);
-
     color: rgba(255, 255, 255, 0.4);
     font-size: 0.7rem;
     letter-spacing: 0.05em;
 }
 
-/* RESPONSIVE */
-
-@media (max-width: 700px) {
-
+@media (min-width: 1024px) {
     .my-profile-bar {
-        padding: 22px 20px;
+        padding: 28px 50px;
     }
 
     .my-profile-logo {
-        font-size: 0.95rem;
+        font-size: 1.15rem;
     }
 
     .my-profile-bar .my-profile-back-button {
-        display: none;
+        display: inline-flex;
     }
 
     .my-profile-content {
-        padding: 45px 16px;
+        padding: 65px 24px;
     }
 
     .my-profile-card {
-        grid-template-columns: 1fr;
-        padding: 28px 20px;
+        grid-template-columns: 1fr 1fr;
+        padding: 40px;
     }
 
     .my-profile-buttons {
-        grid-column: auto;
+        grid-column: 1 / -1;
     }
 
     .my-profile-title h1 {
-        font-size: 2rem;
+        font-size: clamp(2rem, 4.5vw, 3.2rem);
     }
 }

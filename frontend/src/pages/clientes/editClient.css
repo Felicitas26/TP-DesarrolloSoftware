@@ -4,7 +4,7 @@
     width: 100%;
     max-width: 100%;
     margin: 0;
-    padding: 60px 24px;
+    padding: 40px 16px;
 
     display: flex;
     flex-direction: column;
@@ -103,7 +103,7 @@
     margin: 0 0 35px;
 
     font-family: "Playfair Display", Georgia, serif;
-    font-size: clamp(2rem, 4.5vw, 3.2rem);
+    font-size: 2rem;
     font-weight: 800;
 
     letter-spacing: 0.04em;
@@ -130,7 +130,7 @@
     flex-direction: column;
     gap: 22px;
 
-    padding: 40px;
+    padding: 28px 20px;
 
     background: rgba(255, 255, 255, 0.05);
 
@@ -235,51 +235,41 @@
 .form-actions {
     display: flex;
     gap: 12px;
-
     margin-top: 10px;
+    flex-direction: column-reverse;
 }
 
 .btn {
     flex: 1;
-
     padding: 13px 20px;
-
     font-family: "Montserrat", system-ui, sans-serif;
     font-size: 0.8rem;
     font-weight: 700;
-
     letter-spacing: 0.1em;
     text-transform: uppercase;
-
     border-radius: 999px;
-
     cursor: pointer;
-
     transition:
         background 0.2s ease,
         border-color 0.2s ease,
         color 0.2s ease,
         box-shadow 0.2s ease,
         transform 0.2s ease;
+    width: 100%;
 }
 
 /* GUARDAR */
 
 .btn-primary {
     color: #ffffff;
-
     background: rgba(34, 211, 238, 0.12);
-
     border: 1px solid rgba(34, 211, 238, 0.55);
 }
 
 .btn-primary:hover:not(:disabled) {
     background: #22d3ee;
-
     color: #0b0f19;
-
     transform: translateY(-2px);
-
     box-shadow:
         0 0 28px rgba(0, 229, 255, 0.4);
 }
@@ -287,9 +277,7 @@
 .btn-primary:disabled {
     background: rgba(34, 211, 238, 0.05);
     border-color: rgba(34, 211, 238, 0.2);
-
     color: rgba(255, 255, 255, 0.35);
-
     cursor: not-allowed;
 }
 
@@ -297,19 +285,14 @@
 
 .btn-secondary {
     color: rgba(255, 255, 255, 0.7);
-
     background: transparent;
-
     border: 1px solid rgba(255, 255, 255, 0.18);
 }
 
 .btn-secondary:hover {
     background: rgba(255, 255, 255, 0.06);
-
     border-color: rgba(255, 255, 255, 0.4);
-
     color: #ffffff;
-
     transform: translateY(-2px);
 }
 
@@ -318,24 +301,15 @@
 .alert-error {
     position: relative;
     z-index: 1;
-
     width: 100%;
     max-width: 760px;
-
     margin-bottom: 20px;
-
     padding: 13px 16px;
-
     background: rgba(239, 68, 68, 0.1);
-
     border: 1px solid rgba(248, 113, 113, 0.35);
-
     border-radius: 10px;
-
     color: #fca5a5;
-
     font-size: 0.82rem;
-
     text-align: center;
 }
 
@@ -344,39 +318,10 @@
 .state-msg {
     position: relative;
     z-index: 1;
-
     margin: auto;
-
     color: rgba(255, 255, 255, 0.75);
-
     font-size: 0.9rem;
-
     text-align: center;
-}
-
-/* RESPONSIVE */
-
-@media (max-width: 700px) {
-
-    .client-container {
-        padding: 40px 16px;
-    }
-
-    .client-container h1 {
-        font-size: 2rem;
-    }
-
-    .client-form {
-        padding: 28px 20px;
-    }
-
-    .form-actions {
-        flex-direction: column-reverse;
-    }
-
-    .btn {
-        width: 100%;
-    }
 }
 
 .city-suggestions {
@@ -406,4 +351,26 @@
 .city-suggestions li:hover {
     background: rgba(138, 43, 226, 0.2);
     color: #fff;
+}
+
+@media (min-width: 1024px) {
+    .client-container {
+        padding: 60px 24px;
+    }
+
+    .client-container h1 {
+        font-size: clamp(2rem, 4.5vw, 3.2rem);
+    }
+
+    .client-form {
+        padding: 40px;
+    }
+
+    .form-actions {
+        flex-direction: row;
+    }
+
+    .btn {
+        width: auto;
+    }
 }
