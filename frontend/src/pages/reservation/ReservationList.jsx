@@ -35,13 +35,6 @@ const STATUS_OPTIONS = [
     { value: "cancelada", label: "Canceladas" }
 ];
 
-const STATUS_LABEL = {
-    pendiente: "Pendiente",
-    aceptada: "Aceptada",
-    confirmada: "Confirmada",
-    cancelada: "Cancelada"
-};
-
 function ReservationList() {
 
     const navigate = useNavigate();
@@ -241,7 +234,7 @@ function ReservationList() {
 
                                             <td>
                                                 <span className={`status-badge ${reservation.status}`}>
-                                                    {STATUS_LABEL[reservation.status] || reservation.status}
+                                                    {reservation.statusLabel}
                                                 </span>
                                             </td>
 

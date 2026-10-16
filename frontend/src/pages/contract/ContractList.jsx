@@ -32,15 +32,6 @@ const STATUS_OPTIONS = [
     { value: "mod_pendiente", label: "Solicitudes pendientes" }
 ];
 
-const STATUS_LABEL = {
-    generado: "Generado",
-    en_revision: "En revisión",
-    aprobado: "Aprobado",
-    rechazado: "Rechazado",
-    firmado: "Firmado",
-    modificacion_en_curso: "Modificación en curso"
-};
-
 function ContractList() {
 
     const navigate = useNavigate();
@@ -218,7 +209,7 @@ function ContractList() {
                                             <td>
                                                 <div className="contract-list-status-wrap">
                                                     <span className={`contract-list-status ${contract.status}`}>
-                                                        {STATUS_LABEL[contract.status] || contract.status}
+                                                        {contract.statusLabel}
                                                     </span>
                                                     {contract.modificationStatus === "pendiente" && (
                                                         <span className="contract-list-modbadge">

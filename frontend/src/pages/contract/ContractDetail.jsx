@@ -22,21 +22,6 @@ const IconContract = () => (
     </svg>
 );
 
-const STATUS_LABEL = {
-    generado: "Generado (pendiente de completar)",
-    en_revision: "En revisión",
-    aprobado: "Aprobado — listo para firma",
-    rechazado: "Rechazado (requiere correcciones)",
-    firmado: "Firmado",
-    modificacion_en_curso: "Modificación aprobada — revisá y confirmá"
-};
-
-const PAYMENT_STATUS_LABEL = {
-    pendiente: "Pendiente de abono",
-    seña: "Seña abonada",
-    pagado: "Saldo abonado"
-};
-
 function ContractDetail() {
 
     const navigate = useNavigate();
@@ -84,8 +69,8 @@ function ContractDetail() {
         "Otro"
     ];
 
-const canEdit = contract && ["generado", "rechazado"].includes(contract.status);
-    const tieneModPendiente = contract?.modificationStatus === "pendiente";
+    const canEdit = contract?.canBeEdited ?? false;
+    const tieneModPendiente = contract?.hasPendingModification ?? false;
     const tieneModRechazada =
         rol === "cliente" &&
         contract?.status === "firmado" &&
@@ -224,7 +209,7 @@ const canEdit = contract && ["generado", "rechazado"].includes(contract.status);
         .map((type) => ({
             min: type.minQuantity,
             max: type.maxQuantity,
-            label: `${type.minQuantity} - ${type.maxQuantity} invitados`
+            label: type.guestRangeLabel
         }));
 
     const handleChange = (e) => {
@@ -667,7 +652,7 @@ const canEdit = contract && ["generado", "rechazado"].includes(contract.status);
                     <div>
                         <h1>Contrato #{contract.idContract}</h1>
                         <span className={`contract-status ${contract.status}`}>
-                            {STATUS_LABEL[contract.status] || contract.status}
+                            {contract.statusDescription}
                         </span>
                     </div>
                 </div>
@@ -892,7 +877,7 @@ const canEdit = contract && ["generado", "rechazado"].includes(contract.status);
                                     <div className="contract-field">
                                         <label>Estado</label>
                                         <span className={`contract-status ${payment.statusPayment}`}>
-                                            {PAYMENT_STATUS_LABEL[payment.statusPayment] || payment.statusPayment}
+                                            {contract.paymentStatus}
                                         </span>
                                     </div>
                                     <div className="contract-field">

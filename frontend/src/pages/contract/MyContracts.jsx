@@ -4,15 +4,6 @@ import { contractService } from "../../services";
 import FeedbackModal from "../../components/FeedbackModal";
 import "./MyContracts.css";
 
-const STATUS_LABEL = {
-    generado: "Generado — completá tus datos",
-    en_revision: "En revisión",
-    aprobado: "Aprobado — listo para firmar",
-    rechazado: "Rechazado — requiere correcciones",
-    firmado: "Firmado",
-    modificacion_en_curso: "Modificación aprobada — revisá y confirmá"
-};
-
 function MyContracts() {
 
     const navigate = useNavigate();
@@ -119,7 +110,7 @@ function MyContracts() {
                                 <p>
                                     <strong>Estado:</strong>{" "}
                                     <span className={`my-contract-status ${contract.status}`}>
-                                        {STATUS_LABEL[contract.status] || contract.status}
+                                        {contract.statusDescription}
                                     </span>
                                     {contract.modificationStatus === "pendiente" && (
                                         <span className="my-contract-modbadge">

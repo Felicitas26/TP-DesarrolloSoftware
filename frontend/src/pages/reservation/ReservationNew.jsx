@@ -152,7 +152,7 @@ function ReservationNew() {
         id: String(type.idLoungeType),
         min: type.minQuantity,
         max: type.maxQuantity,
-        label: `${type.minQuantity} - ${type.maxQuantity} invitados`
+        label: type.guestRangeLabel
     }));
 
     const handleSubmit = async (e) => {

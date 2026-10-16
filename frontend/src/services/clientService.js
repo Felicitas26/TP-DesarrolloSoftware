@@ -1,9 +1,10 @@
 import { api } from "./api";
+import { Client } from "../models";
 
 export const clientService = {
-    getAll: () => api.get("/api/client"),
-    getById: (id) => api.get(`/api/client/${id}`),
-    getMe: () => api.get("/api/client/me"),
+    getAll: async () => (await api.get("/api/client")).map(Client.from),
+    getById: async (id) => Client.from(await api.get(`/api/client/${id}`)),
+    getMe: async () => Client.from(await api.get("/api/client/me")),
     checkEmail: (email) =>
         api.get(`/api/client/check-email?email=${encodeURIComponent(email)}`),
     create: (data) => api.post("/api/client", data),
