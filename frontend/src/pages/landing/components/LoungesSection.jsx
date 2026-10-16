@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { loungeService, loungeTypeService, locationService } from "../../../services";
+import LoungeCard from "./LoungeCard";
 import "./LoungesSection.css";
 
 function LoungesSection() {
@@ -67,42 +68,14 @@ function LoungesSection() {
             </div>
 
             <div className="lounges-grid">
-                {lounges.map((lounge) => {
-                    const loungeType = getLoungeType(lounge.idLounge);
-
-                    return (
-                        <article
-                            className="lounge-card"
-                            key={lounge.idLounge}
-                        >
-                            <div className="lounge-card-content">
-                                <span className="lounge-number">
-                                    0{lounge.idLounge}
-                                </span>
-
-                                <h3>{lounge.name}</h3>
-
-                                <div className="lounge-info">
-                                    <p>{lounge.loungeAddress}</p>
-                                    <p>
-                                        {getLocationName(lounge.idLocation)}
-                                    </p>
-                                </div>
-
-                                {loungeType && (
-                                    <div className="lounge-capacity">
-                                        <span>CAPACIDAD</span>
-                                        <strong>
-                                            {loungeType.minQuantity} —{" "}
-                                            {loungeType.maxQuantity}
-                                        </strong>
-                                        <span>PERSONAS</span>
-                                    </div>
-                                )}
-                            </div>
-                        </article>
-                    );
-                })}
+                {lounges.map((lounge) => (
+                    <LoungeCard
+                        key={lounge.idLounge}
+                        lounge={lounge}
+                        locationName={getLocationName(lounge.idLocation)}
+                        loungeType={getLoungeType(lounge.idLounge)}
+                    />
+                ))}
             </div>
         </section>
     );

@@ -21,6 +21,7 @@ import cardDetailRoutes from "./src/routes/cardDetail.routes.js";
 import contractRoutes from "./src/routes/contract.routes.js";
 import notificationRoutes from "./src/routes/notification.routes.js";
 import paymentRoutes from "./src/routes/payment.routes.js";
+import { notFound, errorHandler } from "./src/middlewares/error.middleware.js";
 
 const app = express();
 
@@ -43,6 +44,9 @@ app.use("/api/cardDetail", cardDetailRoutes);
 app.use("/api/contract", contractRoutes);
 app.use("/api/notificacion", notificationRoutes);
 app.use("/api/payment", paymentRoutes);
+
+app.use(notFound);
+app.use(errorHandler);
 
 app.listen(3000, () => {
     console.log("Server running on port 3000");

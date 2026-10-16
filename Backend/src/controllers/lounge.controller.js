@@ -1,51 +1,32 @@
 import loungeService from "../services/lounge.service.js";
+import asyncHandler from "../middlewares/asyncHandler.js";
 
 class LoungeController {
 
-    async getAll(req, res) {
-        try {
-            const list = await loungeService.getAll();
-            return res.status(200).json(list);
-        } catch (error) {
-            return res.status(error.statusCode || 500).json({ error: error.message });
-        }
-    }
+    getAll = asyncHandler(async (req, res) => {
+        const list = await loungeService.getAll();
+        return res.status(200).json(list);
+    });
 
-    async getById(req, res) {
-        try {
-            const lounge = await loungeService.getById(req.params.id);
-            return res.status(200).json(lounge);
-        } catch (error) {
-            return res.status(error.statusCode || 500).json({ error: error.message });
-        }
-    }
+    getById = asyncHandler(async (req, res) => {
+        const lounge = await loungeService.getById(req.params.id);
+        return res.status(200).json(lounge);
+    });
 
-    async create(req, res) {
-        try {
-            const newLounge = await loungeService.create(req.body);
-            return res.status(201).json(newLounge);
-        } catch (error) {
-            return res.status(error.statusCode || 500).json({ error: error.message });
-        }
-    }
+    create = asyncHandler(async (req, res) => {
+        const newLounge = await loungeService.create(req.body);
+        return res.status(201).json(newLounge);
+    });
 
-    async update(req, res) {
-        try {
-            const updatedLounge = await loungeService.update(req.params.id, req.body);
-            return res.status(200).json(updatedLounge);
-        } catch (error) {
-            return res.status(error.statusCode || 500).json({ error: error.message });
-        }
-    }
+    update = asyncHandler(async (req, res) => {
+        const updatedLounge = await loungeService.update(req.params.id, req.body);
+        return res.status(200).json(updatedLounge);
+    });
 
-    async delete(req, res) {
-        try {
-            await loungeService.delete(req.params.id);
-            return res.status(200).json({ message: "Salón eliminado exitosamente." });
-        } catch (error) {
-            return res.status(error.statusCode || 500).json({ error: error.message });
-        }
-    }
+    delete = asyncHandler(async (req, res) => {
+        await loungeService.delete(req.params.id);
+        return res.status(200).json({ message: "Salón eliminado exitosamente." });
+    });
 
 }
 

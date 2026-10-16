@@ -1,4 +1,5 @@
 import cardDetailService from "../services/cardDetail.service.js";
+import asyncHandler from "../middlewares/asyncHandler.js";
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
@@ -19,86 +20,56 @@ const removeUploadedFile = (imageUrl) => {
 
 class CardDetailController {
 
-    async getAll(req, res) {
-        try {
-            const cardDetails = await cardDetailService.getAll();
-            return res.status(200).json(cardDetails);
-        } catch (error) {
-            return res.status(error.statusCode || 500).json({
-                error: error.message
-            });
+    getAll = asyncHandler(async (req, res) => {
+        const cardDetails = await cardDetailService.getAll();
+        return res.status(200).json(cardDetails);
+    });
+
+    getById = asyncHandler(async (req, res) => {
+        const cardDetail = await cardDetailService.getById(req.params.id);
+        return res.status(200).json(cardDetail);
+    });
+
+    create = asyncHandler(async (req, res) => {
+        const body = { ...req.body };
+
+        if (req.file) {
+            body.imageUrl = `/uploads/${req.file.filename}`;
         }
-    }
 
-    async getById(req, res) {
-        try {
-            const cardDetail = await cardDetailService.getById(req.params.id);
-            return res.status(200).json(cardDetail);
-        } catch (error) {
-            return res.status(error.statusCode || 500).json({
-                error: error.message
-            });
+        const newCardDetail = await cardDetailService.create(body);
+        return res.status(201).json(newCardDetail);
+    });
+
+    update = asyncHandler(async (req, res) => {
+        const body = { ...req.body };
+
+        if (req.file) {
+            const current = await cardDetailService.getById(req.params.id);
+            body.imageUrl = `/uploads/${req.file.filename}`;
+            removeUploadedFile(current?.imageUrl);
         }
-    }
 
-    async create(req, res) {
-        try {
-            const body = { ...req.body };
+        const cardDetailUpdated = await cardDetailService.update(
+            req.params.id,
+            body
+        );
 
-            if (req.file) {
-                body.imageUrl = `/uploads/${req.file.filename}`;
-            }
+        return res.status(200).json({
+            message: "Detalle de tarjeta actualizado correctamente.",
+            cardDetail: cardDetailUpdated
+        });
+    });
 
-            const newCardDetail = await cardDetailService.create(body);
-            return res.status(201).json(newCardDetail);
-        } catch (error) {
-            return res.status(error.statusCode || 500).json({
-                error: error.message
-            });
-        }
-    }
+    delete = asyncHandler(async (req, res) => {
+        const existing = await cardDetailService.getById(req.params.id);
+        await cardDetailService.delete(req.params.id);
+        removeUploadedFile(existing?.imageUrl);
 
-    async update(req, res) {
-        try {
-            const body = { ...req.body };
-
-            if (req.file) {
-                const current = await cardDetailService.getById(req.params.id);
-                body.imageUrl = `/uploads/${req.file.filename}`;
-                removeUploadedFile(current?.imageUrl);
-            }
-
-            const cardDetailUpdated = await cardDetailService.update(
-                req.params.id,
-                body
-            );
-
-            return res.status(200).json({
-                message: "Detalle de tarjeta actualizado correctamente.",
-                cardDetail: cardDetailUpdated
-            });
-        } catch (error) {
-            return res.status(error.statusCode || 500).json({
-                error: error.message
-            });
-        }
-    }
-
-    async delete(req, res) {
-        try {
-            const existing = await cardDetailService.getById(req.params.id);
-            await cardDetailService.delete(req.params.id);
-            removeUploadedFile(existing?.imageUrl);
-
-            return res.status(200).json({
-                message: "Detalle de tarjeta eliminado correctamente."
-            });
-        } catch (error) {
-            return res.status(error.statusCode || 500).json({
-                error: error.message
-            });
-        }
-    }
+        return res.status(200).json({
+            message: "Detalle de tarjeta eliminado correctamente."
+        });
+    });
 }
 
 export default new CardDetailController();

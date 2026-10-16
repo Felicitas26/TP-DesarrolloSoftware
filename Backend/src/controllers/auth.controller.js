@@ -2,6 +2,7 @@ import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
 import usuarioModel from "../models/usuario.model.js";
 import usuarioService from "../services/usuario.service.js";
+import asyncHandler from "../middlewares/asyncHandler.js";
 
 function generarToken(usuario) {
     return jwt.sign(
@@ -17,78 +18,72 @@ function generarToken(usuario) {
 
 class AuthController {
 
-    async login(req, res) {
-        try {
-            const { username, password } = req.body;
+    login = asyncHandler(async (req, res) => {
+        const { username, password } = req.body;
 
-            if (!username || !password) {
-                return res.status(400).json({ error: "Usuario y contraseña son obligatorios." });
-            }
-
-            const usuario = await usuarioModel.findByUsername(username);
-            if (!usuario) {
-                return res.status(401).json({ error: "Credenciales incorrectas." });
-            }
-
-            const match = await bcrypt.compare(password, usuario.password);
-            if (!match) {
-                return res.status(401).json({ error: "Credenciales incorrectas." });
-            }
-
-            const token = generarToken(usuario);
-
-            return res.status(200).json({
-                token,
-                idUsuario: usuario.idUsuario,
-                rol: usuario.rol,
-                idCli: usuario.idCli,
-                passwordTemporal: Boolean(usuario.passwordTemporal),
-                username: usuario.username
-            });
-        } catch (error) {
-            return res.status(error.statusCode || 500).json({ error: error.message });
+        if (!username || !password) {
+            const error = new Error("Usuario y contraseña son obligatorios.");
+            error.statusCode = 400;
+            throw error;
         }
-    }
 
-    async resetPassword(req, res) {
-        try {
-            const { email, passwordNueva } = req.body;
-
-            const result = await usuarioService.resetPassword({
-                email,
-                passwordNueva
-            });
-
-            return res.status(200).json(result);
-        } catch (error) {
-            return res.status(error.statusCode || 500).json({ error: error.message });
+        const usuario = await usuarioModel.findByUsername(username);
+        if (!usuario) {
+            const error = new Error("Credenciales incorrectas.");
+            error.statusCode = 401;
+            throw error;
         }
-    }
 
-    async register(req, res) {
-        try {
-            const { dniCli, password } = req.body;
-
-            const usuario = await usuarioService.registerCliente({
-                dniCli,
-                passwordNueva: password
-            });
-
-            const token = generarToken(usuario);
-
-            return res.status(201).json({
-                message: "Registro exitoso.",
-                token,
-                idUsuario: usuario.idUsuario,
-                rol: usuario.rol,
-                idCli: usuario.idCli,
-                passwordTemporal: Boolean(usuario.passwordTemporal),
-                username: usuario.username
-            });
-        } catch (error) {
-            return res.status(error.statusCode || 500).json({ error: error.message });
+        const match = await bcrypt.compare(password, usuario.password);
+        if (!match) {
+            const error = new Error("Credenciales incorrectas.");
+            error.statusCode = 401;
+            throw error;
         }
-    }
+
+        const token = generarToken(usuario);
+
+        return res.status(200).json({
+            token,
+            idUsuario: usuario.idUsuario,
+            rol: usuario.rol,
+            idCli: usuario.idCli,
+            passwordTemporal: Boolean(usuario.passwordTemporal),
+            username: usuario.username
+        });
+    });
+
+    resetPassword = asyncHandler(async (req, res) => {
+        const { email, passwordNueva } = req.body;
+
+        const result = await usuarioService.resetPassword({
+            email,
+            passwordNueva
+        });
+
+        return res.status(200).json(result);
+    });
+
+    register = asyncHandler(async (req, res) => {
+        const { dniCli, password } = req.body;
+
+        const usuario = await usuarioService.registerCliente({
+            dniCli,
+            passwordNueva: password
+        });
+
+        const token = generarToken(usuario);
+
+        return res.status(201).json({
+            message: "Registro exitoso.",
+            token,
+            idUsuario: usuario.idUsuario,
+            rol: usuario.rol,
+            idCli: usuario.idCli,
+            passwordTemporal: Boolean(usuario.passwordTemporal),
+            username: usuario.username
+        });
+    });
 }
 
 export default new AuthController();

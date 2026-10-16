@@ -1,64 +1,41 @@
 import priceService from "../services/price.service.js";
+import asyncHandler from "../middlewares/asyncHandler.js";
 
 class PriceController {
 
-    async getAll(req, res) {
-        try {
-            const list = await priceService.getAll();
-            return res.status(200).json(list);
-        } catch (error) {
-            return res.status(error.statusCode || 500).json({ error: error.message });
-        }
-    }
+    getAll = asyncHandler(async (req, res) => {
+        const list = await priceService.getAll();
+        return res.status(200).json(list);
+    });
 
-    async getById(req, res) {
-        try {
-            const { idLoungeType, effectiveDate } = req.params;
-            const price = await priceService.getById(idLoungeType, effectiveDate);
-            return res.status(200).json(price);
-        } catch (error) {
-            return res.status(error.statusCode || 500).json({ error: error.message });
-        }
-    }
+    getById = asyncHandler(async (req, res) => {
+        const { idLoungeType, effectiveDate } = req.params;
+        const price = await priceService.getById(idLoungeType, effectiveDate);
+        return res.status(200).json(price);
+    });
 
-    async getActive(req, res) {
-        try {
-            const { idLoungeType, dateEvent } = req.params;
-            const price = await priceService.getActive(idLoungeType, dateEvent);
-            return res.status(200).json(price);
-        } catch (error) {
-            return res.status(error.statusCode || 500).json({ error: error.message });
-        }
-    }
+    getActive = asyncHandler(async (req, res) => {
+        const { idLoungeType, dateEvent } = req.params;
+        const price = await priceService.getActive(idLoungeType, dateEvent);
+        return res.status(200).json(price);
+    });
 
-    async create(req, res) {
-        try {
-            const newPrice = await priceService.create(req.body);
-            return res.status(201).json(newPrice);
-        } catch (error) {
-            return res.status(error.statusCode || 500).json({ error: error.message });
-        }
-    }
+    create = asyncHandler(async (req, res) => {
+        const newPrice = await priceService.create(req.body);
+        return res.status(201).json(newPrice);
+    });
 
-    async update(req, res) {
-        try {
-            const { idLoungeType, effectiveDate } = req.params;
-            const updated = await priceService.update(idLoungeType, effectiveDate, req.body);
-            return res.status(200).json(updated);
-        } catch (error) {
-            return res.status(error.statusCode || 500).json({ error: error.message });
-        }
-    }
+    update = asyncHandler(async (req, res) => {
+        const { idLoungeType, effectiveDate } = req.params;
+        const updated = await priceService.update(idLoungeType, effectiveDate, req.body);
+        return res.status(200).json(updated);
+    });
 
-    async delete(req, res) {
-        try {
-            const { idLoungeType, effectiveDate } = req.params;
-            await priceService.delete(idLoungeType, effectiveDate);
-            return res.status(200).json({ message: "Precio eliminado correctamente." });
-        } catch (error) {
-            return res.status(error.statusCode || 500).json({ error: error.message });
-        }
-    }
+    delete = asyncHandler(async (req, res) => {
+        const { idLoungeType, effectiveDate } = req.params;
+        await priceService.delete(idLoungeType, effectiveDate);
+        return res.status(200).json({ message: "Precio eliminado correctamente." });
+    });
 
 }
 

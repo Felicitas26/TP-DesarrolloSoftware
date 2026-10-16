@@ -1,71 +1,42 @@
 import paymentService from "../services/payment.service.js";
+import asyncHandler from "../middlewares/asyncHandler.js";
 
 class PaymentController {
 
-    async getAll(req, res) {
-        try {
-            const payments = await paymentService.getAll();
-            return res.status(200).json(payments);
-        } catch (error) {
-            return res.status(error.statusCode || 500).json({
-                error: error.message
-            });
-        }
-    }
+    getAll = asyncHandler(async (req, res) => {
+        const payments = await paymentService.getAll();
+        return res.status(200).json(payments);
+    });
 
-    async getById(req, res) {
-        try {
-            const payment = await paymentService.getById(req.params.id);
-            return res.status(200).json(payment);
-        } catch (error) {
-            return res.status(error.statusCode || 500).json({
-                error: error.message
-            });
-        }
-    }
+    getById = asyncHandler(async (req, res) => {
+        const payment = await paymentService.getById(req.params.id);
+        return res.status(200).json(payment);
+    });
 
-    async create(req, res) {
-        try {
-            const newPayment = await paymentService.create(req.body);
-            return res.status(201).json(newPayment);
-        } catch (error) {
-            return res.status(error.statusCode || 500).json({
-                error: error.message
-            });
-        }
-    }
+    create = asyncHandler(async (req, res) => {
+        const newPayment = await paymentService.create(req.body);
+        return res.status(201).json(newPayment);
+    });
 
-    async update(req, res) {
-        try {
-            const paymentUpdated = await paymentService.update(
-                req.params.id,
-                req.body
-            );
+    update = asyncHandler(async (req, res) => {
+        const paymentUpdated = await paymentService.update(
+            req.params.id,
+            req.body
+        );
 
-            return res.status(200).json({
-                message: "Pago actualizado correctamente.",
-                payment: paymentUpdated
-            });
-        } catch (error) {
-            return res.status(error.statusCode || 500).json({
-                error: error.message
-            });
-        }
-    }
+        return res.status(200).json({
+            message: "Pago actualizado correctamente.",
+            payment: paymentUpdated
+        });
+    });
 
-    async delete(req, res) {
-        try {
-            await paymentService.delete(req.params.id);
+    delete = asyncHandler(async (req, res) => {
+        await paymentService.delete(req.params.id);
 
-            return res.status(200).json({
-                message: "Pago eliminado correctamente."
-            });
-        } catch (error) {
-            return res.status(error.statusCode || 500).json({
-                error: error.message
-            });
-        }
-    }
+        return res.status(200).json({
+            message: "Pago eliminado correctamente."
+        });
+    });
 }
 
 export default new PaymentController();
