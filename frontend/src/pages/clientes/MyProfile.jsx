@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { clientService } from "../../services";
 import "./MyProfile.css";
 
 function MyProfile() {
@@ -14,26 +15,9 @@ function MyProfile() {
 
         const getProfile = async () => {
 
-            const token = localStorage.getItem("sty_token");
-
             try {
 
-                const response = await fetch(
-                    "http://localhost:3000/api/client/me",
-                    {
-                        headers: {
-                            "Authorization": `Bearer ${token}`
-                        }
-                    }
-                );
-
-                const data = await response.json();
-
-                if (!response.ok) {
-                    throw new Error(
-                        data.error || "No se pudo obtener el perfil."
-                    );
-                }
+                const data = await clientService.getMe();
 
                 setClient(data);
 

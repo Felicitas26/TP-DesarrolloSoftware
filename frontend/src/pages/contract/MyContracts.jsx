@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { contractService } from "../../services";
 import FeedbackModal from "../../components/FeedbackModal";
 import "./MyContracts.css";
 
@@ -15,7 +16,6 @@ const STATUS_LABEL = {
 function MyContracts() {
 
     const navigate = useNavigate();
-    const token = localStorage.getItem("sty_token");
 
     const [contracts, setContracts] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -26,20 +26,7 @@ function MyContracts() {
     useEffect(() => {
         const getContracts = async () => {
             try {
-                const response = await fetch(
-                    "http://localhost:3000/api/contract/mis-contratos",
-                    {
-                        headers: {
-                            "Authorization": `Bearer ${token}`
-                        }
-                    }
-                );
-
-                const data = await response.json();
-
-                if (!response.ok) {
-                    throw new Error(data.error || "No se pudieron obtener los contratos.");
-                }
+                const data = await contractService.getMine();
 
                 setContracts(data);
             } catch (error) {
@@ -50,7 +37,7 @@ function MyContracts() {
         };
 
         getContracts();
-    }, [token]);
+    }, []);
 
     const formatDate = (date) => {
         if (!date) return "";

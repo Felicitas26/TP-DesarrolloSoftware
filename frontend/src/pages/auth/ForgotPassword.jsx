@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { authService } from "../../services/authService";
 import "./ForgotPassword.css";
 
 const IconMail = () => (
@@ -85,20 +86,10 @@ function ForgotPassword() {
     setSubmitting(true);
 
     try {
-      const response = await fetch("http://localhost:3000/api/auth/reset-password", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          email: form.email.trim(),
-          passwordNueva: form.passwordNueva
-        })
+      await authService.resetPassword({
+        email: form.email.trim(),
+        passwordNueva: form.passwordNueva
       });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || "No se pudo restablecer la contraseña.");
-      }
 
       setSuccess(true);
     } catch (err) {

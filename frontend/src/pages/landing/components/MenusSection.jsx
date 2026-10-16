@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { cardDetailService, buildAssetUrl } from "../../../services";
 import "./MenusSection.css";
 
 function MenusSection() {
@@ -26,8 +27,7 @@ function MenusSection() {
     useEffect(() => {
         const loadMenus = async () => {
             try {
-                const response = await fetch("http://localhost:3000/api/cardDetail");
-                const data = await response.json();
+                const data = await cardDetailService.getAll();
                 setMenus(data);
             } catch (error) {
                 console.error("Error al cargar los menús:", error);
@@ -84,7 +84,7 @@ function MenusSection() {
                             {menu.imageUrl && (
                                 <div className="menu-image">
                                     <img
-                                        src={`http://localhost:3000${menu.imageUrl}`}
+                                        src={buildAssetUrl(menu.imageUrl)}
                                         alt={menu.menuStage}
                                     />
                                 </div>

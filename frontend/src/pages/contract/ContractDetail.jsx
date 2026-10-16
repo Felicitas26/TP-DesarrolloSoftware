@@ -1,5 +1,14 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import {
+    contractService,
+    loungeService,
+    loungeTypeService,
+    cardDetailService,
+    extraServiceService,
+    priceService,
+    paymentService
+} from "../../services";
 import FeedbackModal from "../../components/FeedbackModal";
 import "./ContractDetail.css";
 
@@ -65,7 +74,6 @@ function ContractDetail() {
     const [activePrice, setActivePrice] = useState(null);
 
     const rol = localStorage.getItem("sty_rol");
-    const token = localStorage.getItem("sty_token");
 
     const EVENT_TYPES = [
         "Casamiento",
@@ -125,18 +133,18 @@ const canEdit = contract && ["generado", "rechazado"].includes(contract.status);
     useEffect(() => {
         const getCatalog = async () => {
             try {
-                const res = await Promise.all([
-                    fetch("http://localhost:3000/api/lounge"),
-                    fetch("http://localhost:3000/api/loungeType"),
-                    fetch("http://localhost:3000/api/cardDetail"),
-                    fetch("http://localhost:3000/api/extraService")
-                ]);
-                const data = await Promise.all(res.map((r) => r.json()));
+                const [lounges, loungeTypes, cardDetails, extraServices] =
+                    await Promise.all([
+                        loungeService.getAll(),
+                        loungeTypeService.getAll(),
+                        cardDetailService.getAll(),
+                        extraServiceService.getAll()
+                    ]);
                 setMountData({
-                    lounges: data[0],
-                    loungeTypes: data[1],
-                    cardDetails: data[2],
-                    extraServices: data[3]
+                    lounges,
+                    loungeTypes,
+                    cardDetails,
+                    extraServices
                 });
             } catch (error) {
                 console.error("Error al obtener el catálogo:", error);
@@ -148,19 +156,7 @@ const canEdit = contract && ["generado", "rechazado"].includes(contract.status);
     useEffect(() => {
         const getContract = async () => {
             try {
-                const response = await fetch(
-                    `http://localhost:3000/api/contract/${id}`,
-                    {
-                        headers: {
-                            "Authorization": `Bearer ${token}`
-                        }
-                    }
-                );
-                const data = await response.json();
-
-                if (!response.ok) {
-                    throw new Error(data.error || "No se pudo cargar el contrato.");
-                }
+                const data = await contractService.getById(id);
 
                 setContract(data);
 
@@ -192,7 +188,6 @@ const canEdit = contract && ["generado", "rechazado"].includes(contract.status);
             }
         };
         getContract();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [id]);
 
     useEffect(() => {
@@ -206,12 +201,7 @@ const canEdit = contract && ["generado", "rechazado"].includes(contract.status);
 
         let cancelled = false;
 
-        fetch(`http://localhost:3000/api/price/activo/${idLoungeType}/${dateEvent}`, {
-            headers: {
-                "Authorization": `Bearer ${token}`
-            }
-        })
-            .then((res) => (res.ok ? res.json() : null))
+        priceService.getActivo(idLoungeType, dateEvent)
             .then((data) => {
                 if (!cancelled) setActivePrice(data);
             })
@@ -256,35 +246,19 @@ const canEdit = contract && ["generado", "rechazado"].includes(contract.status);
         setSaving(true);
 
         try {
-            const response = await fetch(
-                `http://localhost:3000/api/contract/${id}`,
-                {
-                    method: "PUT",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "Authorization": `Bearer ${token}`
-                    },
-                    body: JSON.stringify({
-                        dateEvent: form.dateEvent,
-                        eventType: form.eventType,
-                        idCardDetail: form.idCardDetail
-                            ? Number(form.idCardDetail)
-                            : null,
-                        idServices: form.idServices,
-                        cantExactaInvit: form.cantExactaInvit
-                            ? Number(form.cantExactaInvit)
-                            : null,
-                        eventStartTime: form.eventStartTime || null,
-                        eventEndTime: form.eventEndTime || null
-                    })
-                }
-            );
-
-            const data = await response.json();
-
-            if (!response.ok) {
-                throw new Error(data.error || "No se pudo guardar el contrato.");
-            }
+            const data = await contractService.update(id, {
+                dateEvent: form.dateEvent,
+                eventType: form.eventType,
+                idCardDetail: form.idCardDetail
+                    ? Number(form.idCardDetail)
+                    : null,
+                idServices: form.idServices,
+                cantExactaInvit: form.cantExactaInvit
+                    ? Number(form.cantExactaInvit)
+                    : null,
+                eventStartTime: form.eventStartTime || null,
+                eventEndTime: form.eventEndTime || null
+            });
 
             setContract(data.contract);
             setForm((prev) => ({
@@ -311,50 +285,21 @@ const canEdit = contract && ["generado", "rechazado"].includes(contract.status);
         setSaving(true);
 
         try {
-            const saveResponse = await fetch(
-                `http://localhost:3000/api/contract/${id}`,
-                {
-                    method: "PUT",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "Authorization": `Bearer ${token}`
-                    },
-                    body: JSON.stringify({
-                        dateEvent: form.dateEvent,
-                        eventType: form.eventType,
-                        idCardDetail: form.idCardDetail
-                            ? Number(form.idCardDetail)
-                            : null,
-                        idServices: form.idServices,
-                        cantExactaInvit: form.cantExactaInvit
-                            ? Number(form.cantExactaInvit)
-                            : null,
-                        eventStartTime: form.eventStartTime || null,
-                        eventEndTime: form.eventEndTime || null
-                    })
-                }
-            );
+            await contractService.update(id, {
+                dateEvent: form.dateEvent,
+                eventType: form.eventType,
+                idCardDetail: form.idCardDetail
+                    ? Number(form.idCardDetail)
+                    : null,
+                idServices: form.idServices,
+                cantExactaInvit: form.cantExactaInvit
+                    ? Number(form.cantExactaInvit)
+                    : null,
+                eventStartTime: form.eventStartTime || null,
+                eventEndTime: form.eventEndTime || null
+            });
 
-            if (!saveResponse.ok) {
-                const saveData = await saveResponse.json();
-                throw new Error(saveData.error || "No se pudieron guardar los cambios antes de enviar.");
-            }
-
-            const enviarResponse = await fetch(
-                `http://localhost:3000/api/contract/${id}/enviar`,
-                {
-                    method: "POST",
-                    headers: {
-                        "Authorization": `Bearer ${token}`
-                    }
-                }
-            );
-
-            const data = await enviarResponse.json();
-
-            if (!enviarResponse.ok) {
-                throw new Error(data.error || "No se pudo enviar el contrato.");
-            }
+            const data = await contractService.enviar(id);
 
             setContract(data.contract);
             navigate("/client-home");
@@ -370,36 +315,20 @@ const canEdit = contract && ["generado", "rechazado"].includes(contract.status);
         setSaving(true);
 
         try {
-            const response = await fetch(
-                `http://localhost:3000/api/contract/${id}/modificacion`,
-                {
-                    method: "PUT",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "Authorization": `Bearer ${token}`
-                    },
-                    body: JSON.stringify({
-                        dateEvent: form.dateEvent,
-                        eventType: form.eventType,
-                        idCardDetail: form.idCardDetail
-                            ? Number(form.idCardDetail)
-                            : null,
-                        idServices: form.idServices,
-                        cantExactaInvit: form.cantExactaInvit
-                            ? Number(form.cantExactaInvit)
-                            : null,
-                        eventStartTime: form.eventStartTime || null,
-                        eventEndTime: form.eventEndTime || null,
-                        comment: commentMod || null
-                    })
-                }
-            );
-
-            const data = await response.json();
-
-            if (!response.ok) {
-                throw new Error(data.error || "No se pudo solicitar la modificación.");
-            }
+            const data = await contractService.solicitarModificacion(id, {
+                dateEvent: form.dateEvent,
+                eventType: form.eventType,
+                idCardDetail: form.idCardDetail
+                    ? Number(form.idCardDetail)
+                    : null,
+                idServices: form.idServices,
+                cantExactaInvit: form.cantExactaInvit
+                    ? Number(form.cantExactaInvit)
+                    : null,
+                eventStartTime: form.eventStartTime || null,
+                eventEndTime: form.eventEndTime || null,
+                comment: commentMod || null
+            });
 
             setContract(data.contract);
             setModificando(false);
@@ -417,25 +346,10 @@ const canEdit = contract && ["generado", "rechazado"].includes(contract.status);
         setSaving(true);
 
         try {
-            const response = await fetch(
-                `http://localhost:3000/api/contract/${id}/modificacion/revision`,
-                {
-                    method: "PUT",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "Authorization": `Bearer ${token}`
-                    },
-                    body: JSON.stringify(
-                        decision === "rechazar" ? { decision, motivo } : { decision }
-                    )
-                }
+            const data = await contractService.revisarModificacion(
+                id,
+                decision === "rechazar" ? { decision, motivo } : { decision }
             );
-
-            const data = await response.json();
-
-            if (!response.ok) {
-                throw new Error(data.error || "No se pudo revisar la modificación.");
-            }
 
             setContract(data.contract);
             showMessage(
@@ -466,23 +380,7 @@ const canEdit = contract && ["generado", "rechazado"].includes(contract.status);
         setSaving(true);
 
         try {
-            const response = await fetch(
-                `http://localhost:3000/api/contract/${id}/modificacion/rechazo`,
-                {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "Authorization": `Bearer ${token}`
-                    },
-                    body: JSON.stringify({ decision: "continuar" })
-                }
-            );
-
-            const data = await response.json();
-
-            if (!response.ok) {
-                throw new Error(data.error || "No se pudo procesar tu decisión.");
-            }
+            const data = await contractService.resolverModificacion(id, { decision: "continuar" });
 
             setContract(data.contract);
             showMessage("success", "Contrato vigente", "Continuás con el contrato como estaba.");
@@ -499,23 +397,7 @@ const canEdit = contract && ["generado", "rechazado"].includes(contract.status);
         setSaving(true);
 
         try {
-            const response = await fetch(
-                `http://localhost:3000/api/contract/${id}/modificacion/rechazo`,
-                {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "Authorization": `Bearer ${token}`
-                    },
-                    body: JSON.stringify({ decision: "cancelar" })
-                }
-            );
-
-            const data = await response.json();
-
-            if (!response.ok) {
-                throw new Error(data.error || "No se pudo cancelar el evento.");
-            }
+            const data = await contractService.resolverModificacion(id, { decision: "cancelar" });
 
             setPendingRedirect(true);
             showMessage("success", "Evento cancelado", data.message);
@@ -532,23 +414,7 @@ const canEdit = contract && ["generado", "rechazado"].includes(contract.status);
         setSaving(true);
 
         try {
-            const response = await fetch(
-                `http://localhost:3000/api/payment/${payment.idPayment}`,
-                {
-                    method: "PUT",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "Authorization": `Bearer ${token}`
-                    },
-                    body: JSON.stringify({ statusPayment })
-                }
-            );
-
-            const data = await response.json();
-
-            if (!response.ok) {
-                throw new Error(data.error || "No se pudo actualizar el pago.");
-            }
+            await paymentService.update(payment.idPayment, { statusPayment });
 
             setContract({
                 ...contract,
@@ -574,21 +440,7 @@ const canEdit = contract && ["generado", "rechazado"].includes(contract.status);
         setSaving(true);
 
         try {
-            const response = await fetch(
-                `http://localhost:3000/api/contract/${id}/aceptar`,
-                {
-                    method: "POST",
-                    headers: {
-                        "Authorization": `Bearer ${token}`
-                    }
-                }
-            );
-
-            const data = await response.json();
-
-            if (!response.ok) {
-                throw new Error(data.error || "No se pudo firmar el contrato.");
-            }
+            const data = await contractService.aceptar(id);
 
             setContract(data.contract);
             navigate("/client-home");

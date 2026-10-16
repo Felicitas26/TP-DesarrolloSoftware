@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { loungeService } from "../../services";
 import "./editLounge.css";
 
 const IconArrowLeft = () => (
@@ -39,12 +40,7 @@ function EditLounge() {
     const getLounge = async () => {
       try {
         setLoading(true);
-        const response = await fetch(`http://localhost:3000/api/lounge/${id}`);
-        const data = await response.json();
-
-        if (!response.ok) {
-          throw new Error(data.error || "Error al cargar los datos del salón");
-        }
+        const data = await loungeService.getById(id);
 
         setLounge(data);
       } catch (err) {
@@ -71,19 +67,7 @@ function EditLounge() {
     setError(null);
 
     try {
-      const response = await fetch(`http://localhost:3000/api/lounge/${id}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify(lounge)
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || "Error al actualizar el salón");
-      }
+      await loungeService.update(id, lounge);
 
       navigate("/lounge");
     } catch (err) {

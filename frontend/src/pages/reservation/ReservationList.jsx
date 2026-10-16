@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { reservationService } from "../../services";
 import "./ReservationList.css";
 import FeedbackModal from "../../components/FeedbackModal.jsx";
 
@@ -63,20 +64,7 @@ function ReservationList() {
     const getReservations = async () => {
 
         try {
-            const response = await fetch(
-                "http://localhost:3000/api/reservation",
-                {
-                    headers: {
-                        "Authorization": `Bearer ${token}`
-                    }
-                }
-            );
-
-            const data = await response.json();
-
-            if (!response.ok) {
-                throw new Error(data.error);
-            }
+            const data = await reservationService.getAll();
 
             setReservations(data);
 
@@ -106,25 +94,7 @@ function ReservationList() {
 
         try {
 
-            const response = await fetch(
-                `http://localhost:3000/api/reservation/${id}/status`,
-                {
-                    method: "PUT",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "Authorization": `Bearer ${token}`
-                    },
-                    body: JSON.stringify({
-                        status: "aceptada"
-                    })
-                }
-            );
-
-            const data = await response.json();
-
-            if (!response.ok) {
-                throw new Error(data.error);
-            }
+            await reservationService.updateStatus(id, { status: "aceptada" });
 
             showFeedback("success", "Reserva aceptada", "Reserva aceptada correctamente.");
 
@@ -154,23 +124,7 @@ function ReservationList() {
 
         try {
 
-            const response = await fetch(
-                `http://localhost:3000/api/reservation/${id}`,
-                {
-                    method: "DELETE",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "Authorization": `Bearer ${token}`
-                    },
-                    body: JSON.stringify({ motivo: cancelMotivo.trim() })
-                }
-            );
-
-            const data = await response.json();
-
-            if (!response.ok) {
-                throw new Error(data.error);
-            }
+            await reservationService.remove(id, { motivo: cancelMotivo.trim() });
 
             setCancelMotivo("");
             showFeedback("success", "Reserva cancelada", "Reserva cancelada correctamente. El cliente fue notificado.");

@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { priceService, priceKey, loungeTypeService } from "../../services";
 import "./priceList.css";
 
 const IconTag = () => (
@@ -80,27 +81,17 @@ function PriceList() {
     return found ? found.nameLoungeType : `Tipo #${idLoungeType}`;
   };
 
-  const priceKey = (price) =>
-    `${price.idLoungeType}/${encodeURIComponent(
-      new Date(price.effectiveDate).toISOString().slice(0, 10)
-    )}`;
-
   const fetchData = async () => {
     try {
       setLoading(true);
 
-      const [pricesRes, typesRes] = await Promise.all([
-        fetch("http://localhost:3000/api/price"),
-        fetch("http://localhost:3000/api/loungeType")
+      const [pricesData, typesData] = await Promise.all([
+        priceService.getAll(),
+        loungeTypeService.getAll()
       ]);
 
-      if (pricesRes.ok) {
-        setPrices(await pricesRes.json());
-      }
-
-      if (typesRes.ok) {
-        setLoungeTypes(await typesRes.json());
-      }
+      setPrices(pricesData);
+      setLoungeTypes(typesData);
     } catch (error) {
       console.error("Error al cargar precios:", error);
     } finally {
@@ -118,20 +109,7 @@ function PriceList() {
     setDeleting(true);
 
     try {
-      const response = await fetch(
-        `http://localhost:3000/api/price/${priceKey(priceToDelete)}`,
-        {
-          method: "DELETE",
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("sty_token")}`
-          }
-        }
-      );
-
-      if (!response.ok) {
-        const data = await response.json();
-        throw new Error(data.error || "No se pudo eliminar el precio.");
-      }
+      await priceService.remove(priceKey(priceToDelete));
 
       setPrices((prev) =>
         prev.filter(
@@ -166,27 +144,10 @@ function PriceList() {
     setSavingEdit(true);
 
     try {
-      const response = await fetch(
-        `http://localhost:3000/api/price/${priceKey(priceToEdit)}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("sty_token")}`
-          },
-          body: JSON.stringify({
-            value: Number(priceToEdit.value),
-            endDate: priceToEdit.endDate || null
-          })
-        }
-      );
-
-      if (!response.ok) {
-        const data = await response.json();
-        throw new Error(data.error || "No se pudo actualizar el precio.");
-      }
-
-      const data = await response.json();
+      const data = await priceService.update(priceKey(priceToEdit), {
+        value: Number(priceToEdit.value),
+        endDate: priceToEdit.endDate || null
+      });
 
       setPrices((prev) =>
         prev.map((price) =>

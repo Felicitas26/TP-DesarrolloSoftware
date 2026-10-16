@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { extraServiceService } from "../../../services";
 import "./ExtraServicesSection.css";
 
 function ExtraServicesSection() {
@@ -8,11 +9,7 @@ function ExtraServicesSection() {
     useEffect(() => {
         const loadServices = async () => {
             try {
-                const response = await fetch(
-                    "http://localhost:3000/api/extraService"
-                );
-
-                const data = await response.json();
+                const data = await extraServiceService.getAll();
                 setServices(data);
             } catch (error) {
                 console.error(

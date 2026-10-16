@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { loungeService, locationService } from "../../services";
 import "./loungeList.css";
 
 const IconPlus = () => (
@@ -63,20 +64,13 @@ function LoungeList() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [resLounges, resLocations] = await Promise.all([
-          fetch("http://localhost:3000/api/lounge"),
-          fetch("http://localhost:3000/api/locations")
+        const [dataLounges, dataLocations] = await Promise.all([
+          loungeService.getAll(),
+          locationService.getAll()
         ]);
 
-        if (resLounges.ok) {
-          const dataLounges = await resLounges.json();
-          setLounges(dataLounges);
-        }
-
-        if (resLocations.ok) {
-          const dataLocations = await resLocations.json();
-          setLocations(dataLocations);
-        }
+        setLounges(dataLounges);
+        setLocations(dataLocations);
       } catch (err) {
         console.error("Error al cargar datos:", err);
       } finally {
@@ -93,11 +87,7 @@ function LoungeList() {
     const id = loungeToDelete.id_lounge || loungeToDelete.idLounge || loungeToDelete.id;
 
     try {
-      const response = await fetch(`http://localhost:3000/api/lounge/${id}`, {
-        method: "DELETE"
-      });
-
-      if (!response.ok) throw new Error("No se pudo eliminar el salón.");
+      await loungeService.remove(id);
 
       setLounges((prev) => prev.filter((l) => (l.id_lounge || l.idLounge || l.id) !== id));
       setLoungeToDelete(null);
@@ -119,13 +109,7 @@ function LoungeList() {
     const id = loungeToEdit.id_lounge || loungeToEdit.idLounge || loungeToEdit.id;
 
     try {
-      const response = await fetch(`http://localhost:3000/api/lounge/${id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(loungeToEdit)
-      });
-
-      if (!response.ok) throw new Error("No se pudo actualizar el salón.");
+      await loungeService.update(id, loungeToEdit);
 
       // Actualizamos la lista localizando el objeto completo o buscando la ciudad correspondiente para mostrarla bien en la tabla
       const updatedLocation = locations.find(loc => String(loc.idLocation || loc.id) === String(loungeToEdit.idLocation || loungeToEdit.id_location));

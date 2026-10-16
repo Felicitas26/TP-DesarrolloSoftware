@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { authService } from "../../services/authService";
 import "./ChangePassword.css";
 
 const IconLock = () => (
@@ -74,23 +75,10 @@ function ChangePassword() {
     setSubmitting(true);
 
     try {
-      const response = await fetch("http://localhost:3000/api/usuario/cambiar-password", {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`
-        },
-        body: JSON.stringify({
-          passwordActual: form.passwordActual,
-          passwordNueva: form.passwordNueva
-        })
+      await authService.changePassword({
+        passwordActual: form.passwordActual,
+        passwordNueva: form.passwordNueva
       });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || "No se pudo cambiar la contraseña.");
-      }
 
       localStorage.setItem("sty_password_temporal", "0");
       setSuccess(true);

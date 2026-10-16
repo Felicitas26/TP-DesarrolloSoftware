@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { cardDetailService } from "../../services";
 import "./newCardDetail.css";
 
 const IconMenu = () => (
@@ -77,24 +78,7 @@ function NewCardDetail() {
                 formData.append("image", imageFile);
             }
 
-            const response = await fetch(
-                "http://localhost:3000/api/cardDetail",
-                {
-                    method: "POST",
-                    headers: {
-                        Authorization: `Bearer ${localStorage.getItem("sty_token")}`
-                    },
-                    body: formData
-                }
-            );
-
-            const data = await response.json();
-
-            if (!response.ok) {
-                throw new Error(
-                    data.error || "No se pudo crear el menú."
-                );
-            }
+            await cardDetailService.create(formData);
 
             navigate("/cardDetail");
 

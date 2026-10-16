@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { loungeService, locationService } from "../../services";
 import "./newLounge.css";
 
 const IconLounge = () => (
@@ -49,8 +50,7 @@ function NewLounge() {
   const [showSuccessModal, setShowSuccessModal] = useState(false);
 
   useEffect(() => {
-    fetch("http://localhost:3000/api/locations")
-      .then((res) => res.json())
+    locationService.getAll()
       .then((data) => setLocations(data))
       .catch((err) => console.error("Error al cargar locaciones:", err));
   }, []);
@@ -97,20 +97,10 @@ function NewLounge() {
     setSubmitting(true);
 
     try {
-      const response = await fetch("http://localhost:3000/api/lounge", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          ...lounge,
-          idLocation: Number(lounge.idLocation)
-        })
+      await loungeService.create({
+        ...lounge,
+        idLocation: Number(lounge.idLocation)
       });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || "No se pudo registrar el salón.");
-      }
 
       setShowSuccessModal(true);
       setLounge(emptyLounge);

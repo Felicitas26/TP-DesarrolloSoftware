@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { notificationService } from "../services";
 import "./NotificationBell.css";
 
 const NOTIFICATION_LABEL = {
@@ -30,7 +31,6 @@ const IconLogout = () => (
 
 function NotificationBell() {
     const navigate = useNavigate();
-    const token = localStorage.getItem("sty_token");
 
     const [open, setOpen] = useState(false);
     const [loading, setLoading] = useState(false);
@@ -40,15 +40,9 @@ function NotificationBell() {
 
     const fetchNotifications = async () => {
         try {
-            const response = await fetch(
-                "http://localhost:3000/api/notificacion",
-                { headers: { "Authorization": `Bearer ${token}` } }
-            );
-            const data = await response.json();
-            if (response.ok) {
-                setNotifications(data.notifications || []);
-                setUnread(data.unread || 0);
-            }
+            const data = await notificationService.getAll();
+            setNotifications(data.notifications || []);
+            setUnread(data.unread || 0);
         } catch {
             // silencioso
         }
@@ -58,8 +52,7 @@ function NotificationBell() {
         fetchNotifications();
         const interval = setInterval(fetchNotifications, 30000);
         return () => clearInterval(interval);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [token]);
+    }, []);
 
     useEffect(() => {
         const handleClickOutside = (event) => {
@@ -76,28 +69,20 @@ function NotificationBell() {
             setOpen(true);
             setLoading(true);
             try {
-                const response = await fetch(
-                    "http://localhost:3000/api/notificacion",
-                    { headers: { "Authorization": `Bearer ${token}` } }
-                );
-                const data = await response.json();
-                if (response.ok) {
-                    setNotifications(data.notifications || []);
-                    setUnread(data.unread || 0);
-                }
+                const data = await notificationService.getAll();
+                setNotifications(data.notifications || []);
+                setUnread(data.unread || 0);
             } catch {
                 setNotifications([]);
             } finally {
                 setLoading(false);
             }
-            const mark = await fetch(
-                "http://localhost:3000/api/notificacion/marcar-todas",
-                {
-                    method: "PUT",
-                    headers: { "Authorization": `Bearer ${token}` }
-                }
-            );
-            if (mark.ok) setUnread(0);
+            try {
+                await notificationService.marcarTodas();
+                setUnread(0);
+            } catch {
+                // silencioso
+            }
         } else {
             setOpen(false);
         }

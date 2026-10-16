@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { clientService, locationService } from "../../services";
 import "./clientList.css";
 
 const IconUser = () => (
@@ -69,11 +70,8 @@ function ClientList() {
   const fetchClients = async () => {
     try {
       setLoading(true);
-      const res = await fetch("http://localhost:3000/api/client");
-      if (res.ok) {
-        const data = await res.json();
-        setClients(data);
-      }
+      const data = await clientService.getAll();
+      setClients(data);
     } catch (err) {
       console.error("Error al cargar clientes:", err);
     } finally {
@@ -86,10 +84,7 @@ function ClientList() {
 
     const fetchLocations = async () => {
       try {
-        const res = await fetch("http://localhost:3000/api/locations");
-        if (res.ok) {
-          setLocations(await res.json());
-        }
+        setLocations(await locationService.getAll());
       } catch (err) {
         console.error("Error al cargar ubicaciones:", err);
       }
@@ -104,11 +99,7 @@ function ClientList() {
     const id = clientToDelete.id_client || clientToDelete.idCli || clientToDelete.id;
 
     try {
-      const response = await fetch(`http://localhost:3000/api/client/${id}`, {
-        method: "DELETE"
-      });
-
-      if (!response.ok) throw new Error("No se pudo eliminar el cliente.");
+      await clientService.remove(id);
 
       setClients((prev) => prev.filter((c) => (c.id_client || c.idCli || c.id) !== id));
       setClientToDelete(null);
@@ -203,13 +194,7 @@ function ClientList() {
     setSavingEdit(true);
 
     try {
-      const response = await fetch(`http://localhost:3000/api/client/${id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body)
-      });
-
-      if (!response.ok) throw new Error("No se pudo actualizar el cliente.");
+      await clientService.update(id, body);
 
       setClients((prev) =>
         prev.map((c) =>

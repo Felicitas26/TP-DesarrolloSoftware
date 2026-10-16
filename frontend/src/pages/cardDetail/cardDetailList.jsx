@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { cardDetailService, buildAssetUrl } from "../../services";
 import "./cardDetailList.css";
 
 const IconMenu = () => (
@@ -52,15 +53,7 @@ function CardDetailList() {
 
             setLoading(true);
 
-            const response = await fetch(
-                "http://localhost:3000/api/cardDetail"
-            );
-
-            if (!response.ok) {
-                throw new Error("No se pudieron cargar los menúes.");
-            }
-
-            const data = await response.json();
+            const data = await cardDetailService.getAll();
 
             setCardDetails(data);
 
@@ -163,7 +156,7 @@ function CardDetailList() {
                                                     {cardDetail.imageUrl ? (
                                                         <img
                                                             className="menu-table-thumb"
-                                                            src={`http://localhost:3000${cardDetail.imageUrl}`}
+                                                            src={buildAssetUrl(cardDetail.imageUrl)}
                                                             alt={cardDetail.menuStage}
                                                         />
                                                     ) : (
@@ -279,7 +272,7 @@ function CardDetailList() {
                             {cardDetailToView.imageUrl && (
                                 <div className="detail-item detail-image-item">
                                     <img
-                                        src={`http://localhost:3000${cardDetailToView.imageUrl}`}
+                                        src={buildAssetUrl(cardDetailToView.imageUrl)}
                                         alt={cardDetailToView.menuStage}
                                     />
                                 </div>

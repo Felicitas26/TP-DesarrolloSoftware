@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { reservationService } from "../../services";
 import FeedbackModal from "../../components/FeedbackModal";
 import "./MyReservations.css";
 
@@ -34,27 +35,9 @@ function MyReservations() {
 
         const getReservations = async () => {
 
-            const token = localStorage.getItem("sty_token");
-
             try {
 
-                const response = await fetch(
-                    "http://localhost:3000/api/reservation/mis-reservas",
-                    {
-                        headers: {
-                            "Authorization": `Bearer ${token}`
-                        }
-                    }
-                );
-
-                const data = await response.json();
-
-                if (!response.ok) {
-                    throw new Error(
-                        data.error ||
-                        "No se pudieron obtener las reservas."
-                    );
-                }
+                const data = await reservationService.getMine();
 
                 setReservations(data);
 
@@ -89,27 +72,9 @@ function MyReservations() {
         setFeedback(null);
         setReservationToDeleteId(null);
 
-        const token = localStorage.getItem("sty_token");
-
         try {
 
-            const response = await fetch(
-                `http://localhost:3000/api/reservation/${id}`,
-                {
-                    method: "DELETE",
-                    headers: {
-                        "Authorization": `Bearer ${token}`
-                    }
-                }
-            );
-
-            const data = await response.json();
-
-            if (!response.ok) {
-                throw new Error(
-                    data.error || "No se pudo eliminar la reserva."
-                );
-            }
+            await reservationService.remove(id);
 
             setReservations((prev) =>
                 prev.filter(

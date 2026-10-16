@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { cardDetailService, buildAssetUrl } from "../../services";
 import FeedbackModal from "../../components/FeedbackModal";
 import "./editCardDetail.css";
 
@@ -52,22 +53,7 @@ function EditCardDetail() {
 
         try {
 
-            const response = await fetch(
-                `http://localhost:3000/api/cardDetail/${id}`,
-                {
-                    headers: {
-                        Authorization: `Bearer ${localStorage.getItem("sty_token")}`
-                    }
-                }
-            );
-
-            const data = await response.json();
-
-            if (!response.ok) {
-                throw new Error(
-                    data.error || "No se pudo cargar el menú."
-                );
-            }
+            const data = await cardDetailService.getById(id);
 
             setForm({
                 menuStage: data.menuStage || "",
@@ -137,24 +123,7 @@ function EditCardDetail() {
                 formData.append("image", imageFile);
             }
 
-            const response = await fetch(
-                `http://localhost:3000/api/cardDetail/${id}`,
-                {
-                    method: "PUT",
-                    headers: {
-                        Authorization: `Bearer ${localStorage.getItem("sty_token")}`
-                    },
-                    body: formData
-                }
-            );
-
-            const data = await response.json();
-
-            if (!response.ok) {
-                throw new Error(
-                    data.error || "No se pudo actualizar el menú."
-                );
-            }
+            await cardDetailService.update(id, formData);
 
             setFeedback({ type: "success", title: "Menú actualizado", message: "El menú se actualizó correctamente.", onClose: () => { setFeedback(null); navigate("/cardDetail"); } });
 
@@ -180,23 +149,7 @@ function EditCardDetail() {
 
         try {
 
-            const response = await fetch(
-                `http://localhost:3000/api/cardDetail/${id}`,
-                {
-                    method: "DELETE",
-                    headers: {
-                        Authorization: `Bearer ${localStorage.getItem("sty_token")}`
-                    }
-                }
-            );
-
-            const data = await response.json();
-
-            if (!response.ok) {
-                throw new Error(
-                    data.error || "No se pudo eliminar el menú."
-                );
-            }
+            await cardDetailService.remove(id);
 
             setFeedback({ type: "success", title: "Menú eliminado", message: "El menú se eliminó correctamente." });
 
@@ -320,7 +273,7 @@ function EditCardDetail() {
                                             <img
                                                 src={imageFile
                                                     ? URL.createObjectURL(imageFile)
-                                                    : `http://localhost:3000${imageUrl}`}
+                                                    : buildAssetUrl(imageUrl)}
                                                 alt="Vista previa del menú"
                                             />
                                         </div>

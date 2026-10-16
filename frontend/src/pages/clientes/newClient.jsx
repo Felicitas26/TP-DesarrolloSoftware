@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import { clientService, locationService } from "../../services";
 import "./newClient.css";
 
 const IconUser = () => (
@@ -87,9 +88,7 @@ const emptyClient = {
     setLocationsLoading(true);
     setLocationsError(null);
     try {
-      const res = await fetch("http://localhost:3000/api/locations");
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "No se pudieron cargar las ciudades.");
+      const data = await locationService.getAll();
       setLocations(data);
     } catch (err) {
       setLocationsError(getErrorMessage(err));
@@ -114,10 +113,7 @@ const emptyClient = {
 
     emailTimerRef.current = setTimeout(async () => {
       try {
-        const res = await fetch(
-          `http://localhost:3000/api/client/check-email?email=${encodeURIComponent(client.emailCli)}`
-        );
-        const data = await res.json();
+        const data = await clientService.checkEmail(client.emailCli);
         setEmailAvailable(data.available);
       } catch {
         setEmailAvailable(null);
@@ -250,20 +246,10 @@ const emptyClient = {
           String(loc.zipCode) === String(postalCode.trim())
       );
 
-      const response = await fetch("http://localhost:3000/api/client", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          ...client,
-          idLocation: Number(matchingLocation.idLocation) // Aseguramos que viaje como número
-        })
+      await clientService.create({
+        ...client,
+        idLocation: Number(matchingLocation.idLocation) // Aseguramos que viaje como número
       });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || "No se pudo registrar el cliente.");
-      }
 
       setShowSuccessModal(true);
       setLastRegistered({ username: client.username, password: client.password });

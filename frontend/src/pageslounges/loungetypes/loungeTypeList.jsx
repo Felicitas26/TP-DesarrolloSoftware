@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import { loungeTypeService, loungeService } from "../../services";
 import "./loungeTypeList.css";
 
 const IconArrowLeft = () => (
@@ -76,20 +77,13 @@ function LoungeTypeList() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [resTypes, resLounges] = await Promise.all([
-          fetch("http://localhost:3000/api/loungeType"),
-          fetch("http://localhost:3000/api/lounge")
+        const [dataTypes, dataLounges] = await Promise.all([
+          loungeTypeService.getAll(),
+          loungeService.getAll()
         ]);
 
-        if (resTypes.ok) {
-          const dataTypes = await resTypes.json();
-          setLoungeTypes(dataTypes);
-        }
-
-        if (resLounges.ok) {
-          const dataLounges = await resLounges.json();
-          setLounges(dataLounges);
-        }
+        setLoungeTypes(dataTypes);
+        setLounges(dataLounges);
       } catch (err) {
         console.error("Error al cargar datos:", err);
       } finally {
@@ -116,11 +110,7 @@ function LoungeTypeList() {
     const id = loungeTypeToDelete.idLoungeType || loungeTypeToDelete.id;
 
     try {
-      const response = await fetch(`http://localhost:3000/api/loungeType/${id}`, {
-        method: "DELETE"
-      });
-
-      if (!response.ok) throw new Error("No se pudo eliminar el tipo de salón.");
+      await loungeTypeService.remove(id);
 
       setLoungeTypes((prev) => prev.filter((lt) => lt.idLoungeType !== id));
       setLoungeTypeToDelete(null);
@@ -175,42 +165,29 @@ function LoungeTypeList() {
     }
 
     try {
-      const response = await fetch(`http://localhost:3000/api/loungeType/${id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          nameLoungeType: String(loungeTypeToEdit.nameLoungeType).trim(),
-          minQuantity,
-          maxQuantity,
-          idLounge: Number(loungeTypeToEdit.idLounge)
-        })
+      const updated = await loungeTypeService.update(id, {
+        nameLoungeType: String(loungeTypeToEdit.nameLoungeType).trim(),
+        minQuantity,
+        maxQuantity,
+        idLounge: Number(loungeTypeToEdit.idLounge)
       });
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        if (response.status === 409) {
-          const dest = lounges.find(
-            (l) => (l.idLounge || l.id || l.id_lounge) === Number(loungeTypeToEdit.idLounge)
-          );
-          const destName = dest ? dest.name : "";
-          setEditErrorMsg(
-            `No se puede guardar: ya existe un tipo de salón llamado "${loungeTypeToEdit.nameLoungeType}" `
-            + `en el salón ${destName ? `"${destName}"` : `(ID ${loungeTypeToEdit.idLounge})`}. `
-            + "Elegí otro nombre o seleccioná otro salón."
-          );
-        } else {
-          alert(data.error || "No se pudo actualizar el tipo de salón.");
-        }
-        setSavingEdit(false);
-        return;
-      }
-
-      const updated = await response.json();
       setLoungeTypes((prev) => prev.map((lt) => (lt.idLoungeType === id ? { ...updated, loungeName: getLoungeName(updated) } : lt)));
       setLoungeTypeToEdit(null);
     } catch (error) {
-      alert(error.message);
+      if (error.status === 409) {
+        const dest = lounges.find(
+          (l) => (l.idLounge || l.id || l.id_lounge) === Number(loungeTypeToEdit.idLounge)
+        );
+        const destName = dest ? dest.name : "";
+        setEditErrorMsg(
+          `No se puede guardar: ya existe un tipo de salón llamado "${loungeTypeToEdit.nameLoungeType}" `
+          + `en el salón ${destName ? `"${destName}"` : `(ID ${loungeTypeToEdit.idLounge})`}. `
+          + "Elegí otro nombre o seleccioná otro salón."
+        );
+      } else {
+        alert(error.message);
+      }
     } finally {
       setSavingEdit(false);
     }

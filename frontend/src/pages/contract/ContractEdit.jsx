@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { contractService } from "../../services";
 import FeedbackModal from "../../components/FeedbackModal";
 import "./ContractEdit.css";
 
@@ -43,28 +44,10 @@ function ContractEdit() {
     const [deleteOpen, setDeleteOpen] = useState(false);
     const [deleteMotivo, setDeleteMotivo] = useState("");
 
-    const token = localStorage.getItem("sty_token");
-
-    const authHeaders = (withBody = false) => ({
-        ...(withBody ? { "Content-Type": "application/json" } : {}),
-        ...(token ? { Authorization: `Bearer ${token}` } : {})
-    });
-
     const getContracts = async () => {
 
         try {
-            const response = await fetch(
-                "http://localhost:3000/api/contract",
-                {
-                    headers: authHeaders()
-                }
-            );
-
-            const data = await response.json();
-
-            if (!response.ok) {
-                throw new Error(data.error);
-            }
+            const data = await contractService.getAll();
 
             setContracts(data);
 
@@ -76,7 +59,6 @@ function ContractEdit() {
 
     useEffect(() => {
         getContracts();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const contractLabel = (item) => {
@@ -107,18 +89,7 @@ function ContractEdit() {
         }
 
         try {
-            const response = await fetch(
-                `http://localhost:3000/api/contract/${id}`,
-                {
-                    headers: authHeaders()
-                }
-            );
-
-            const data = await response.json();
-
-            if (!response.ok) {
-                throw new Error(data.error);
-            }
+            const data = await contractService.getById(id);
 
             setContract({
                 eventStartTime: fmtTime(data.eventStartTime),
@@ -144,26 +115,13 @@ function ContractEdit() {
         e.preventDefault();
 
         try {
-            const response = await fetch(
-                `http://localhost:3000/api/contract/${selectedId}/edit`,
-                {
-                    method: "PUT",
-                    headers: authHeaders(true),
-                    body: JSON.stringify({
-                        eventStartTime: contract.eventStartTime,
-                        eventEndTime: contract.eventEndTime,
-                        cantExactaInvit: contract.cantExactaInvit === ""
-                            ? null
-                            : Number(contract.cantExactaInvit)
-                    })
-                }
-            );
-
-            const data = await response.json();
-
-            if (!response.ok) {
-                throw new Error(data.error);
-            }
+            await contractService.updateEdit(selectedId, {
+                eventStartTime: contract.eventStartTime,
+                eventEndTime: contract.eventEndTime,
+                cantExactaInvit: contract.cantExactaInvit === ""
+                    ? null
+                    : Number(contract.cantExactaInvit)
+            });
 
             setFeedback({ type: "success", title: "Contrato actualizado", message: "El contrato se actualizó correctamente." });
 
@@ -189,20 +147,7 @@ function ContractEdit() {
         setDeleteOpen(false);
 
         try {
-            const response = await fetch(
-                `http://localhost:3000/api/contract/${selectedId}`,
-                {
-                    method: "DELETE",
-                    headers: authHeaders(true),
-                    body: JSON.stringify({ motivo: deleteMotivo.trim() })
-                }
-            );
-
-            const data = await response.json();
-
-            if (!response.ok) {
-                throw new Error(data.error);
-            }
+            await contractService.remove(selectedId, { motivo: deleteMotivo.trim() });
 
             setFeedback({ type: "success", title: "Contrato eliminado", message: "El contrato se eliminó correctamente y el cliente fue notificado." });
 

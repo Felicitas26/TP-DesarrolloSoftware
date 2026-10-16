@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { extraServiceService } from "../../services";
 import "./extraServiceList.css";
 
 const IconSparkles = () => (
@@ -68,14 +69,8 @@ function ExtraServiceList() {
     try {
       setLoading(true);
 
-      const response = await fetch(
-        "http://localhost:3000/api/extraService"
-      );
-
-      if (response.ok) {
-        const data = await response.json();
-        setExtraServices(data);
-      }
+      const data = await extraServiceService.getAll();
+      setExtraServices(data);
     } catch (error) {
       console.error("Error al cargar servicios extras:", error);
     } finally {
@@ -93,19 +88,7 @@ function ExtraServiceList() {
     setDeleting(true);
 
     try {
-      const response = await fetch(
-        `http://localhost:3000/api/extraService/${serviceToDelete.idService}`,
-        {
-          method: "DELETE",
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("sty_token")}`
-          }
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error("No se pudo eliminar el servicio extra.");
-      }
+      await extraServiceService.remove(serviceToDelete.idService);
 
       setExtraServices((prev) =>
         prev.filter(
@@ -138,27 +121,11 @@ function ExtraServiceList() {
     setSavingEdit(true);
 
     try {
-      const response = await fetch(
-        `http://localhost:3000/api/extraService/${serviceToEdit.idService}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("sty_token")}`
-          },
-          body: JSON.stringify({
-            nameService: serviceToEdit.nameService,
-            detailService: serviceToEdit.detailService,
-            cost: Number(serviceToEdit.cost)
-          })
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error("No se pudo actualizar el servicio extra.");
-      }
-
-      const data = await response.json();
+      const data = await extraServiceService.update(serviceToEdit.idService, {
+        nameService: serviceToEdit.nameService,
+        detailService: serviceToEdit.detailService,
+        cost: Number(serviceToEdit.cost)
+      });
 
       setExtraServices((prev) =>
         prev.map((service) =>

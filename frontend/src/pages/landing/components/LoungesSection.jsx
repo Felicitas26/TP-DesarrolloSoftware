@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { loungeService, loungeTypeService, locationService } from "../../../services";
 import "./LoungesSection.css";
 
 function LoungesSection() {
@@ -10,16 +11,12 @@ function LoungesSection() {
     useEffect(() => {
         const loadData = async () => {
             try {
-                const [loungesResponse, typesResponse, locationsResponse] =
+                const [loungesData, typesData, locationsData] =
                     await Promise.all([
-                        fetch("http://localhost:3000/api/lounge"),
-                        fetch("http://localhost:3000/api/loungeType"),
-                        fetch("http://localhost:3000/api/locations")
+                        loungeService.getAll(),
+                        loungeTypeService.getAll(),
+                        locationService.getAll()
                     ]);
-
-                const loungesData = await loungesResponse.json();
-                const typesData = await typesResponse.json();
-                const locationsData = await locationsResponse.json();
 
                 setLounges(loungesData);
                 setLoungeTypes(typesData);

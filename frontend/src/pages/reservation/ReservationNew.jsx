@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import { loungeService, loungeTypeService, cardDetailService, extraServiceService, reservationService } from "../../services";
 import "./ReservationNew.css";
 
 function ReservationNew() {
@@ -45,10 +46,7 @@ function ReservationNew() {
 
         const getLounges = async () => {
             try {
-                const response = await fetch(
-                    "http://localhost:3000/api/lounge"
-                );
-                const data = await response.json();
+                const data = await loungeService.getAll();
                 setLounges(data);
             } catch (error) {
                 console.error("Error al obtener los salones:", error);
@@ -57,11 +55,7 @@ function ReservationNew() {
 
         const getLoungeTypes = async () => {
             try {
-                const response = await fetch(
-                    "http://localhost:3000/api/loungeType"
-                );
-
-                const data = await response.json();
+                const data = await loungeTypeService.getAll();
                 setLoungeTypes(data);
             } catch (error) {
                 console.error(
@@ -73,11 +67,7 @@ function ReservationNew() {
 
         const getCardDetails = async () => {
             try {
-                const response = await fetch(
-                    "http://localhost:3000/api/cardDetail"
-                );
-
-                const data = await response.json();
+                const data = await cardDetailService.getAll();
                 setCardDetails(data);
             } catch (error) {
                 console.error(
@@ -89,11 +79,7 @@ function ReservationNew() {
 
         const getExtraServices = async () => {
             try {
-                const response = await fetch(
-                    "http://localhost:3000/api/extraService"
-                );
-
-                const data = await response.json();
+                const data = await extraServiceService.getAll();
                 setExtraServices(data);
             } catch (error) {
                 console.error(
@@ -250,26 +236,7 @@ function ReservationNew() {
         };
 
         try {
-            const response = await fetch(
-                "http://localhost:3000/api/reservation",
-                {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "Authorization": `Bearer ${token}`
-                    },
-                    body: JSON.stringify(reservationData)
-                }
-            );
-
-            const data = await response.json();
-
-            if (!response.ok) {
-                throw new Error(
-                    data.error ||
-                    "No se pudo crear la reserva."
-                );
-            }
+            await reservationService.create(reservationData);
 
             showMessage("success", "¡Reserva creada correctamente!");
             navigate("/my-reservations");

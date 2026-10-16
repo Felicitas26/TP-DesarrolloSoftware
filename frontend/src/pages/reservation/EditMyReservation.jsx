@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { loungeService, loungeTypeService, cardDetailService, extraServiceService, reservationService } from "../../services";
 import "./ReservationNew.css";
 
 function EditMyReservation() {
@@ -26,8 +27,6 @@ function EditMyReservation() {
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
 
-    const token = localStorage.getItem("sty_token");
-
     const EVENT_TYPES = [
         "Casamiento",
         "Cumpleaños",
@@ -45,20 +44,12 @@ function EditMyReservation() {
 
         const getCatalog = async () => {
             try {
-                const [loungesRes, typesRes, menusRes, extrasRes] =
-                    await Promise.all([
-                        fetch("http://localhost:3000/api/lounge"),
-                        fetch("http://localhost:3000/api/loungeType"),
-                        fetch("http://localhost:3000/api/cardDetail"),
-                        fetch("http://localhost:3000/api/extraService")
-                    ]);
-
                 const [loungesData, typesData, menusData, extrasData] =
                     await Promise.all([
-                        loungesRes.json(),
-                        typesRes.json(),
-                        menusRes.json(),
-                        extrasRes.json()
+                        loungeService.getAll(),
+                        loungeTypeService.getAll(),
+                        cardDetailService.getAll(),
+                        extraServiceService.getAll()
                     ]);
 
                 setLounges(loungesData);
@@ -72,20 +63,7 @@ function EditMyReservation() {
 
         const getReservation = async () => {
             try {
-                const response = await fetch(
-                    `http://localhost:3000/api/reservation/${id}`,
-                    {
-                        headers: {
-                            "Authorization": `Bearer ${token}`
-                        }
-                    }
-                );
-
-                const data = await response.json();
-
-                if (!response.ok) {
-                    throw new Error(data.error || "No se pudo cargar la reserva.");
-                }
+                const data = await reservationService.getById(id);
 
                 setReservation({
                     dateEvent: data.dateEvent
@@ -237,23 +215,7 @@ function EditMyReservation() {
         setSaving(true);
 
         try {
-            const response = await fetch(
-                `http://localhost:3000/api/reservation/${id}`,
-                {
-                    method: "PUT",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "Authorization": `Bearer ${token}`
-                    },
-                    body: JSON.stringify(reservationData)
-                }
-            );
-
-            const data = await response.json();
-
-            if (!response.ok) {
-                throw new Error(data.error || "No se pudo actualizar la reserva.");
-            }
+            await reservationService.update(id, reservationData);
 
             showMessage("success", "¡Reserva actualizada correctamente!");
             setTimeout(() => navigate("/my-reservations"), 1000);

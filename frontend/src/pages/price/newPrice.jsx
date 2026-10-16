@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { priceService, loungeTypeService } from "../../services";
 import "./priceList.css";
 
 const IconTag = () => (
@@ -34,13 +35,7 @@ function NewPrice() {
   useEffect(() => {
     const fetchTypes = async () => {
       try {
-        const response = await fetch(
-          "http://localhost:3000/api/loungeType"
-        );
-
-        if (response.ok) {
-          setLoungeTypes(await response.json());
-        }
+        setLoungeTypes(await loungeTypeService.getAll());
       } catch (error) {
         console.error("Error al cargar tipos de salón:", error);
       } finally {
@@ -66,30 +61,12 @@ function NewPrice() {
     setSaving(true);
 
     try {
-      const response = await fetch(
-        "http://localhost:3000/api/price",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("sty_token")}`
-          },
-          body: JSON.stringify({
-            idLoungeType: Number(form.idLoungeType),
-            effectiveDate: form.effectiveDate,
-            endDate: form.endDate || null,
-            value: Number(form.value)
-          })
-        }
-      );
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(
-          data.error || "No se pudo crear el precio."
-        );
-      }
+      await priceService.create({
+        idLoungeType: Number(form.idLoungeType),
+        effectiveDate: form.effectiveDate,
+        endDate: form.endDate || null,
+        value: Number(form.value)
+      });
 
       navigate("/price");
 

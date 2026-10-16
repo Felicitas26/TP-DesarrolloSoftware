@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
+import { clientService, locationService } from "../../services";
 import "./editClient.css";
 
 function EditClient() {
@@ -41,41 +42,11 @@ function EditClient() {
       try {
         setLoading(true);
 
-        const token = localStorage.getItem("sty_token");
+        const clientData = isMyProfile
+          ? await clientService.getMe()
+          : await clientService.getById(id);
 
-        const clientRes = await fetch(
-          isMyProfile
-            ? "http://localhost:3000/api/client/me"
-            : `http://localhost:3000/api/client/${id}`,
-          isMyProfile
-            ? {
-                headers: {
-                  Authorization: `Bearer ${token}`
-                }
-              }
-            : {}
-        );
-
-        const locsRes = await fetch(
-          "http://localhost:3000/api/locations"
-        );
-
-        const clientData = await clientRes.json();
-        const locsData = await locsRes.json();
-
-        if (!clientRes.ok) {
-          throw new Error(
-            clientData.error ||
-              "Error al cargar los datos del cliente"
-          );
-        }
-
-        if (!locsRes.ok) {
-          throw new Error(
-            locsData.error ||
-              "Error al cargar las ubicaciones"
-          );
-        }
+        const locsData = await locationService.getAll();
 
         setClient({
           ...clientData,
@@ -200,30 +171,10 @@ function EditClient() {
     };
 
     try {
-      const token = localStorage.getItem("sty_token");
-
-      const response = await fetch(
-        isMyProfile
-          ? "http://localhost:3000/api/client/me"
-          : `http://localhost:3000/api/client/${id}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            ...(isMyProfile && {
-              Authorization: `Bearer ${token}`
-            })
-          },
-          body: JSON.stringify(body)
-        }
-      );
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(
-          data.error || "Error al actualizar el cliente"
-        );
+      if (isMyProfile) {
+        await clientService.updateMe(body);
+      } else {
+        await clientService.update(id, body);
       }
 
       if (isMyProfile) {

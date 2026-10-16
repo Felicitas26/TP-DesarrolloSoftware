@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { extraServiceService } from "../../services";
 import "./extraServiceList.css";
 
 const IconSparkles = () => (
@@ -41,29 +42,11 @@ function NewExtraService() {
     setSaving(true);
 
     try {
-      const response = await fetch(
-        "http://localhost:3000/api/extraService",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("sty_token")}`
-          },
-          body: JSON.stringify({
-            nameService: form.nameService,
-            detailService: form.detailService,
-            cost: Number(form.cost)
-          })
-        }
-      );
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(
-          data.error || "No se pudo crear el servicio extra."
-        );
-      }
+      await extraServiceService.create({
+        nameService: form.nameService,
+        detailService: form.detailService,
+        cost: Number(form.cost)
+      });
 
       navigate("/extraService");
 

@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import { loungeTypeService, loungeService } from "../../services";
 import "./newLoungeType.css";
 
 const IconLayers = () => (
@@ -52,8 +53,7 @@ function NewLoungeType() {
   const [showSuccessModal, setShowSuccessModal] = useState(false);
 
   useEffect(() => {
-    fetch("http://localhost:3000/api/lounge")
-      .then((res) => res.json())
+    loungeService.getAll()
       .then((data) => setLounges(data))
       .catch((err) => console.error("Error al cargar salones:", err));
   }, []);
@@ -117,22 +117,12 @@ function NewLoungeType() {
     setSubmitting(true);
 
     try {
-      const response = await fetch("http://localhost:3000/api/loungeType", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          nameLoungeType: String(loungeType.nameLoungeType).trim(),
-          minQuantity: Number(loungeType.minQuantity),
-          maxQuantity: Number(loungeType.maxQuantity),
-          idLounge: Number(loungeType.idLounge)
-        })
+      await loungeTypeService.create({
+        nameLoungeType: String(loungeType.nameLoungeType).trim(),
+        minQuantity: Number(loungeType.minQuantity),
+        maxQuantity: Number(loungeType.maxQuantity),
+        idLounge: Number(loungeType.idLounge)
       });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || "No se pudo registrar el tipo de salón.");
-      }
 
       setShowSuccessModal(true);
       setLoungeType(emptyLoungeType);

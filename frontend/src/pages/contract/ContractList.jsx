@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { contractService } from "../../services";
 import "./ContractList.css";
 import FeedbackModal from "../../components/FeedbackModal.jsx";
 
@@ -56,20 +57,7 @@ function ContractList() {
 
     const getContracts = async () => {
         try {
-            const response = await fetch(
-                "http://localhost:3000/api/contract",
-                {
-                    headers: {
-                        "Authorization": `Bearer ${token}`
-                    }
-                }
-            );
-
-            const data = await response.json();
-
-            if (!response.ok) {
-                throw new Error(data.error);
-            }
+            const data = await contractService.getAll();
 
             setContracts(data);
         } catch (error) {
@@ -111,23 +99,7 @@ function ContractList() {
 
     const review = async (id, decision) => {
         try {
-            const response = await fetch(
-                `http://localhost:3000/api/contract/${id}/revision`,
-                {
-                    method: "PUT",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "Authorization": `Bearer ${token}`
-                    },
-                    body: JSON.stringify({ decision })
-                }
-            );
-
-            const data = await response.json();
-
-            if (!response.ok) {
-                throw new Error(data.error);
-            }
+            const data = await contractService.revision(id, { decision });
 
             showFeedback(
                 "success",

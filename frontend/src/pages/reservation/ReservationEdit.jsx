@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { reservationService } from "../../services";
 import FeedbackModal from "../../components/FeedbackModal";
 import "./ReservationEdit.css";
 
@@ -21,20 +22,7 @@ function ReservationEdit() {
     const getReservations = async () => {
 
         try {
-            const response = await fetch(
-                "http://localhost:3000/api/reservation",
-                {
-                    headers: {
-                        "Authorization": `Bearer ${localStorage.getItem("sty_token")}`
-                    }
-                }
-            );
-
-            const data = await response.json();
-
-            if (!response.ok) {
-                throw new Error(data.error);
-            }
+            const data = await reservationService.getAll();
 
             setReservations(data);
 
@@ -69,20 +57,7 @@ function ReservationEdit() {
         }
 
         try {
-            const response = await fetch(
-                `http://localhost:3000/api/reservation/${id}`,
-                {
-                    headers: {
-                        "Authorization": `Bearer ${localStorage.getItem("sty_token")}`
-                    }
-                }
-            );
-
-            const data = await response.json();
-
-            if (!response.ok) {
-                throw new Error(data.error);
-            }
+            const data = await reservationService.getById(id);
 
             setReservation({
                 dateEvent: data.dateEvent,
@@ -113,31 +88,15 @@ function ReservationEdit() {
         e.preventDefault();
 
         try {
-            const response = await fetch(
-                `http://localhost:3000/api/reservation/${selectedId}`,
-                {
-                    method: "PUT",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "Authorization": `Bearer ${localStorage.getItem("sty_token")}`
-                    },
-                    body: JSON.stringify({
-                        dateEvent: reservation.dateEvent,
-                        status: reservation.status,
-                        cantInvit: Number(reservation.cantInvit),
-                        maxCantInvit: Number(reservation.maxCantInvit) || Number(reservation.cantInvit),
-                        idCli: Number(reservation.idCli),
-                        idLounge: Number(reservation.idLounge),
-                        idLoungeType: Number(reservation.idLoungeType)
-                    })
-                }
-            );
-
-            const data = await response.json();
-
-            if (!response.ok) {
-                throw new Error(data.error);
-            }
+            await reservationService.update(selectedId, {
+                dateEvent: reservation.dateEvent,
+                status: reservation.status,
+                cantInvit: Number(reservation.cantInvit),
+                maxCantInvit: Number(reservation.maxCantInvit) || Number(reservation.cantInvit),
+                idCli: Number(reservation.idCli),
+                idLounge: Number(reservation.idLounge),
+                idLoungeType: Number(reservation.idLoungeType)
+            });
 
             setFeedback({ type: "success", title: "Reserva actualizada", message: "La reserva se actualizó correctamente." });
 
@@ -158,21 +117,7 @@ function ReservationEdit() {
         setFeedback(null);
 
         try {
-            const response = await fetch(
-                `http://localhost:3000/api/reservation/${selectedId}`,
-                {
-                    method: "DELETE",
-                    headers: {
-                        "Authorization": `Bearer ${localStorage.getItem("sty_token")}`
-                    }
-                }
-            );
-
-            const data = await response.json();
-
-            if (!response.ok) {
-                throw new Error(data.error);
-            }
+            await reservationService.remove(selectedId);
 
             setFeedback({ type: "success", title: "Reserva eliminada", message: "La reserva se eliminó correctamente." });
 

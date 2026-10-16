@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { authService } from "../../services/authService";
 import "./Login.css";
 
 const IconUser = () => (
@@ -67,20 +68,10 @@ function Login() {
     setSubmitting(true);
 
     try {
-      const response = await fetch("http://localhost:3000/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          username: form.username.trim(),
-          password: form.password
-        })
+      const data = await authService.login({
+        username: form.username.trim(),
+        password: form.password
       });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || "Credenciales incorrectas.");
-      }
 
       if (data.token) {
         localStorage.setItem("sty_token", data.token);
