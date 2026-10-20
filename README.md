@@ -3,6 +3,10 @@ tags: #dsw #tp
 
 Status: draft
 
+## Instalación y ejecución
+
+Las instrucciones completas para instalar y ejecutar el proyecto (requisitos, configuración de la base de datos, variables de entorno y scripts) están en **[INSTALL.md](INSTALL.md)**.
+
 ## 1. Objetivo
 
 Desarrollar en grupo una aplicación web full stack en base a un alcance propuesto por los integrantes.
