@@ -4,14 +4,17 @@ import { notificationService } from "../services";
 import "./NotificationBell.css";
 
 const NOTIFICATION_LABEL = {
+    reserva_solicitada: "Nueva reserva",
+    reserva_aceptada: "Reserva aceptada",
+    reserva_cancelada: "Reserva cancelada",
+    contrato_enviado: "Contrato enviado",
+    contrato_revisado: "Revisión de contrato",
+    contrato_firmado: "Contrato firmado",
+    contrato_cancelado: "Evento cancelado",
     modificacion_solicitada: "Solicitud de modificación",
     modificacion_aprobada: "Modificación aprobada",
     modificacion_rechazada: "Modificación rechazada",
-    contrato_revisado: "Revisión de contrato",
-    contrato_firmado: "Contrato firmado",
-    modificacion_descartada: "Modificación descartada",
-    contrato_cancelado: "Evento cancelado",
-    reserva_cancelada: "Reserva cancelada"
+    modificacion_descartada: "Modificación descartada"
 };
 
 const IconBell = () => (
@@ -101,10 +104,27 @@ function NotificationBell() {
         });
     };
 
-    const goTo = (idContract) => {
+    const goTo = (notification) => {
         setOpen(false);
-        if (idContract) {
-            navigate(`/contract/${idContract}`);
+
+        const isAdmin = localStorage.getItem("sty_rol") === "administrador";
+
+        if (notification.idContract) {
+            navigate(`/contract/${notification.idContract}`);
+            return;
+        }
+
+        if (
+            notification.tipo === "reserva_solicitada" ||
+            notification.tipo === "reserva_aceptada" ||
+            notification.tipo === "reserva_cancelada"
+        ) {
+            navigate(isAdmin ? "/reservation" : "/my-reservations");
+            return;
+        }
+
+        if (notification.tipo === "contrato_cancelado") {
+            navigate(isAdmin ? "/contract" : "/my-contracts");
         }
     };
 
@@ -163,7 +183,7 @@ function NotificationBell() {
                                     <button
                                         type="button"
                                         className="bell-item-main"
-                                        onClick={() => goTo(n.idContract)}
+                                        onClick={() => goTo(n)}
                                     >
                                         <span className="bell-item-tag">
                                             {NOTIFICATION_LABEL[n.tipo] || "Notificación"}

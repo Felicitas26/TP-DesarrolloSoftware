@@ -1,4 +1,5 @@
-import { useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import "./CityAutocomplete.css";
 
 const normalize = (value) =>
@@ -10,6 +11,9 @@ const normalize = (value) =>
 
 const getCityLabel = (loc) => loc.city || loc.name || "";
 const getZipCode = (loc) => (loc.zipCode ?? loc.zip_code ?? "").toString();
+
+const DROPDOWN_GAP = 4;
+const DROPDOWN_MAX_HEIGHT = 240;
 
 function CityAutocomplete({
   id,
@@ -26,11 +30,13 @@ function CityAutocomplete({
 }) {
   const inputId = id || "city-autocomplete";
   const listId = `${inputId}-list`;
+  const inputRef = useRef(null);
 
   const [query, setQuery] = useState(value || "");
   const [lastValue, setLastValue] = useState(value || "");
   const [open, setOpen] = useState(false);
   const [highlighted, setHighlighted] = useState(-1);
+  const [position, setPosition] = useState(null);
 
   if ((value || "") !== lastValue) {
     setLastValue(value || "");
@@ -44,6 +50,44 @@ function CityAutocomplete({
       normalize(getCityLabel(loc)).includes(term)
     );
   }, [query, locations]);
+
+  const updatePosition = useCallback(() => {
+    const input = inputRef.current;
+    if (!input) return;
+
+    const rect = input.getBoundingClientRect();
+    const spaceBelow = window.innerHeight - rect.bottom - DROPDOWN_GAP - 8;
+    const spaceAbove = rect.top - DROPDOWN_GAP - 8;
+    const openUp = spaceBelow < 160 && spaceAbove > spaceBelow;
+    const available = openUp ? spaceAbove : spaceBelow;
+
+    setPosition({
+      left: rect.left,
+      width: rect.width,
+      top: openUp ? null : rect.bottom + DROPDOWN_GAP,
+      bottom: openUp ? window.innerHeight - rect.top + DROPDOWN_GAP : null,
+      maxHeight: Math.max(96, Math.min(DROPDOWN_MAX_HEIGHT, available)),
+    });
+  }, []);
+
+  useEffect(() => {
+    if (!open) return undefined;
+
+    const handleViewportChange = () => updatePosition();
+
+    window.addEventListener("scroll", handleViewportChange, true);
+    window.addEventListener("resize", handleViewportChange);
+
+    return () => {
+      window.removeEventListener("scroll", handleViewportChange, true);
+      window.removeEventListener("resize", handleViewportChange);
+    };
+  }, [open, updatePosition]);
+
+  const openList = () => {
+    updatePosition();
+    setOpen(true);
+  };
 
   const commit = (loc) => {
     setQuery(getCityLabel(loc));
@@ -72,7 +116,7 @@ function CityAutocomplete({
   const handleKeyDown = (event) => {
     if (event.key === "ArrowDown") {
       event.preventDefault();
-      setOpen(true);
+      openList();
       if (matches.length) {
         setHighlighted((prev) => Math.min(prev + 1, matches.length - 1));
       }
@@ -94,9 +138,21 @@ function CityAutocomplete({
 
   const showEmpty = open && matches.length === 0 && normalize(query) !== "";
 
+  const dropdownStyle = position
+    ? {
+        position: "fixed",
+        left: `${position.left}px`,
+        width: `${position.width}px`,
+        maxHeight: `${position.maxHeight}px`,
+        ...(position.top != null ? { top: `${position.top}px` } : {}),
+        ...(position.bottom != null ? { bottom: `${position.bottom}px` } : {}),
+      }
+    : undefined;
+
   return (
     <div className="city-autocomplete">
       <input
+        ref={inputRef}
         id={inputId}
         name={name}
         type="text"
@@ -115,10 +171,10 @@ function CityAutocomplete({
         onChange={(event) => {
           setQuery(event.target.value);
           setHighlighted(-1);
-          setOpen(true);
+          openList();
         }}
         onFocus={() => {
-          if (locations.length) setOpen(true);
+          if (locations.length) openList();
         }}
         onBlur={() => {
           window.setTimeout(() => {
@@ -129,35 +185,49 @@ function CityAutocomplete({
         onKeyDown={handleKeyDown}
       />
 
-      {open && matches.length > 0 && (
-        <ul className="city-autocomplete__list" id={listId} role="listbox">
-          {matches.map((loc, index) => (
-            <li
-              key={`${getCityLabel(loc)}-${getZipCode(loc)}-${index}`}
-              id={`${inputId}-opt-${index}`}
-              role="option"
-              aria-selected={index === highlighted}
-              className={`city-autocomplete__option${
-                index === highlighted ? " is-highlighted" : ""
-              }`}
-              onMouseDown={(event) => {
-                event.preventDefault();
-                commit(loc);
-              }}
-              onMouseEnter={() => setHighlighted(index)}
-            >
-              <span className="city-autocomplete__city">{getCityLabel(loc)}</span>
-              {getZipCode(loc) && (
-                <span className="city-autocomplete__zip">CP: {getZipCode(loc)}</span>
-              )}
-            </li>
-          ))}
-        </ul>
-      )}
+      {open && position && matches.length > 0 &&
+        createPortal(
+          <ul
+            className="city-autocomplete__list city-autocomplete__list--portal"
+            id={listId}
+            role="listbox"
+            style={dropdownStyle}
+          >
+            {matches.map((loc, index) => (
+              <li
+                key={`${getCityLabel(loc)}-${getZipCode(loc)}-${index}`}
+                id={`${inputId}-opt-${index}`}
+                role="option"
+                aria-selected={index === highlighted}
+                className={`city-autocomplete__option${
+                  index === highlighted ? " is-highlighted" : ""
+                }`}
+                onMouseDown={(event) => {
+                  event.preventDefault();
+                  commit(loc);
+                }}
+                onMouseEnter={() => setHighlighted(index)}
+              >
+                <span className="city-autocomplete__city">{getCityLabel(loc)}</span>
+                {getZipCode(loc) && (
+                  <span className="city-autocomplete__zip">CP: {getZipCode(loc)}</span>
+                )}
+              </li>
+            ))}
+          </ul>,
+          document.body
+        )}
 
-      {showEmpty && (
-        <div className="city-autocomplete__empty">Sin resultados</div>
-      )}
+      {showEmpty && position &&
+        createPortal(
+          <div
+            className="city-autocomplete__empty city-autocomplete__empty--portal"
+            style={dropdownStyle}
+          >
+            Sin resultados
+          </div>,
+          document.body
+        )}
     </div>
   );
 }

@@ -42,6 +42,12 @@ class ReservationController {
             req.usuario.idCli
         );
 
+        await notificationService.notifyAdmins({
+            mensaje: `El cliente solicitó una nueva reserva #${newReservation.idReservation} para el ${new Date(newReservation.dateEvent).toLocaleDateString("es-AR")}.`,
+            tipo: "reserva_solicitada",
+            idContract: null
+        });
+
         return res.status(201).json(newReservation);
     });
 
@@ -89,6 +95,15 @@ class ReservationController {
             contract = await contractService.generateForReservation(
                 reservationUpdated.idReservation
             );
+
+            await notificationService.notifyClient({
+                idCli: reservationUpdated.idCli,
+                mensaje: contract
+                    ? `Tu reserva #${reservationUpdated.idReservation} fue aceptada. Ya podés completar y enviar el contrato #${contract.idContract}.`
+                    : `Tu reserva #${reservationUpdated.idReservation} fue aceptada.`,
+                tipo: "reserva_aceptada",
+                idContract: contract ? contract.idContract : null
+            });
         }
 
         return res.status(200).json({
@@ -127,6 +142,12 @@ class ReservationController {
             await notificationService.notifyClient({
                 idCli: reservation.idCli,
                 mensaje: `El administrador eliminó la reserva #${reservation.idReservation} por la siguiente razón: ${motivo}. Tu evento fue cancelado.`,
+                tipo: "reserva_cancelada",
+                idContract: null
+            });
+        } else if (req.usuario.rol === "cliente") {
+            await notificationService.notifyAdmins({
+                mensaje: `El cliente canceló la reserva #${reservation.idReservation} para el ${new Date(reservation.dateEvent).toLocaleDateString("es-AR")}.`,
                 tipo: "reserva_cancelada",
                 idContract: null
             });

@@ -69,3 +69,12 @@
   font-family: "Montserrat", sans-serif;
   font-size: 0.8rem;
 }
+
+.city-autocomplete__list--portal,
+.city-autocomplete__empty--portal {
+  position: fixed;
+  top: auto;
+  right: auto;
+  bottom: auto;
+  z-index: 100000;
+}

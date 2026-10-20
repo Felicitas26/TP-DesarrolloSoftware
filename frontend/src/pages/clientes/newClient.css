@@ -180,18 +180,6 @@
         inset 0 1px 0 rgba(255, 255, 255, 0.04);
 }
 
-/* Permite que el autocompletado de ciudad se dibuje por encima del resto */
-.form-card--dropdown {
-    overflow: visible;
-    position: relative;
-    z-index: 10;
-}
-
-.form-card--dropdown .card-header {
-    border-top-left-radius: 18px;
-    border-top-right-radius: 18px;
-}
-
 .card-header {
     display: flex;
     align-items: center;

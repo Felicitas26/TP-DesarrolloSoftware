@@ -247,6 +247,12 @@ class ContractService {
 
         await contractModel.updateStatus(id, "en_revision");
 
+        await notificationService.notifyAdmins({
+            mensaje: `El cliente envió el contrato #${id} para revisión.`,
+            tipo: "contrato_enviado",
+            idContract: id
+        });
+
         return await contractModel.getById(id);
     }
 
