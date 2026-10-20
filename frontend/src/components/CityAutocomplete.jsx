@@ -22,7 +22,6 @@ function CityAutocomplete({
   className = "",
   disabled = false,
   autoComplete = "off",
-  maxResults = 8,
   hasError = false,
 }) {
   const inputId = id || "city-autocomplete";
@@ -40,11 +39,11 @@ function CityAutocomplete({
 
   const matches = useMemo(() => {
     const term = normalize(query);
-    if (!term) return locations.slice(0, maxResults);
-    return locations
-      .filter((loc) => normalize(getCityLabel(loc)).includes(term))
-      .slice(0, maxResults);
-  }, [query, locations, maxResults]);
+    if (!term) return locations;
+    return locations.filter((loc) =>
+      normalize(getCityLabel(loc)).includes(term)
+    );
+  }, [query, locations]);
 
   const commit = (loc) => {
     setQuery(getCityLabel(loc));
