@@ -79,6 +79,7 @@ function NotificationBell() {
             }
             try {
                 await notificationService.marcarTodas();
+                setNotifications((prev) => prev.map((n) => ({ ...n, leida: true })));
                 setUnread(0);
             } catch {
                 // silencioso
@@ -104,6 +105,21 @@ function NotificationBell() {
         setOpen(false);
         if (idContract) {
             navigate(`/contract/${idContract}`);
+        }
+    };
+
+    const handleDelete = async (event, notification) => {
+        event.stopPropagation();
+        try {
+            await notificationService.eliminar(notification.idNotificacion);
+            setNotifications((prev) =>
+                prev.filter((n) => n.idNotificacion !== notification.idNotificacion)
+            );
+            if (!notification.leida) {
+                setUnread((prev) => Math.max(0, prev - 1));
+            }
+        } catch {
+            // silencioso
         }
     };
 
@@ -140,18 +156,31 @@ function NotificationBell() {
                             <p className="bell-empty">No tenés notificaciones.</p>
                         ) : (
                             notifications.map((n) => (
-                                <button
-                                    type="button"
+                                <div
                                     key={n.idNotificacion}
                                     className={`bell-item ${n.leida ? "read" : "unread"}`}
-                                    onClick={() => goTo(n.idContract)}
                                 >
-                                    <span className="bell-item-tag">
-                                        {NOTIFICATION_LABEL[n.tipo] || "Notificación"}
-                                    </span>
-                                    <span className="bell-item-text">{n.mensaje}</span>
-                                    <span className="bell-item-date">{formatDate(n.fecha)}</span>
-                                </button>
+                                    <button
+                                        type="button"
+                                        className="bell-item-main"
+                                        onClick={() => goTo(n.idContract)}
+                                    >
+                                        <span className="bell-item-tag">
+                                            {NOTIFICATION_LABEL[n.tipo] || "Notificación"}
+                                        </span>
+                                        <span className="bell-item-text">{n.mensaje}</span>
+                                        <span className="bell-item-date">{formatDate(n.fecha)}</span>
+                                    </button>
+                                    <button
+                                        type="button"
+                                        className="bell-item-delete"
+                                        onClick={(event) => handleDelete(event, n)}
+                                        aria-label="Eliminar notificación"
+                                        title="Eliminar"
+                                    >
+                                        ✕
+                                    </button>
+                                </div>
                             ))
                         )}
                     </div>

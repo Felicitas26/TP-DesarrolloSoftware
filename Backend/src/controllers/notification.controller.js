@@ -32,6 +32,14 @@ class NotificationController {
         await notificationService.markAllAsRead(req.usuario.idUsuario);
         return res.status(200).json({ ok: true });
     });
+
+    remove = asyncHandler(async (req, res) => {
+        const result = await notificationService.remove(
+            req.params.id,
+            req.usuario.idUsuario
+        );
+        return res.status(200).json({ ok: Boolean(result?.count) });
+    });
 }
 
 export default new NotificationController();

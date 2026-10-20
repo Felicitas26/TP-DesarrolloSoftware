@@ -9,5 +9,6 @@ router.get("/", authenticate, notificationController.getByUser);
 router.get("/contador", authenticate, notificationController.countUnread);
 router.put("/:id/leida", authenticate, notificationController.markAsRead);
 router.put("/marcar-todas", authenticate, notificationController.markAllAsRead);
+router.delete("/:id", authenticate, notificationController.remove);
 
 export default router;

@@ -52,6 +52,15 @@ class NotificationModel {
             data: { leida: true }
         });
     }
+
+    async remove(idNotificacion, idUsuario) {
+        return await prisma.notification.deleteMany({
+            where: {
+                idNotificacion: Number(idNotificacion),
+                idUsuario: Number(idUsuario)
+            }
+        });
+    }
 }
 
 export default new NotificationModel();

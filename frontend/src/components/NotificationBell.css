@@ -109,16 +109,9 @@
 
 .bell-item {
     display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 4px;
+    align-items: stretch;
     width: 100%;
-    padding: 12px 16px;
-    text-align: left;
-    background: transparent;
-    border: none;
     border-bottom: 1px solid rgba(255, 255, 255, 0.07);
-    cursor: pointer;
     transition: background 0.15s ease;
 }
 
@@ -129,6 +122,47 @@
 .bell-item.unread {
     background: rgba(168, 85, 247, 0.08);
     border-left: 3px solid #a855f7;
+}
+
+.bell-item-main {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+    padding: 12px 8px 12px 16px;
+    text-align: left;
+    background: transparent;
+    border: none;
+    color: inherit;
+    cursor: pointer;
+}
+
+.bell-item-delete {
+    flex: none;
+    align-self: flex-start;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    margin: 8px 8px 0 0;
+    background: transparent;
+    border: none;
+    border-radius: 8px;
+    color: rgba(255, 255, 255, 0.45);
+    font-size: 0.75rem;
+    line-height: 1;
+    cursor: pointer;
+    transition:
+        color 0.15s ease,
+        background 0.15s ease;
+}
+
+.bell-item-delete:hover {
+    color: #fecaca;
+    background: rgba(239, 68, 68, 0.15);
 }
 
 .bell-item-tag {

@@ -378,7 +378,7 @@ const emptyClient = {
               </div>
             </div>
 
-            <div className="form-card full-width">
+            <div className="form-card full-width form-card--dropdown">
               <div className="card-header">
                 <span className="card-icon"><IconMapPin /></span>
                 <h2>Ubicación</h2>
