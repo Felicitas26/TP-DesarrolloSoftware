@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { clientService, locationService } from "../../services";
+import CityAutocomplete from "../../components/CityAutocomplete";
 import "./newClient.css";
 
 const IconUser = () => (
@@ -399,28 +400,28 @@ const emptyClient = {
 
                 <div className={`form-group ${fieldErrors.city ? "has-error" : ""}`}>
                   <label htmlFor="cityInput">Ciudad *</label>
-                  <input
+                  <CityAutocomplete
                     id="cityInput"
-                    type="text"
                     name="cityInput"
                     value={cityInput}
-                    onChange={(e) => {
-                      const value = e.target.value;
-                      setCityInput(value);
-                      if (fieldErrors.city) {
-                        setFieldErrors((prev) => ({ ...prev, city: null }));
-                      }
-                      const match = locations.find(
-                        (loc) => normalizeText(loc.city) === normalizeText(value)
-                      );
-                      if (match) {
-                        setPostalCode(match.zipCode);
-                        setFieldErrors((prev) => ({ ...prev, postalCode: null }));
-                      }
-                    }}
+                    locations={locations}
                     placeholder="Ej: Rosario"
-                    autoComplete="off"
                     className={isFieldComplete("cityInput") ? "input-complete" : ""}
+                    hasError={Boolean(fieldErrors.city)}
+                    disabled={locationsLoading}
+                    onSelect={(loc) => {
+                      setCityInput(loc.city);
+                      setPostalCode(loc.zipCode);
+                      setFieldErrors((prev) => ({
+                        ...prev,
+                        city: null,
+                        postalCode: null,
+                      }));
+                    }}
+                    onClear={() => {
+                      setCityInput("");
+                      setPostalCode("");
+                    }}
                   />
                   {fieldErrors.city && <span className="error-message">{fieldErrors.city}</span>}
                 </div>

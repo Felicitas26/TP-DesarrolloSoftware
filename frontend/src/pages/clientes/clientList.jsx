@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { clientService, locationService } from "../../services";
+import CityAutocomplete from "../../components/CityAutocomplete";
 import "./clientList.css";
 
 const IconUser = () => (
@@ -115,17 +116,6 @@ function ClientList() {
     setClientToEdit((prev) => ({ ...prev, [name]: value }));
     if (editErrors[name]) {
       setEditErrors((prev) => ({ ...prev, [name]: null }));
-    }
-  };
-
-  const handleEditCityChange = (e) => {
-    const value = e.target.value;
-    setClientToEdit((prev) => ({ ...prev, cityInput: value }));
-    setEditErrors((prev) => ({ ...prev, city: null }));
-    const match = locations.find((loc) => normalizeText(loc.city) === normalizeText(value));
-    if (match) {
-      setClientToEdit((prev) => ({ ...prev, postalCode: match.zipCode }));
-      setEditErrors((prev) => ({ ...prev, postalCode: null }));
     }
   };
 
@@ -378,14 +368,33 @@ function ClientList() {
                   <input type="text" name="addressCli" value={clientToEdit.addressCli || ""} onChange={handleEditChange} required />
                 </div>
                 <div className={`form-group ${editErrors.city ? "has-error" : ""}`}>
-                  <label>Ciudad *</label>
-                  <input
-                    type="text"
+                  <label htmlFor="edit-cityInput">Ciudad *</label>
+                  <CityAutocomplete
+                    id="edit-cityInput"
                     name="cityInput"
                     value={clientToEdit.cityInput || ""}
-                    onChange={handleEditCityChange}
+                    locations={locations}
                     placeholder="Ej: Rosario"
-                    autoComplete="off"
+                    hasError={Boolean(editErrors.city)}
+                    onSelect={(loc) => {
+                      setClientToEdit((prev) => ({
+                        ...prev,
+                        cityInput: loc.city,
+                        postalCode: loc.zipCode,
+                      }));
+                      setEditErrors((prev) => ({
+                        ...prev,
+                        city: null,
+                        postalCode: null,
+                      }));
+                    }}
+                    onClear={() => {
+                      setClientToEdit((prev) => ({
+                        ...prev,
+                        cityInput: "",
+                        postalCode: "",
+                      }));
+                    }}
                   />
                   {editErrors.city && <span className="error-message">{editErrors.city}</span>}
                 </div>
