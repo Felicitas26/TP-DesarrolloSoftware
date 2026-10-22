@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { loungeService, locationService } from "../../services";
+import { clearSession } from "../../utils/session";
 import "./newLounge.css";
 
 const IconLounge = () => (
@@ -56,9 +57,7 @@ function NewLounge() {
   }, []);
 
   const handleLogout = () => {
-    localStorage.removeItem("sty_token");
-    localStorage.removeItem("sty_rol");
-    localStorage.removeItem("sty_idUsuario");
+    clearSession();
     navigate("/");
   };
 

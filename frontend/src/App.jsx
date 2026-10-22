@@ -1,5 +1,8 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
+import ProtectedRoute from "./components/ProtectedRoute";
+import { ROLES } from "./utils/session";
+
 import Landing from "./pages/landing/Landing";
 import AdminHome from "./pages/home/AdminHome";
 import ClientHome from "./pages/home/ClientHome";
@@ -35,6 +38,10 @@ import MyContracts from "./pages/contract/MyContracts";
 
 import "./App.css";
 
+const ADMIN = [ROLES.administrador];
+const CLIENTE = [ROLES.cliente];
+const TODOS = [ROLES.administrador, ROLES.cliente];
+
 function App() {
 
     return (
@@ -44,47 +51,258 @@ function App() {
 
                 <Route path="/" element={<Landing />} />
                 <Route path="/home" element={<Landing />} />
-                <Route path="/admin-home" element={<AdminHome />} />
-                <Route path="/client-home" element={<ClientHome />} />
 
                 <Route path="/login" element={<Login />} />
-                <Route path="/cambiar-password" element={<ChangePassword />} />
                 <Route path="/recuperar-password" element={<ForgotPassword />} />
+                <Route
+                    path="/cambiar-password"
+                    element={
+                        <ProtectedRoute roles={TODOS}>
+                            <ChangePassword />
+                        </ProtectedRoute>
+                    }
+                />
 
-                <Route path="/client" element={<ClientList />} />
-                <Route path="/client/new" element={<NewClient />} />
-                <Route path="/client/edit/:id" element={<EditClient />} />
-                <Route path="/client/edit/me" element={<EditClient />} />
-                <Route path="/my-profile" element={<MyProfile />} />
+                <Route
+                    path="/admin-home"
+                    element={
+                        <ProtectedRoute roles={ADMIN}>
+                            <AdminHome />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/client-home"
+                    element={
+                        <ProtectedRoute roles={CLIENTE}>
+                            <ClientHome />
+                        </ProtectedRoute>
+                    }
+                />
 
-                <Route path="/lounge" element={<LoungeList />} />
-                <Route path="/lounge/new" element={<NewLounge />} />
-                <Route path="/lounge/edit/:id" element={<EditLounge />} />
+                <Route
+                    path="/client"
+                    element={
+                        <ProtectedRoute roles={ADMIN}>
+                            <ClientList />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/client/new"
+                    element={
+                        <ProtectedRoute roles={ADMIN}>
+                            <NewClient />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/client/edit/:id"
+                    element={
+                        <ProtectedRoute roles={ADMIN}>
+                            <EditClient />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/client/edit/me"
+                    element={
+                        <ProtectedRoute roles={CLIENTE}>
+                            <EditClient />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/my-profile"
+                    element={
+                        <ProtectedRoute roles={CLIENTE}>
+                            <MyProfile />
+                        </ProtectedRoute>
+                    }
+                />
 
-                <Route path="/loungeType" element={<LoungeTypeList />} />
-                <Route path="/loungeType/new" element={<NewLoungeType />} />
-                <Route path="/loungeType/edit/:id" element={<EditLoungeType />} />
+                <Route
+                    path="/lounge"
+                    element={
+                        <ProtectedRoute roles={ADMIN}>
+                            <LoungeList />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/lounge/new"
+                    element={
+                        <ProtectedRoute roles={ADMIN}>
+                            <NewLounge />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/lounge/edit/:id"
+                    element={
+                        <ProtectedRoute roles={ADMIN}>
+                            <EditLounge />
+                        </ProtectedRoute>
+                    }
+                />
 
-                <Route path="/reservation" element={<ReservationList />} />
-                <Route path="/reservation/new" element={<ReservationNew />} />
-                <Route path="/reservation/edit/:id" element={<ReservationEdit />} />
-                <Route path="/my-reservations" element={<MyReservations />} />
-                <Route path="/my-reservations/edit/:id" element={<EditMyReservation />} />
+                <Route
+                    path="/loungeType"
+                    element={
+                        <ProtectedRoute roles={ADMIN}>
+                            <LoungeTypeList />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/loungeType/new"
+                    element={
+                        <ProtectedRoute roles={ADMIN}>
+                            <NewLoungeType />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/loungeType/edit/:id"
+                    element={
+                        <ProtectedRoute roles={ADMIN}>
+                            <EditLoungeType />
+                        </ProtectedRoute>
+                    }
+                />
 
-                <Route path="/extraService" element={<ExtraServiceList />} />
-                <Route path="/extraService/new" element={<NewExtraService />} />
+                <Route
+                    path="/reservation"
+                    element={
+                        <ProtectedRoute roles={ADMIN}>
+                            <ReservationList />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/reservation/new"
+                    element={
+                        <ProtectedRoute roles={TODOS}>
+                            <ReservationNew />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/reservation/edit/:id"
+                    element={
+                        <ProtectedRoute roles={ADMIN}>
+                            <ReservationEdit />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/my-reservations"
+                    element={
+                        <ProtectedRoute roles={CLIENTE}>
+                            <MyReservations />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/my-reservations/edit/:id"
+                    element={
+                        <ProtectedRoute roles={CLIENTE}>
+                            <EditMyReservation />
+                        </ProtectedRoute>
+                    }
+                />
 
-                <Route path="/price" element={<PriceList />} />
-                <Route path="/price/new" element={<NewPrice />} />
+                <Route
+                    path="/extraService"
+                    element={
+                        <ProtectedRoute roles={ADMIN}>
+                            <ExtraServiceList />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/extraService/new"
+                    element={
+                        <ProtectedRoute roles={ADMIN}>
+                            <NewExtraService />
+                        </ProtectedRoute>
+                    }
+                />
 
-                <Route path="/cardDetail" element={<CardDetailList />} />
-                <Route path="/cardDetail/new" element={<NewCardDetail />} />
-                <Route path="/cardDetail/edit/:id" element={<EditCardDetail />} />
+                <Route
+                    path="/price"
+                    element={
+                        <ProtectedRoute roles={ADMIN}>
+                            <PriceList />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/price/new"
+                    element={
+                        <ProtectedRoute roles={ADMIN}>
+                            <NewPrice />
+                        </ProtectedRoute>
+                    }
+                />
 
-                <Route path="/contract" element={<ContractList />} />
-                <Route path="/contract/edit" element={<ContractEdit />} />
-                <Route path="/contract/:id" element={<ContractDetail />} />
-                <Route path="/my-contracts" element={<MyContracts />} />
+                <Route
+                    path="/cardDetail"
+                    element={
+                        <ProtectedRoute roles={ADMIN}>
+                            <CardDetailList />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/cardDetail/new"
+                    element={
+                        <ProtectedRoute roles={TODOS}>
+                            <NewCardDetail />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/cardDetail/edit/:id"
+                    element={
+                        <ProtectedRoute roles={ADMIN}>
+                            <EditCardDetail />
+                        </ProtectedRoute>
+                    }
+                />
+
+                <Route
+                    path="/contract"
+                    element={
+                        <ProtectedRoute roles={ADMIN}>
+                            <ContractList />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/contract/edit"
+                    element={
+                        <ProtectedRoute roles={ADMIN}>
+                            <ContractEdit />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/contract/:id"
+                    element={
+                        <ProtectedRoute roles={TODOS}>
+                            <ContractDetail />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/my-contracts"
+                    element={
+                        <ProtectedRoute roles={CLIENTE}>
+                            <MyContracts />
+                        </ProtectedRoute>
+                    }
+                />
 
             </Routes>
 

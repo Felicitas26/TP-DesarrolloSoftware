@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import NotificationBell from "../../components/NotificationBell.jsx";
+import { clearSession } from "../../utils/session";
 import "./ClientHome.css";
 
 const IconCalendar = () => (
@@ -111,10 +112,7 @@ function ClientHome() {
     const navigate = useNavigate();
 
     const handleLogout = () => {
-        localStorage.removeItem("sty_token");
-        localStorage.removeItem("sty_rol");
-        localStorage.removeItem("sty_idUsuario");
-        localStorage.removeItem("sty_idCli");
+        clearSession();
 
         navigate("/");
     };

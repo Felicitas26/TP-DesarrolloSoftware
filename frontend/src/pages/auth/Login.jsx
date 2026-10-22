@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { authService } from "../../services/authService";
+import { saveSession } from "../../utils/session";
 import "./Login.css";
 
 const IconUser = () => (
@@ -74,10 +75,7 @@ function Login() {
       });
 
       if (data.token) {
-        localStorage.setItem("sty_token", data.token);
-        localStorage.setItem("sty_rol", data.rol || "");
-        localStorage.setItem("sty_idUsuario", data.idUsuario || "");
-        localStorage.setItem("sty_idCli", data.idCli || "");
+        saveSession(data);
       }
 
       if (data.passwordTemporal) {

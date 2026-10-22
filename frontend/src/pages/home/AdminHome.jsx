@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import NotificationBell from "../../components/NotificationBell.jsx";
+import { clearSession } from "../../utils/session";
 import "./AdminHome.css";
 
 const IconUser = () => (
@@ -75,9 +76,7 @@ function AdminHome() {
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    localStorage.removeItem("sty_token");
-    localStorage.removeItem("sty_rol");
-    localStorage.removeItem("sty_idUsuario");
+    clearSession();
     navigate("/");
   };
 

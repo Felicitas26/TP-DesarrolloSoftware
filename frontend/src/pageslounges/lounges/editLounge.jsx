@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { loungeService } from "../../services";
+import { clearSession } from "../../utils/session";
 import "./editLounge.css";
 
 const IconArrowLeft = () => (
@@ -30,9 +31,7 @@ function EditLounge() {
   const [error, setError] = useState(null);
 
   const handleLogout = () => {
-    localStorage.removeItem("sty_token");
-    localStorage.removeItem("sty_rol");
-    localStorage.removeItem("sty_idUsuario");
+    clearSession();
     navigate("/");
   };
 
