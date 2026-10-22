@@ -35,4 +35,4 @@ Adicionales
 |Req|Detalle|
 |:-|:-|
 |CRUD |1. CRUD Client<br>2. CRUD LoungeType<br>3. CRUD Location<br>4. CRUD Lounge<br>5. CRUD Price<br>6. CRUD Reservation<br>7. Contract<br>8. CardDetail<br>9. ExtraService|
-|CUU/Epic|1. Anular contrato vigente<br>2. Modificar contrato de salón<br>3. Realizar pago de seña del evento|
+|CUU/Epic|1. Anular contrato vigente<br>2. Modificar contrato de salón<br>3. Registrar pago del evento|
