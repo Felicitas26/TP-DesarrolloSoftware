@@ -24,6 +24,7 @@
     "jsonwebtoken": "^9.0.3",
     "multer": "^2.3.0",
     "mysql2": "^3.24.4",
-    "react-router-dom": "^7.18.2"
+    "react-router-dom": "^7.18.2",
+    "swagger-ui-express": "^5.0.1"
   }
 }

@@ -5,8 +5,11 @@ import express from "express";
 import cors from "cors";
 import path from "path";
 import { fileURLToPath } from "url";
+import swaggerUi from "swagger-ui-express";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+import openapi from "./src/docs/openapi.js";
 
 import clientRoutes from "./src/routes/client.routes.js";
 import loungeRoutes from "./src/routes/lounge.routes.js";
@@ -30,6 +33,16 @@ app.use(cors());
 app.use(express.json());
 
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+
+app.get("/api-docs.json", (req, res) => res.json(openapi));
+app.use(
+    "/api-docs",
+    swaggerUi.serve,
+    swaggerUi.setup(openapi, {
+        customSiteTitle: "API SALON STYLO",
+        swaggerOptions: { persistAuthorization: true }
+    })
+);
 
 app.use("/api/client", clientRoutes);
 app.use("/api/lounge", loungeRoutes);

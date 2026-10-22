@@ -233,12 +233,34 @@ Credenciales del administrador creadas por el seed:
 
 1. El backend muestra `Server running on port 3000`.
 2. Al abrir `http://localhost:3000/api/locations` en el navegador se obtiene un JSON con las ciudades.
-3. El frontend abre en `http://localhost:5173`.
-4. Se puede iniciar sesión con `admin` / `admin123`.
+3. La documentación de la API está disponible en `http://localhost:3000/api-docs`.
+4. El frontend abre en `http://localhost:5173`.
+5. Se puede iniciar sesión con `admin` / `admin123`.
 
 ---
 
-## 8. Solución de problemas
+## 8. Documentación de la API
+
+La API está documentada con el estándar **OpenAPI 3.0** y se expone mediante **Swagger UI**:
+
+| Recurso | URL |
+|---------|-----|
+| Swagger UI (interactivo) | `http://localhost:3000/api-docs` |
+| Especificación OpenAPI (JSON) | `http://localhost:3000/api-docs.json` |
+
+Desde Swagger UI se pueden explorar todos los endpoints, ver los esquemas de request/response y ejecutar peticiones contra la API.
+
+Para probar rutas protegidas:
+
+1. Ejecutar `POST /api/auth/login` con `{ "username": "admin", "password": "admin123" }`.
+2. Copiar el `token` de la respuesta.
+3. Usar el botón **Authorize** (arriba a la derecha) e ingresar `Bearer <token>`.
+
+La especificación vive en `Backend/src/docs/openapi.js`.
+
+---
+
+## 9. Solución de problemas
 
 | Síntoma | Causa probable | Solución |
 |---------|----------------|----------|
@@ -254,7 +276,7 @@ Credenciales del administrador creadas por el seed:
 
 ---
 
-## 9. Notas
+## 10. Notas
 
 - El archivo `Backend/.env` es privado y no se versiona; cada entorno debe crear el suyo.
 - Las imágenes subidas por los usuarios se guardan en `Backend/uploads/` y se sirven en `/uploads`.

@@ -7,6 +7,16 @@ Status: draft
 
 Las instrucciones completas para instalar y ejecutar el proyecto (requisitos, configuración de la base de datos, variables de entorno y scripts) están en **[INSTALL.md](INSTALL.md)**.
 
+## Documentación de la API
+
+La API del backend está documentada con el estándar **OpenAPI 3.0** y se expone con **Swagger UI**:
+
+- Swagger UI: `http://localhost:3000/api-docs`
+- Especificación OpenAPI (JSON): `http://localhost:3000/api-docs.json`
+
+La especificación se mantiene en [`Backend/src/docs/openapi.js`](Backend/src/docs/openapi.js). Para probar rutas protegidas, iniciar sesión en `POST /api/auth/login` y usar el botón **Authorize** con `Bearer <token>`.
+
+
 ## 1. Objetivo
 
 Desarrollar en grupo una aplicación web full stack en base a un alcance propuesto por los integrantes.
