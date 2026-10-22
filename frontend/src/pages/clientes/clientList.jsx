@@ -139,6 +139,20 @@ function ClientList() {
       errors.city = "La ciudad no existe en la base de ciudades de Argentina.";
     }
 
+    const nameCli = (clientToEdit.nameCli || "").trim();
+    if (!nameCli) {
+      errors.nameCli = "El nombre es obligatorio.";
+    } else if (nameCli.length < 2) {
+      errors.nameCli = "El nombre debe tener al menos 2 caracteres.";
+    }
+
+    const surnameCli = (clientToEdit.surnameCli || "").trim();
+    if (!surnameCli) {
+      errors.surnameCli = "El apellido es obligatorio.";
+    } else if (surnameCli.length < 2) {
+      errors.surnameCli = "El apellido debe tener al menos 2 caracteres.";
+    }
+
     const dni = clientToEdit.dniCli || "";
     if (!dni.trim()) {
       errors.dniCli = "El DNI es obligatorio.";
@@ -146,6 +160,29 @@ function ClientList() {
       errors.dniCli = "El DNI solo puede contener números.";
     } else if (dni.length < 7 || dni.length > 9) {
       errors.dniCli = "El DNI debe tener entre 7 y 9 dígitos numéricos.";
+    }
+
+    const phone = (clientToEdit.phoneCli || "").trim();
+    if (!phone) {
+      errors.phoneCli = "El teléfono es obligatorio.";
+    } else if (!/^\d+$/.test(phone)) {
+      errors.phoneCli = "El teléfono solo puede contener números.";
+    } else if (phone.length < 6 || phone.length > 20) {
+      errors.phoneCli = "El teléfono debe tener entre 6 y 20 dígitos.";
+    }
+
+    const email = (clientToEdit.emailCli || "").trim();
+    if (!email) {
+      errors.emailCli = "El email es obligatorio.";
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      errors.emailCli = "Email inválido.";
+    }
+
+    const address = (clientToEdit.addressCli || "").trim();
+    if (!address) {
+      errors.addressCli = "La dirección es obligatoria.";
+    } else if (address.length < 3) {
+      errors.addressCli = "La dirección debe tener al menos 3 caracteres.";
     }
 
     if (!postal.trim()) {
@@ -342,30 +379,35 @@ function ClientList() {
             </div>
             <form onSubmit={handleSaveEdit} className="modal-edit-form">
               <div className="form-grid-2">
-                <div className="form-group">
+                <div className={`form-group ${editErrors.nameCli ? "has-error" : ""}`}>
                   <label>Nombre</label>
-                  <input type="text" name="nameCli" value={clientToEdit.nameCli || ""} onChange={handleEditChange} required />
+                  <input type="text" name="nameCli" value={clientToEdit.nameCli || ""} onChange={handleEditChange} />
+                  {editErrors.nameCli && <span className="error-message">{editErrors.nameCli}</span>}
                 </div>
-                <div className="form-group">
+                <div className={`form-group ${editErrors.surnameCli ? "has-error" : ""}`}>
                   <label>Apellido</label>
-                  <input type="text" name="surnameCli" value={clientToEdit.surnameCli || ""} onChange={handleEditChange} required />
+                  <input type="text" name="surnameCli" value={clientToEdit.surnameCli || ""} onChange={handleEditChange} />
+                  {editErrors.surnameCli && <span className="error-message">{editErrors.surnameCli}</span>}
                 </div>
                 <div className={`form-group ${editErrors.dniCli ? "has-error" : ""}`}>
                   <label>DNI</label>
-                  <input type="text" name="dniCli" value={clientToEdit.dniCli || ""} onChange={handleEditChange} required />
+                  <input type="text" name="dniCli" value={clientToEdit.dniCli || ""} onChange={handleEditChange} />
                   {editErrors.dniCli && <span className="error-message">{editErrors.dniCli}</span>}
                 </div>
-                <div className="form-group">
+                <div className={`form-group ${editErrors.phoneCli ? "has-error" : ""}`}>
                   <label>Teléfono</label>
-                  <input type="text" name="phoneCli" value={clientToEdit.phoneCli || ""} onChange={handleEditChange} required />
+                  <input type="text" name="phoneCli" value={clientToEdit.phoneCli || ""} onChange={handleEditChange} />
+                  {editErrors.phoneCli && <span className="error-message">{editErrors.phoneCli}</span>}
                 </div>
-                <div className="form-group">
+                <div className={`form-group ${editErrors.emailCli ? "has-error" : ""}`}>
                   <label>Email</label>
-                  <input type="email" name="emailCli" value={clientToEdit.emailCli || ""} onChange={handleEditChange} required />
+                  <input type="email" name="emailCli" value={clientToEdit.emailCli || ""} onChange={handleEditChange} />
+                  {editErrors.emailCli && <span className="error-message">{editErrors.emailCli}</span>}
                 </div>
-                <div className="form-group">
+                <div className={`form-group ${editErrors.addressCli ? "has-error" : ""}`}>
                   <label>Dirección</label>
-                  <input type="text" name="addressCli" value={clientToEdit.addressCli || ""} onChange={handleEditChange} required />
+                  <input type="text" name="addressCli" value={clientToEdit.addressCli || ""} onChange={handleEditChange} />
+                  {editErrors.addressCli && <span className="error-message">{editErrors.addressCli}</span>}
                 </div>
                 <div className={`form-group ${editErrors.city ? "has-error" : ""}`}>
                   <label htmlFor="edit-cityInput">Ciudad *</label>

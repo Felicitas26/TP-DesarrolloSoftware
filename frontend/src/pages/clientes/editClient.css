@@ -313,6 +313,18 @@
     text-align: center;
 }
 
+.form-group.has-error input {
+    border-color: rgba(248, 113, 113, 0.7);
+}
+
+.error-message {
+    display: block;
+    margin-top: 6px;
+    color: #fca5a5;
+    font-size: 0.78rem;
+    line-height: 1.3;
+}
+
 /* LOADING */
 
 .state-msg {

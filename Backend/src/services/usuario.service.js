@@ -1,5 +1,11 @@
 import bcrypt from "bcryptjs";
 import usuarioModel from "../models/usuario.model.js";
+import {
+    validatePassword,
+    validateUsername,
+    validateDni,
+    validateEmail
+} from "../utils/validators.js";
 
 const SALT_ROUNDS = 10;
 
@@ -21,14 +27,10 @@ class UsuarioService {
     }
 
     async registerCliente({ dniCli, passwordNueva }) {
-        if (!dniCli || !passwordNueva) {
-            throw {
-                statusCode: 400,
-                message: "El DNI y la contraseña son obligatorios."
-            };
-        }
+        const dni = validateDni(dniCli);
+        const password = validatePassword(passwordNueva);
 
-        const client = await usuarioModel.findByDni(dniCli);
+        const client = await usuarioModel.findByDni(dni);
 
         if (!client) {
             throw {
@@ -71,6 +73,8 @@ class UsuarioService {
     }
 
     async registerClienteAdmin({ idCli, passwordProvisoria }) {
+        const password = validatePassword(passwordProvisoria);
+
         const usuario = await usuarioModel.findByCli(idCli);
 
         if (usuario) {
@@ -81,7 +85,7 @@ class UsuarioService {
         }
 
         const passwordHash =
-            await bcrypt.hash(passwordProvisoria, SALT_ROUNDS);
+            await bcrypt.hash(password, SALT_ROUNDS);
 
         return usuarioModel.create({
             username: null,
@@ -93,14 +97,10 @@ class UsuarioService {
     }
 
     async resetPassword({ email, passwordNueva }) {
-        if (!email || !passwordNueva) {
-            throw {
-                statusCode: 400,
-                message: "Debe ingresar el email y la nueva contraseña."
-            };
-        }
+        const emailNormalizado = validateEmail(email);
+        const password = validatePassword(passwordNueva);
 
-        const usuario = await usuarioModel.findByEmail(email);
+        const usuario = await usuarioModel.findByEmail(emailNormalizado);
 
         if (!usuario) {
             throw {
@@ -110,7 +110,7 @@ class UsuarioService {
         }
 
         const passwordHash =
-            await bcrypt.hash(passwordNueva, SALT_ROUNDS);
+            await bcrypt.hash(password, SALT_ROUNDS);
 
         await usuarioModel.updatePassword(
             usuario.idUsuario,
@@ -121,12 +121,14 @@ class UsuarioService {
     }
 
     async cambiarPassword(idUsuario, { passwordActual, passwordNueva }) {
-        if (!passwordActual || !passwordNueva) {
+        if (!passwordActual) {
             throw {
                 statusCode: 400,
-                message: "Debe ingresar la contraseña actual y la nueva."
+                message: "Debe ingresar la contraseña actual."
             };
         }
+
+        const nuevaPassword = validatePassword(passwordNueva);
 
         const usuario = await usuarioModel.findById(idUsuario);
 
@@ -147,8 +149,15 @@ class UsuarioService {
             };
         }
 
+        if (passwordActual === nuevaPassword) {
+            throw {
+                statusCode: 400,
+                message: "La nueva contraseña debe ser diferente a la actual."
+            };
+        }
+
         const passwordHash =
-            await bcrypt.hash(passwordNueva, SALT_ROUNDS);
+            await bcrypt.hash(nuevaPassword, SALT_ROUNDS);
 
         const updated =
             await usuarioModel.updatePassword(
@@ -182,16 +191,11 @@ class UsuarioService {
     }
 
     async createAdministrador({ username, password }) {
-
-        if (!username || !password) {
-            throw {
-                statusCode: 400,
-                message: "El usuario y la contraseña son obligatorios."
-            };
-        }
+        const usuario = validateUsername(username);
+        const passwordValida = validatePassword(password);
 
         const existing =
-            await usuarioModel.findByUsername(username);
+            await usuarioModel.findByUsername(usuario);
 
         if (existing) {
             throw {
@@ -201,10 +205,10 @@ class UsuarioService {
         }
 
         const passwordHash =
-            await bcrypt.hash(password, SALT_ROUNDS);
+            await bcrypt.hash(passwordValida, SALT_ROUNDS);
 
         return usuarioModel.create({
-            username,
+            username: usuario,
             password: passwordHash,
             rol: "administrador",
             idCli: null,
@@ -213,13 +217,8 @@ class UsuarioService {
     }
 
     async updateAdministrador(id, { username, password }) {
-
-        if (!username) {
-            throw {
-                statusCode: 400,
-                message: "El usuario es obligatorio."
-            };
-        }
+        const usuario = validateUsername(username);
+        const passwordValida = validatePassword(password, { required: false });
 
         const administrador =
             await usuarioModel.findById(id);
@@ -235,7 +234,7 @@ class UsuarioService {
         }
 
         const existing =
-            await usuarioModel.findByUsername(username);
+            await usuarioModel.findByUsername(usuario);
 
         if (
             existing &&
@@ -249,16 +248,16 @@ class UsuarioService {
 
         let passwordHash = null;
 
-        if (password) {
+        if (passwordValida) {
             passwordHash =
-                await bcrypt.hash(password, SALT_ROUNDS);
+                await bcrypt.hash(passwordValida, SALT_ROUNDS);
         }
 
         const updated =
             await usuarioModel.updateAdministrador(
                 id,
                 {
-                    username,
+                    username: usuario,
                     password: passwordHash
                 }
             );

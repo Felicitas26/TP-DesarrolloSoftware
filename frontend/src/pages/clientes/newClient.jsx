@@ -164,9 +164,18 @@ const emptyClient = {
     }
 
     const errors = {};
-    if (!client.nameCli.trim()) errors.nameCli = "El nombre es obligatorio.";
-    if (!client.surnameCli.trim()) errors.surnameCli = "El apellido es obligatorio.";
-    
+    if (!client.nameCli.trim()) {
+      errors.nameCli = "El nombre es obligatorio.";
+    } else if (client.nameCli.trim().length < 2) {
+      errors.nameCli = "El nombre debe tener al menos 2 caracteres.";
+    }
+
+    if (!client.surnameCli.trim()) {
+      errors.surnameCli = "El apellido es obligatorio.";
+    } else if (client.surnameCli.trim().length < 2) {
+      errors.surnameCli = "El apellido debe tener al menos 2 caracteres.";
+    }
+
     if (!client.dniCli.trim()) {
       errors.dniCli = "El DNI es obligatorio.";
     } else if (!/^\d+$/.test(client.dniCli)) {
@@ -179,6 +188,8 @@ const emptyClient = {
       errors.phoneCli = "El teléfono es obligatorio.";
     } else if (!/^\d+$/.test(client.phoneCli)) {
       errors.phoneCli = "Solo números.";
+    } else if (client.phoneCli.trim().length < 6 || client.phoneCli.trim().length > 20) {
+      errors.phoneCli = "El teléfono debe tener entre 6 y 20 dígitos.";
     }
 
     if (!client.emailCli.trim()) {
@@ -187,7 +198,11 @@ const emptyClient = {
       errors.emailCli = "Email inválido.";
     }
 
-    if (!client.addressCli.trim()) errors.addressCli = "La dirección es obligatoria.";
+    if (!client.addressCli.trim()) {
+      errors.addressCli = "La dirección es obligatoria.";
+    } else if (client.addressCli.trim().length < 3) {
+      errors.addressCli = "La dirección debe tener al menos 3 caracteres.";
+    }
 
     const cityMatch = locations.find((loc) => normalizeText(loc.city) === normalizeText(cityInput));
 

@@ -29,6 +29,7 @@ function EditClient() {
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(null);
+  const [fieldErrors, setFieldErrors] = useState({});
 
   const normalizeText = (value) =>
     String(value || "")
@@ -79,6 +80,10 @@ function EditClient() {
       ...prev,
       [name]: value
     }));
+
+    if (fieldErrors[name]) {
+      setFieldErrors((prev) => ({ ...prev, [name]: null }));
+    }
   };
 
   const handleCityChange = (e) => {
@@ -89,6 +94,13 @@ function EditClient() {
     );
     setSuggestions(value.trim() ? matches.slice(0, 5) : []);
     setShowSuggestions(value.trim().length > 0);
+
+    if (fieldErrors.city) {
+      setFieldErrors((prev) => ({ ...prev, city: null }));
+    }
+    if (fieldErrors.postalCode) {
+      setFieldErrors((prev) => ({ ...prev, postalCode: null }));
+    }
 
     if (normalizeText(locations.find((l) => l.idLocation === client.idLocation)?.city) === normalizeText(value)) {
       return;
@@ -103,67 +115,96 @@ function EditClient() {
     setClient((prev) => ({ ...prev, idLocation: loc.idLocation }));
     setSuggestions([]);
     setShowSuggestions(false);
+    setFieldErrors((prev) => ({ ...prev, city: null, postalCode: null }));
   };
 
   const handlePostalChange = (e) => {
     setPostalCode(e.target.value);
+    if (fieldErrors.postalCode) {
+      setFieldErrors((prev) => ({ ...prev, postalCode: null }));
+    }
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const validateForm = () => {
+    const errors = {};
 
-    setSubmitting(true);
-    setError(null);
-
-    if (!cityInput.trim()) {
-      setError("La ciudad es obligatoria.");
-      setSubmitting(false);
-      return;
+    if (!client.nameCli?.trim()) {
+      errors.nameCli = "El nombre es obligatorio.";
+    } else if (client.nameCli.trim().length < 2) {
+      errors.nameCli = "El nombre debe tener al menos 2 caracteres.";
     }
 
-    if (!client.idLocation) {
-      setError("La ciudad ingresada no existe en la base de ciudades de Argentina.");
-      setSubmitting(false);
-      return;
+    if (!client.surnameCli?.trim()) {
+      errors.surnameCli = "El apellido es obligatorio.";
+    } else if (client.surnameCli.trim().length < 2) {
+      errors.surnameCli = "El apellido debe tener al menos 2 caracteres.";
+    }
+
+    if (!client.dniCli?.trim()) {
+      errors.dniCli = "El DNI es obligatorio.";
+    } else if (!/^\d+$/.test(client.dniCli)) {
+      errors.dniCli = "El DNI solo puede contener números.";
+    } else if (client.dniCli.length < 7 || client.dniCli.length > 9) {
+      errors.dniCli = "El DNI debe tener entre 7 y 9 dígitos numéricos.";
+    }
+
+    if (!client.phoneCli?.trim()) {
+      errors.phoneCli = "El teléfono es obligatorio.";
+    } else if (!/^\d+$/.test(client.phoneCli)) {
+      errors.phoneCli = "El teléfono solo puede contener números.";
+    } else if (client.phoneCli.trim().length < 6 || client.phoneCli.trim().length > 20) {
+      errors.phoneCli = "El teléfono debe tener entre 6 y 20 dígitos.";
+    }
+
+    if (!client.emailCli?.trim()) {
+      errors.emailCli = "El email es obligatorio.";
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(client.emailCli)) {
+      errors.emailCli = "Email inválido.";
+    }
+
+    if (!client.addressCli?.trim()) {
+      errors.addressCli = "La dirección es obligatoria.";
+    } else if (client.addressCli.trim().length < 3) {
+      errors.addressCli = "La dirección debe tener al menos 3 caracteres.";
+    }
+
+    if (!cityInput.trim()) {
+      errors.city = "La ciudad es obligatoria.";
+    } else if (!client.idLocation) {
+      errors.city = "La ciudad ingresada no existe en la base de ciudades de Argentina.";
     }
 
     if (!postalCode.trim()) {
-      setError("El código postal es obligatorio.");
-      setSubmitting(false);
-      return;
-    }
-
-    if (!/^\d+$/.test(postalCode.trim())) {
-      setError("El código postal solo puede contener números.");
-      setSubmitting(false);
-      return;
+      errors.postalCode = "El código postal es obligatorio.";
+    } else if (!/^\d+$/.test(postalCode.trim())) {
+      errors.postalCode = "El código postal solo puede contener números.";
     }
 
     const matchedLocation = locations.find(
       (l) => l.idLocation === client.idLocation
     );
-    if (matchedLocation && String(matchedLocation.zipCode) !== String(postalCode.trim())) {
-      setError(`El código postal no coincide. Para ${matchedLocation.city} el código es ${matchedLocation.zipCode}.`);
-      setSubmitting(false);
-      return;
-    }
-
-    if (!/^\d+$/.test(client.dniCli)) {
-      setError("El DNI solo puede contener números.");
-      setSubmitting(false);
-      return;
-    }
-
     if (
-      client.dniCli.length < 7 ||
-      client.dniCli.length > 9
+      matchedLocation &&
+      !errors.postalCode &&
+      String(matchedLocation.zipCode) !== String(postalCode.trim())
     ) {
-      setError(
-        "El DNI debe tener entre 7 y 9 dígitos numéricos."
-      );
-      setSubmitting(false);
+      errors.postalCode = `El código postal no coincide. Para ${matchedLocation.city} el código es ${matchedLocation.zipCode}.`;
+    }
+
+    setFieldErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    setError(null);
+
+    if (!validateForm()) {
       return;
     }
+
+    setSubmitting(true);
 
     const body = {
       ...client,
@@ -229,8 +270,8 @@ function EditClient() {
             name="nameCli"
             value={client.nameCli || ""}
             onChange={handleChange}
-            required
           />
+          {fieldErrors.nameCli && <span className="error-message">{fieldErrors.nameCli}</span>}
         </div>
 
         <div className="form-group">
@@ -244,8 +285,8 @@ function EditClient() {
             name="surnameCli"
             value={client.surnameCli || ""}
             onChange={handleChange}
-            required
           />
+          {fieldErrors.surnameCli && <span className="error-message">{fieldErrors.surnameCli}</span>}
         </div>
 
         <div className="form-group">
@@ -261,8 +302,8 @@ function EditClient() {
             title="Ingrese un DNI válido (7 a 9 dígitos)"
             value={client.dniCli || ""}
             onChange={handleChange}
-            required
           />
+          {fieldErrors.dniCli && <span className="error-message">{fieldErrors.dniCli}</span>}
         </div>
 
         <div className="form-group">
@@ -276,8 +317,8 @@ function EditClient() {
             name="phoneCli"
             value={client.phoneCli || ""}
             onChange={handleChange}
-            required
           />
+          {fieldErrors.phoneCli && <span className="error-message">{fieldErrors.phoneCli}</span>}
         </div>
 
         <div className="form-group">
@@ -291,8 +332,8 @@ function EditClient() {
             name="emailCli"
             value={client.emailCli || ""}
             onChange={handleChange}
-            required
           />
+          {fieldErrors.emailCli && <span className="error-message">{fieldErrors.emailCli}</span>}
         </div>
 
         <div className="form-group">
@@ -306,8 +347,8 @@ function EditClient() {
             name="addressCli"
             value={client.addressCli || ""}
             onChange={handleChange}
-            required
           />
+          {fieldErrors.addressCli && <span className="error-message">{fieldErrors.addressCli}</span>}
         </div>
 
         <div className="form-group" style={{ position: "relative" }}>
@@ -332,8 +373,8 @@ function EditClient() {
             onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
             placeholder="Ej: Rosario"
             autoComplete="off"
-            required
           />
+          {fieldErrors.city && <span className="error-message">{fieldErrors.city}</span>}
 
           {showSuggestions && suggestions.length > 0 && (
             <ul className="city-suggestions">
@@ -361,8 +402,8 @@ function EditClient() {
             onChange={handlePostalChange}
             placeholder="Ej: 2000"
             autoComplete="off"
-            required
           />
+          {fieldErrors.postalCode && <span className="error-message">{fieldErrors.postalCode}</span>}
         </div>
 
         <div className="form-actions">

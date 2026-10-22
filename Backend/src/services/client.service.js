@@ -1,6 +1,16 @@
 import bcrypt from "bcryptjs";
 import clientModel from "../../src/models/client.model.js";
 import usuarioModel from "../../src/models/usuario.model.js";
+import locationModel from "../../src/models/location.model.js";
+import {
+    requireFields,
+    validateEmail,
+    validateDni,
+    validatePhone,
+    validateName,
+    validateAddress,
+    validateId
+} from "../../src/utils/validators.js";
 
 const SALT_ROUNDS = 10;
 
@@ -19,36 +29,26 @@ class ClientService {
     }
 
     async create(client) {
-        const { nameCli, surnameCli, phoneCli, dniCli, emailCli, addressCli, idLocation } = client;
+        const data = await this.validateClientData(client, { checkEmailUnique: true, checkDniUnique: true });
 
-        if (!nameCli || !surnameCli || !phoneCli || !dniCli || !emailCli || !addressCli || idLocation == undefined || idLocation === "") {
-            throw { statusCode: 400, message: "Todos los campos son obligatorios." };
-        }
-
-        if (!/^\d+$/.test(dniCli)) {
-            throw { statusCode: 400, message: "El DNI solo puede contener números." };
-        }
-
-        if (dniCli.length < 7 || dniCli.length > 9) {
-            throw { statusCode: 400, message: "El DNI debe tener entre 7 y 9 dígitos numéricos." };
-        }
-
-        if (!/^\d+$/.test(phoneCli)) {
-            throw { statusCode: 400, message: "El teléfono solo puede contener números." };
-        }
-
-        const existingEmail = await clientModel.findByEmail(emailCli);
-        if (existingEmail) {
-            throw { statusCode: 400, message: "El email ingresado ya está registrado." };
-        }
-
-        const created = await clientModel.create(client);
+        // El alta del cliente crea además su cuenta de usuario.
+        const created = await clientModel.create({
+            nameCli: data.nameCli,
+            surnameCli: data.surnameCli,
+            phoneCli: data.phoneCli,
+            dniCli: data.dniCli,
+            emailCli: data.emailCli,
+            addressCli: data.addressCli,
+            idLocation: data.idLocation
+        });
 
         try {
             const existingUser = await usuarioModel.findByCli(created.idCli);
             if (!existingUser) {
-                const username = client.username || emailCli;
-                const password = client.password || String(dniCli);
+                const username = client.username
+                    ? String(client.username).trim()
+                    : data.emailCli;
+                const password = client.password || String(data.dniCli);
                 const passwordHash = await bcrypt.hash(String(password), SALT_ROUNDS);
                 await usuarioModel.create({
                     username,
@@ -66,25 +66,14 @@ class ClientService {
     }
 
     async update(id, client) {
-        const { nameCli, surnameCli, phoneCli, dniCli, emailCli, addressCli, idLocation } = client;
+        const clientId = validateId(id, "ID de cliente");
+        const data = await this.validateClientData(client, {
+            checkEmailUnique: true,
+            checkDniUnique: true,
+            excludeClientId: clientId
+        });
 
-        if (!nameCli || !surnameCli || !phoneCli || !dniCli || !emailCli || !addressCli || idLocation == undefined || idLocation === "") {
-            throw { statusCode: 400, message: "Todos los campos son obligatorios." };
-        }
-
-        if (!/^\d+$/.test(dniCli)) {
-            throw { statusCode: 400, message: "El DNI solo puede contener números." };
-        }
-
-        if (dniCli.length < 7 || dniCli.length > 9) {
-            throw { statusCode: 400, message: "El DNI debe tener entre 7 y 9 dígitos numéricos." };
-        }
-
-        if (!/^\d+$/.test(phoneCli)) {
-            throw { statusCode: 400, message: "El teléfono solo puede contener números." };
-        }
-
-        const updated = await clientModel.update(id, client);
+        const updated = await clientModel.update(clientId, data);
         if (!updated) {
             throw { statusCode: 404, message: "No se ha encontrado al cliente." };
         }
@@ -92,54 +81,14 @@ class ClientService {
     }
 
     async updateMe(idCli, client) {
-        const {
-            nameCli,
-            surnameCli,
-            phoneCli,
-            dniCli,
-            emailCli,
-            addressCli,
-            idLocation
-        } = client;
+        const clientId = validateId(idCli, "ID de cliente");
+        const data = await this.validateClientData(client, {
+            checkEmailUnique: true,
+            checkDniUnique: true,
+            excludeClientId: clientId
+        });
 
-        if (
-            !nameCli ||
-            !surnameCli ||
-            !phoneCli ||
-            !dniCli ||
-            !emailCli ||
-            !addressCli ||
-            idLocation == undefined ||
-            idLocation === ""
-        ) {
-            throw {
-                statusCode: 400,
-                message: "Todos los campos son obligatorios."
-            };
-        }
-
-        if (!/^\d+$/.test(dniCli)) {
-            throw {
-                statusCode: 400,
-                message: "El DNI solo puede contener números."
-            };
-        }
-
-        if (dniCli.length < 7 || dniCli.length > 9) {
-            throw {
-                statusCode: 400,
-                message: "El DNI debe tener entre 7 y 9 dígitos numéricos."
-            };
-        }
-
-        if (!/^\d+$/.test(phoneCli)) {
-            throw {
-                statusCode: 400,
-                message: "El teléfono solo puede contener números."
-            };
-        }
-
-        const updated = await clientModel.updateMe(idCli, client);
+        const updated = await clientModel.updateMe(clientId, data);
 
         if (!updated) {
             throw {
@@ -158,7 +107,63 @@ class ClientService {
         }
         return deleted;
     }
+
+    /**
+     * Valida y normaliza los datos de un cliente.
+     * @param {object} client
+     * @param {{checkEmailUnique?: boolean, checkDniUnique?: boolean, excludeClientId?: number}} opts
+     */
+    async validateClientData(client, { checkEmailUnique = false, checkDniUnique = false, excludeClientId = null } = {}) {
+        requireFields(client, [
+            "nameCli",
+            "surnameCli",
+            "phoneCli",
+            "dniCli",
+            "emailCli",
+            "addressCli",
+            "idLocation"
+        ]);
+
+        const nameCli = validateName(client.nameCli, "nombre");
+        const surnameCli = validateName(client.surnameCli, "apellido");
+        const phoneCli = validatePhone(client.phoneCli);
+        const dniCli = validateDni(client.dniCli);
+        const emailCli = validateEmail(client.emailCli);
+        const addressCli = validateAddress(client.addressCli);
+        const idLocation = validateId(client.idLocation, "ID de ubicación");
+
+        const location = await locationModel.findByPk(idLocation);
+        if (!location) {
+            throw {
+                statusCode: 400,
+                message: "La ubicación seleccionada no existe."
+            };
+        }
+
+        if (checkEmailUnique) {
+            const existingEmail = await clientModel.findByEmail(emailCli);
+            if (existingEmail && existingEmail.idCli !== excludeClientId) {
+                throw { statusCode: 409, message: "El email ingresado ya está registrado por otro cliente." };
+            }
+        }
+
+        if (checkDniUnique) {
+            const existingDni = await clientModel.findByDni(dniCli);
+            if (existingDni && existingDni.idCli !== excludeClientId) {
+                throw { statusCode: 409, message: "El DNI ingresado ya está registrado por otro cliente." };
+            }
+        }
+
+        return {
+            nameCli,
+            surnameCli,
+            phoneCli,
+            dniCli,
+            emailCli,
+            addressCli,
+            idLocation
+        };
+    }
 }
 
 export default new ClientService();
-

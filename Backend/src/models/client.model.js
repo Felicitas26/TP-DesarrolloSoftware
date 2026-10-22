@@ -27,8 +27,15 @@ class ClientModel {
     }
 
     async findByEmail(email) {
+        const normalized = String(email).trim().toLowerCase();
         return await prisma.client.findFirst({
-            where: { emailCli: email }
+            where: { emailCli: normalized }
+        });
+    }
+
+    async findByDni(dniCli) {
+        return await prisma.client.findFirst({
+            where: { dniCli: Number(dniCli) }
         });
     }
 
