@@ -100,4 +100,20 @@ export class Contract {
     get payment() {
         return this.payments?.[0] || null;
     }
+
+    /** @returns {string|null} Fecha del evento (de la reserva asociada) */
+    get eventDate() {
+        return this.reservation?.dateEvent || null;
+    }
+
+    /** @returns {boolean} El evento ya pasó (fecha anterior a hoy) */
+    get isExpired() {
+        if (!this.eventDate) return false;
+        const dateOnly = String(this.eventDate).split("T")[0];
+        const eventDate = new Date(`${dateOnly}T00:00:00`);
+        if (Number.isNaN(eventDate.getTime())) return false;
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        return eventDate.getTime() < today.getTime();
+    }
 }

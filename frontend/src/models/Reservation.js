@@ -53,4 +53,15 @@ export class Reservation {
     get isPending() {
         return this.status === "pendiente";
     }
+
+    /** @returns {boolean} El evento ya pasó (fecha anterior a hoy) */
+    get isExpired() {
+        if (!this.dateEvent) return false;
+        const dateOnly = String(this.dateEvent).split("T")[0];
+        const eventDate = new Date(`${dateOnly}T00:00:00`);
+        if (Number.isNaN(eventDate.getTime())) return false;
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        return eventDate.getTime() < today.getTime();
+    }
 }

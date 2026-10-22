@@ -20,6 +20,30 @@ const IconEdit = () => (
     </svg>
 );
 
+const IconSearch = () => (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+        stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <circle cx="11" cy="11" r="8" />
+        <line x1="21" y1="21" x2="16.65" y2="16.65" />
+    </svg>
+);
+
+const STATUS_OPTIONS = [
+    { value: "todas", label: "Todas" },
+    { value: "pendiente", label: "Pendientes" },
+    { value: "aceptada", label: "Aceptadas" },
+    { value: "confirmada", label: "Confirmadas" },
+    { value: "cancelada", label: "Canceladas" },
+    { value: "expiradas", label: "Expiradas" }
+];
+
+const normalizeText = (value) =>
+    String(value || "")
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .trim();
+
 function MyReservations() {
 
     const navigate = useNavigate();
@@ -27,6 +51,9 @@ function MyReservations() {
     const [reservations, setReservations] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+
+    const [statusFilter, setStatusFilter] = useState("todas");
+    const [searchTerm, setSearchTerm] = useState("");
 
     const [feedback, setFeedback] = useState(null);
     const [reservationToDeleteId, setReservationToDeleteId] = useState(null);
@@ -51,6 +78,32 @@ function MyReservations() {
         getReservations();
 
     }, []);
+
+    const filteredReservations = (() => {
+        let list = reservations;
+
+        if (statusFilter === "expiradas") {
+            list = list.filter((r) => r.isExpired);
+        } else if (statusFilter !== "todas") {
+            list = list.filter((r) => r.status === statusFilter);
+        }
+
+        const term = normalizeText(searchTerm);
+        if (term) {
+            list = list.filter((r) =>
+                [
+                    r.idReservation,
+                    r.eventType,
+                    r.lounge?.name,
+                    r.loungeType?.nameLoungeType
+                ]
+                    .map(normalizeText)
+                    .some((value) => value.includes(term))
+            );
+        }
+
+        return list;
+    })();
 
     const formatDate = (date) => {
 
@@ -145,17 +198,53 @@ function MyReservations() {
 
                 </div>
 
+                {reservations.length > 0 && (
+                    <>
+                        <div className="my-reservations-filters">
+                            {STATUS_OPTIONS.map((opt) => (
+                                <button
+                                    key={opt.value}
+                                    type="button"
+                                    className={`my-reservations-filter-btn ${statusFilter === opt.value ? "active" : ""}`}
+                                    onClick={() => setStatusFilter(opt.value)}
+                                >
+                                    {opt.label}
+                                </button>
+                            ))}
+                        </div>
+
+                        <div className="my-reservations-search">
+                            <span className="my-reservations-search-icon">
+                                <IconSearch />
+                            </span>
+                            <input
+                                type="text"
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                                placeholder="Buscar por salón, tipo de evento o N° de reserva..."
+                                aria-label="Buscar reservas"
+                            />
+                        </div>
+                    </>
+                )}
+
                 {reservations.length === 0 ? (
 
                     <p className="my-reservations-empty">
                         No tenés reservas realizadas.
                     </p>
 
+                ) : filteredReservations.length === 0 ? (
+
+                    <p className="my-reservations-empty">
+                        No se encontraron reservas con esos criterios.
+                    </p>
+
                 ) : (
 
                     <div className="my-reservations-list">
 
-                        {reservations.map((reservation) => (
+                        {filteredReservations.map((reservation) => (
 
                             <div
                                 className="my-reservation-card"
@@ -241,7 +330,14 @@ function MyReservations() {
                                     <strong>
                                         Estado:
                                     </strong>{" "}
-                                    {reservation.status}
+                                    <span className={`my-reservation-status ${reservation.status}`}>
+                                        {reservation.statusLabel}
+                                    </span>
+                                    {reservation.isExpired && (
+                                        <span className="my-reservation-expired">
+                                            Expirada
+                                        </span>
+                                    )}
                                 </p>
 
                                 <p>

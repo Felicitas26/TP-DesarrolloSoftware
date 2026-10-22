@@ -217,6 +217,92 @@
     gap: 24px;
 }
 
+/* FILTROS */
+
+.my-reservations-filters {
+    width: 100%;
+    max-width: 850px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 14px;
+}
+
+.my-reservations-filter-btn {
+    padding: 8px 16px;
+    background: rgba(255, 255, 255, 0.05);
+    color: rgba(255, 255, 255, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 999px;
+    font-family: "Montserrat", system-ui, sans-serif;
+    font-size: 0.76rem;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    cursor: pointer;
+    transition:
+        background 0.2s ease,
+        border-color 0.2s ease,
+        color 0.2s ease,
+        transform 0.2s ease;
+}
+
+.my-reservations-filter-btn:hover {
+    background: rgba(34, 211, 238, 0.08);
+    border-color: rgba(34, 211, 238, 0.35);
+    color: #67e8f9;
+    transform: translateY(-1px);
+}
+
+.my-reservations-filter-btn.active {
+    background: rgba(34, 211, 238, 0.14);
+    border-color: rgba(34, 211, 238, 0.45);
+    color: #67e8f9;
+    box-shadow: 0 0 14px rgba(34, 211, 238, 0.12);
+}
+
+/* BUSCADOR */
+
+.my-reservations-search {
+    position: relative;
+    width: 100%;
+    max-width: 850px;
+    margin-bottom: 28px;
+}
+
+.my-reservations-search-icon {
+    position: absolute;
+    top: 50%;
+    left: 16px;
+    transform: translateY(-50%);
+    display: inline-flex;
+    color: rgba(255, 255, 255, 0.45);
+    pointer-events: none;
+}
+
+.my-reservations-search input {
+    width: 100%;
+    padding: 14px 16px 14px 44px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 12px;
+    color: #ffffff;
+    font-family: "Montserrat", system-ui, sans-serif;
+    font-size: 0.85rem;
+    outline: none;
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.my-reservations-search input::placeholder {
+    color: rgba(255, 255, 255, 0.4);
+}
+
+.my-reservations-search input:focus {
+    border-color: rgba(34, 211, 238, 0.45);
+    box-shadow: 0 0 14px rgba(34, 211, 238, 0.12);
+}
+
 /* TARJETAS */
 
 .my-reservation-card {
@@ -341,12 +427,50 @@
 /* ESTADO */
 
 .my-reservation-status {
+    display: inline-block;
     padding: 7px 14px;
     border-radius: 999px;
     background: rgba(34, 211, 238, 0.12);
     border: 1px solid rgba(34, 211, 238, 0.4);
     color: #22d3ee;
     font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+}
+
+.my-reservation-status.pendiente {
+    background: rgba(250, 204, 21, 0.12);
+    border-color: rgba(250, 204, 21, 0.4);
+    color: #facc15;
+}
+
+.my-reservation-status.aceptada {
+    background: rgba(34, 211, 238, 0.12);
+    border-color: rgba(34, 211, 238, 0.4);
+    color: #67e8f9;
+}
+
+.my-reservation-status.confirmada {
+    background: rgba(74, 222, 128, 0.12);
+    border-color: rgba(74, 222, 128, 0.4);
+    color: #86efac;
+}
+
+.my-reservation-status.cancelada {
+    background: rgba(248, 113, 113, 0.12);
+    border-color: rgba(248, 113, 113, 0.4);
+    color: #fca5a5;
+}
+
+.my-reservation-expired {
+    display: inline-block;
+    margin-left: 8px;
+    padding: 7px 14px;
+    border-radius: 999px;
+    background: rgba(148, 163, 184, 0.12);
+    border: 1px solid rgba(148, 163, 184, 0.35);
+    color: #cbd5e1;
+    font-size: 0.72rem;
     font-weight: 600;
     letter-spacing: 0.05em;
 }
