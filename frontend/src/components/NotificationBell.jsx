@@ -11,6 +11,7 @@ const NOTIFICATION_LABEL = {
     contrato_revisado: "Revisión de contrato",
     contrato_firmado: "Contrato firmado",
     contrato_cancelado: "Evento cancelado",
+    contrato_eliminado: "Contrato eliminado por el cliente",
     modificacion_solicitada: "Solicitud de modificación",
     modificacion_aprobada: "Modificación aprobada",
     modificacion_rechazada: "Modificación rechazada",
@@ -123,7 +124,10 @@ function NotificationBell() {
             return;
         }
 
-        if (notification.tipo === "contrato_cancelado") {
+        if (
+            notification.tipo === "contrato_cancelado" ||
+            notification.tipo === "contrato_eliminado"
+        ) {
             navigate(isAdmin ? "/contract" : "/my-contracts");
         }
     };

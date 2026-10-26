@@ -639,6 +639,64 @@ class ContractService {
         return true;
     }
 
+    async eliminarCliente(id) {
+        const contract = await contractModel.getById(id);
+
+        if (!contract) {
+            const error = new Error("Contrato no encontrado.");
+            error.statusCode = 404;
+            throw error;
+        }
+
+        if (contract.status !== "firmado") {
+            const error = new Error(
+                "Solo podés eliminar un contrato que ya está firmado."
+            );
+            error.statusCode = 400;
+            throw error;
+        }
+
+        const reservation = contract.reservation;
+
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        const eventDate = new Date(
+            `${String(toDateString(reservation.dateEvent)).split("T")[0]}T00:00:00`
+        );
+        const daysUntil = Math.round(
+            (eventDate.getTime() - today.getTime()) / 86400000
+        );
+
+        if (daysUntil < 1) {
+            const error = new Error(
+                "La eliminación del contrato está disponible hasta un día antes de la fecha del evento. Ya no hay tiempo para eliminarlo."
+            );
+            error.statusCode = 400;
+            throw error;
+        }
+
+        const eliminado = await contractModel.remove(id);
+
+        if (!eliminado) {
+            const error = new Error(
+                "No se pudo eliminar el contrato. Intentalo de nuevo."
+            );
+            error.statusCode = 500;
+            throw error;
+        }
+
+        await reservationModel.delete(contract.idReservation);
+
+        await notificationService.notifyAdmins({
+            mensaje: `El cliente ${reservation.client?.nameCli || ""} ${reservation.client?.surnameCli || ""} eliminó el contrato #${id} y canceló su evento del ${toDateString(reservation.dateEvent)} (salón ${reservation.lounge?.name}${reservation.loungeType?.nameLoungeType ? ` — ${reservation.loungeType.nameLoungeType}` : ""}). No se realizan reembolsos de lo pagado.`,
+            tipo: "contrato_eliminado",
+            idContract: null
+        });
+
+        return true;
+    }
+
     async contestarRechazoModificacion(id, decision) {
         const contract = await contractModel.getById(id);
 
