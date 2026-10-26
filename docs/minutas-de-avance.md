@@ -48,9 +48,9 @@ Se adoptó **Scrum** como marco de gestión, adaptado a un equipo de tres integr
 
 ### 1.3. Herramientas y convenciones de trabajo
 
-- **Planilla de seguimiento:** se utiliza una hoja de cálculo (Excel / Google Sheets) como Product Backlog y Matriz de Seguimiento y Asignación de Tareas, con columnas de ID, ítem, tipo (feature, bugfix, refactor, base de datos), sprint, responsable, prioridad, estado, criterio de aceptación y evidencia (commit o PR). No se utiliza un tablero visual en GitHub.
-- **Ramas:** `feature/<tema>`, `fix/<tema>`, `refactor/<tema>` y `docs/<tema>`.
-- **Integración:** Pull Request con revisión de al menos un integrante antes de mergear a `main`.
+- **Planilla de seguimiento:** se utiliza una hoja de cálculo (Excel / Google Sheets) como Product Backlog y Matriz de Seguimiento y Asignación de Tareas.
+- **Ramas:** se trabaja sobre una única rama (`main`); no se utilizan ramas por funcionalidad.
+- **Integración:** los cambios se suben directamente a `main`; no se utilizan Pull Requests, aunque se mantiene la revisión cruzada entre integrantes.
 - **Commits:** mensajes descriptivos en español, agrupados por funcionalidad.
 - **Backend:** nomenclatura en inglés para entidades, controladores, rutas y servicios; arquitectura por capas (`routes → controllers → services → models`).
 - **Frontend:** React + Vite, componentes por entidad, servicios centralizados de API y enfoque **mobile first**.
@@ -111,7 +111,7 @@ Definir el alcance funcional de Stylo, acordar la arquitectura general del siste
 | AD-04 | React + Vite para el frontend | Rapidez de desarrollo, recarga en caliente y ecosistema maduro | Componentes por entidad y servicios de API centralizados |
 | AD-05 | Variables de entorno para configuración sensible | Seguridad y portabilidad entre entornos | `.env` obligatorio; `.gitignore` para secretos |
 | AD-06 | Monorepo con carpetas `Backend`, `frontend` y `database` | Simplicidad de coordinación para un equipo pequeño | Un solo repositorio y un solo historial de commits |
-| AD-07 | Flujo de trabajo con ramas por tema y revisión cruzada | Prácticas de XP y control de calidad | Todo cambio relevante entra por Pull Request |
+| AD-07 | Trabajo sobre una única rama (`main`) con revisión cruzada | Simplicidad para un equipo pequeño y menor sobrecarga de integración | Los cambios se suben directo a `main`, sin Pull Requests |
 
 #### Backlog / Próximas Tareas Asignadas
 
@@ -229,7 +229,7 @@ Consolidar la persistencia del sistema: crear la base de datos `event_hall`, def
 - **Qué funcionó:** la integración temprana del frontend con la API permitió detectar problemas de datos a tiempo.
 - **Qué mejorar:** las credenciales de MySQL generaron retrabajo; se acordó una única fuente de configuración.
 - **Acciones:** Nadia documenta el esquema; Felicitas valida altas y relaciones; Luli ajusta las vistas a los datos reales.
-- **Acuerdo:** todo cambio de esquema se comunica al equipo y se refleja en el script SQL antes del merge.
+- **Acuerdo:** todo cambio de esquema se comunica al equipo y se refleja en el script SQL antes de subir los cambios.
 
 ---
 
@@ -387,7 +387,7 @@ Refinar la aplicación de cara a la entrega: mejorar la experiencia mobile first
 | Riesgo | Probabilidad | Impacto | Mitigación acordada |
 |---|---|---|---|
 | Falta de pruebas automatizadas para la entrega | Alta | Alto | Priorizar STY-24 y STY-25 en el cierre |
-| Regresiones por cambios de seguridad | Media | Alto | Prueba manual de ambos roles antes del merge |
+| Regresiones por cambios de seguridad | Media | Alto | Prueba manual de ambos roles antes de subir los cambios |
 | Tiempo disponible antes de la defensa | Alta | Alto | Congelar alcance y enfocar en calidad y documentación |
 | Datos de demo inconsistentes | Media | Medio | Reejecutar setup desde cero y validar seeds |
 | Dependencia de configuración local de MySQL | Media | Medio | Documentar credenciales y usar `.env` |
