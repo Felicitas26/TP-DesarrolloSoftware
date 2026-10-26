@@ -4,7 +4,7 @@
 |---|---|
 | Proyecto | **Stylo** — Sistema de reservas para salón de eventos |
 | Materia | Desarrollo de Software |
-| Equipo | Felicitas de Pentima, Nadia Berrino, Luisina Movio |
+| Equipo | Felicitas Di Pentima, Nadia Berrino, Luisina Movio |
 | Repositorio | `TP-DesarrolloSoftware` (monorepo: `Backend`, `frontend`, `database`) |
 | Período documentado | Agosto – Octubre 2026 |
 | Metodología | **Scrum** con prácticas de ingeniería de **XP** |
@@ -38,7 +38,7 @@ Se adoptó **Scrum** como marco de gestión, adaptado a un equipo de tres integr
 
 | Integrante | Usuario GitHub | Rol técnico | Responsabilidad de gestión |
 |---|---|---|---|
-| Felicitas de Pentima | `Felicitas26` | Backend, modelos, unificación de vistas de administración | Facilitadora de la Minuta 1; revisión de integración y consistencia de vistas admin |
+| Felicitas Di Pentima | `Felicitas26` | Backend, modelos, unificación de vistas de administración | Facilitadora de la Minuta 1; revisión de integración y consistencia de vistas admin |
 | Nadia Berrino | `NadiaBerrino` | Backend, ORM, scripts SQL, base de datos, autenticación y modelos de dominio | Facilitadora de la Minuta 2; custodia del esquema, migraciones y entorno |
 | Luisina Movio | `LuliMovio` | Frontend, componentes React, CRUDs, integración de pagos, seeds, mobile first, seguridad y notificaciones | Facilitadora de las Minutas 3 y 4; QA funcional y validación de UX |
 
@@ -76,14 +76,14 @@ Se adoptó **Scrum** como marco de gestión, adaptado a un equipo de tres integr
 **Fecha y hora:** lunes 10/08/2026, 18:00–19:30 (UTC-3).
 **Modalidad:** reunión virtual del equipo.
 **Duración:** 90 minutos.
-**Facilitadora:** Felicitas de Pentima.
+**Facilitadora:** Felicitas Di Pentima.
 **Evidencia:** definición del alcance en `Proposal.md`, estructura inicial del repositorio y commits de estandarización del backend.
 
 #### Participantes
 
 | Integrante | Rol en la reunión |
 |---|---|
-| Felicitas de Pentima | Backend, modelos y unificación de vistas admin |
+| Felicitas Di Pentima | Backend, modelos y unificación de vistas admin |
 | Nadia Berrino | Backend, ORM, scripts SQL y base de datos |
 | Luisina Movio | Frontend, componentes React, CRUDs e integración |
 
@@ -117,12 +117,12 @@ Definir el alcance funcional de Stylo, acordar la arquitectura general del siste
 
 | ID | Tarea | Tipo | Responsable | Prioridad | Criterio de aceptación |
 |---|---|---|---|---|---|
-| STY-01 | Estandarizar nombres y estructura de rutas/controladores en inglés | Refactor | Felicitas de Pentima / Nadia Berrino | Alta | Entidades con rutas y controladores consistentes |
+| STY-01 | Estandarizar nombres y estructura de rutas/controladores en inglés | Refactor | Felicitas Di Pentima / Nadia Berrino | Alta | Entidades con rutas y controladores consistentes |
 | STY-02 | Diseñar el modelo relacional inicial | Base de datos | Nadia Berrino | Alta | Diagrama y script SQL con entidades principales |
 | STY-03 | Crear el CRUD inicial de clientes en frontend | Feature | Luisina Movio | Alta | Alta, edición y listado funcionando contra la API |
 | STY-04 | Configurar `.env`, `server.js` y scripts de arranque | Feature | Nadia Berrino | Alta | Backend levanta en el puerto 3000 con configuración externa |
 | STY-05 | Definir el esquema de autenticación y roles | Spike | Nadia Berrino | Media | Propuesta técnica de login JWT y dos niveles de acceso |
-| STY-06 | Relevar entidades y atributos del dominio | Análisis | Felicitas de Pentima | Media | Listado validado de entidades y relaciones |
+| STY-06 | Relevar entidades y atributos del dominio | Análisis | Felicitas Di Pentima | Media | Listado validado de entidades y relaciones |
 
 #### Riesgos e Impedimentos
 
@@ -164,7 +164,7 @@ Definir el alcance funcional de Stylo, acordar la arquitectura general del siste
 
 | Integrante | Rol en la reunión |
 |---|---|
-| Felicitas de Pentima | Backend, modelos y unificación de vistas admin |
+| Felicitas Di Pentima | Backend, modelos y unificación de vistas admin |
 | Nadia Berrino | Backend, ORM, scripts SQL y base de datos — **facilitadora de la reunión** |
 | Luisina Movio | Frontend, componentes React, CRUDs e integración |
 
@@ -198,11 +198,11 @@ Consolidar la persistencia del sistema: crear la base de datos `event_hall`, def
 
 | ID | Tarea | Tipo | Responsable | Prioridad | Criterio de aceptación |
 |---|---|---|---|---|---|
-| STY-07 | Completar CRUD de salones y tipos de salón | Feature | Felicitas de Pentima / Luisina Movio | Alta | Alta, edición, listado y baja funcionando |
+| STY-07 | Completar CRUD de salones y tipos de salón | Feature | Felicitas Di Pentima / Luisina Movio | Alta | Alta, edición, listado y baja funcionando |
 | STY-10 | Implementar CRUD de precios | Feature | Luisina Movio | Media | Módulo de precios en admin y API asociada |
 | STY-11 | Corregir claves primarias y relaciones del esquema | Base de datos | Nadia Berrino | Alta | Esquema actualizado y `db push` sin errores |
 | STY-12 | Preparar seeds de ubicaciones, salones y precios | Base de datos | Luisina Movio | Media | Seeds ejecutables y datos visibles en el frontend |
-| STY-13 | Definir el flujo de reserva de punta a punta | Análisis | Felicitas de Pentima | Alta | Diagrama de estados y endpoints identificados |
+| STY-13 | Definir el flujo de reserva de punta a punta | Análisis | Felicitas Di Pentima | Alta | Diagrama de estados y endpoints identificados |
 | STY-31 | Corregir validaciones del alta de cliente | Bugfix | Nadia Berrino | Alta | Alta de cliente sin errores de validación |
 
 #### Riesgos e Impedimentos
@@ -245,7 +245,7 @@ Consolidar la persistencia del sistema: crear la base de datos `event_hall`, def
 
 | Integrante | Rol en la reunión |
 |---|---|
-| Felicitas de Pentima | Backend, modelos y unificación de vistas admin |
+| Felicitas Di Pentima | Backend, modelos y unificación de vistas admin |
 | Nadia Berrino | Backend, ORM, scripts SQL y base de datos |
 | Luisina Movio | Frontend, componentes React, CRUDs e integración de pagos |
 
@@ -283,14 +283,14 @@ Completar el caso de uso central del negocio —realizar una reserva— e integr
 
 | ID | Tarea | Tipo | Responsable | Prioridad | Criterio de aceptación |
 |---|---|---|---|---|---|
-| STY-14 | Completar CRUD de reservas en admin | Feature | Felicitas de Pentima | Alta | Listado, detalle, aceptación y rechazo funcionando |
-| STY-15 | Completar CRUD de contratos en admin | Feature | Felicitas de Pentima / Luisina Movio | Alta | Generación, edición, revisión y anulación |
+| STY-14 | Completar CRUD de reservas en admin | Feature | Felicitas Di Pentima | Alta | Listado, detalle, aceptación y rechazo funcionando |
+| STY-15 | Completar CRUD de contratos en admin | Feature | Felicitas Di Pentima / Luisina Movio | Alta | Generación, edición, revisión y anulación |
 | STY-16 | Integrar pago al flujo del cliente | Feature | Luisina Movio | Alta | El cliente registra el pago y ve el estado |
 | STY-17 | Mejorar notificaciones de rechazo y cambios de estado | Feature | Luisina Movio | Media | El cliente recibe y visualiza la notificación |
 | STY-18 | Ajustar seeds y datos de ejemplo | Refactor | Luisina Movio | Media | Datos coherentes y reutilizables en todas las vistas |
 | STY-19 | Normalizar nombres y atributos de servicios extra | Refactor | Luisina Movio | Baja | Consistencia de mayúsculas y campos |
 | STY-20 | Revisar el esquema tras la incorporación de pagos y contratos | Base de datos | Nadia Berrino | Alta | `prisma db push` sin errores y relaciones correctas |
-| STY-21 | Validar el flujo completo reserva → contrato → pago | QA | Felicitas de Pentima | Alta | Prueba manual documentada del caso de uso |
+| STY-21 | Validar el flujo completo reserva → contrato → pago | QA | Felicitas Di Pentima | Alta | Prueba manual documentada del caso de uso |
 
 #### Riesgos e Impedimentos
 
@@ -332,7 +332,7 @@ Completar el caso de uso central del negocio —realizar una reserva— e integr
 
 | Integrante | Rol en la reunión |
 |---|---|
-| Felicitas de Pentima | Backend, modelos y unificación de vistas admin |
+| Felicitas Di Pentima | Backend, modelos y unificación de vistas admin |
 | Nadia Berrino | Backend, ORM, scripts SQL y base de datos |
 | Luisina Movio | Frontend, componentes React, CRUDs, seguridad y notificaciones |
 
@@ -372,12 +372,12 @@ Refinar la aplicación de cara a la entrega: mejorar la experiencia mobile first
 
 | ID | Tarea | Tipo | Responsable | Prioridad | Criterio de aceptación |
 |---|---|---|---|---|---|
-| STY-22 | Revisar y completar validaciones de todos los formularios | Feature | Luisina Movio / Felicitas de Pentima | Alta | Formularios con validación y mensajes de error |
+| STY-22 | Revisar y completar validaciones de todos los formularios | Feature | Luisina Movio / Felicitas Di Pentima | Alta | Formularios con validación y mensajes de error |
 | STY-23 | Auditar rutas protegidas y permisos por rol | Seguridad | Nadia Berrino / Luisina Movio | Alta | Ningún rol accede a rutas que no le corresponden |
 | STY-24 | Agregar pruebas automatizadas (1 por integrante + integración) | Test | Equipo | Alta | Suite ejecutable y evidencia de resultados |
 | STY-25 | Incorporar pruebas unitarias de componentes y E2E | Test | Luisina Movio | Media | Al menos un test de componente y un E2E |
 | STY-26 | Revisar consistencia de seeds y datos de demo | Refactor | Nadia Berrino | Media | Setup reproducible desde cero |
-| STY-27 | Completar README e instructivo de despliegue | Documentación | Felicitas de Pentima | Media | Instalación reproducible sin conocimiento previo |
+| STY-27 | Completar README e instructivo de despliegue | Documentación | Felicitas Di Pentima | Media | Instalación reproducible sin conocimiento previo |
 | STY-28 | Preparar video demostrativo y guion de defensa | Documentación | Equipo | Alta | Video y guion disponibles para la entrega |
 | STY-29 | Verificar build de producción del frontend | QA | Luisina Movio | Media | `npm run build` sin errores |
 | STY-30 | Revisar Swagger y credenciales de la app | Documentación | Nadia Berrino | Media | Swagger completo y credenciales documentadas |
@@ -423,11 +423,11 @@ La siguiente sección concentra el seguimiento de features, bugfixes, refactoriz
 | STY-08 | Login con JWT y dos roles | 2 | Nadia Berrino | Hecho | `auth.controller.js`, `auth.middleware.js` |
 | STY-09 | Protección de rutas por rol | 2 | Nadia Berrino | Hecho | Middleware `requireRole` en rutas |
 | STY-10 | CRUD de precios | 3 | Luisina Movio | Hecho | Commit `armé front de prices` y API asociada |
-| STY-14 | CRUD de reservas en admin | 3 | Felicitas de Pentima | Hecho | Listado, detalle y cambio de estado |
-| STY-15 | CRUD de contratos | 3 | Felicitas de Pentima / Luisina Movio | Hecho | Generación, revisión, edición y anulación |
+| STY-14 | CRUD de reservas en admin | 3 | Felicitas Di Pentima | Hecho | Listado, detalle y cambio de estado |
+| STY-15 | CRUD de contratos | 3 | Felicitas Di Pentima / Luisina Movio | Hecho | Generación, revisión, edición y anulación |
 | STY-16 | Integración de pagos al flujo del cliente | 3 | Luisina Movio | Hecho | Commit `payment incorporado al CUU` |
 | STY-17 | Notificaciones de rechazo y cambios de estado | 3 | Luisina Movio | Hecho | Commit `agregue notificaciones correspondientes a los rechazos del admin` |
-| STY-22 | Validaciones de formularios y usuarios | 4 | Luisina Movio / Felicitas de Pentima | Hecho | Commit `validaciones para los users` |
+| STY-22 | Validaciones de formularios y usuarios | 4 | Luisina Movio / Felicitas Di Pentima | Hecho | Commit `validaciones para los users` |
 | STY-23 | Protección de accesos y sesión | 4 | Nadia Berrino / Luisina Movio | Hecho | Commit `protección d los accesos` |
 | STY-24 | Notificaciones persistentes y eliminables | 4 | Luisina Movio | Hecho | Commits `mejoré notificaciones, se pueden borrar` y `mejoras notis` |
 | STY-25 | Filtrado de reservas y contratos por cliente | 4 | Luisina Movio | Hecho | Commit `filtrado para reservas y contratos de clientes` |
@@ -450,11 +450,11 @@ La siguiente sección concentra el seguimiento de features, bugfixes, refactoriz
 
 | ID | Refactor | Sprint | Responsable | Estado | Evidencia |
 |---|---|---|---|---|---|
-| STY-01 | Estandarización de nomenclatura en inglés en backend | 1 | Felicitas de Pentima / Nadia Berrino | Hecho | Rutas, controladores y servicios renombrados |
+| STY-01 | Estandarización de nomenclatura en inglés en backend | 1 | Felicitas Di Pentima / Nadia Berrino | Hecho | Rutas, controladores y servicios renombrados |
 | STY-11 | Ajuste de claves primarias y relaciones | 2 | Nadia Berrino | Hecho | Cambio de PK en precios y esquema actualizado |
 | STY-18 | Normalización de datos y atributos de servicios extra | 3 | Luisina Movio | Hecho | Commit `normalicé las mayusculas en extraService` |
 | STY-19 | Reorganización de seeds y datos de contrato | 3 | Luisina Movio | Hecho | Commit `reordené la info, creé seed extraServ... BD actualizada` |
-| STY-20 | Unificación de vistas de gestión al estándar admin | 3 | Felicitas de Pentima | Hecho | Commit `Unifico paginas de gestion al estandar admin y tablas a ancho completo` |
+| STY-20 | Unificación de vistas de gestión al estándar admin | 3 | Felicitas Di Pentima | Hecho | Commit `Unifico paginas de gestion al estandar admin y tablas a ancho completo` |
 | STY-30 | Centralización de errores y validaciones | 4 | Luisina Movio | Hecho | Commit `manejo centralizado de errores y validacion en backend` |
 
 ### 3.4. Scripts de base de datos y datos iniciales
@@ -475,7 +475,7 @@ La siguiente sección concentra el seguimiento de features, bugfixes, refactoriz
 
 | Integrante | Áreas principales | Ítems asignados | Rol de gestión |
 |---|---|---|---|
-| Felicitas de Pentima | Backend, modelos, vistas admin, integración | STY-01, STY-06, STY-14, STY-15, STY-20, STY-27 | Facilitadora Minuta 1; revisión de integración |
+| Felicitas Di Pentima | Backend, modelos, vistas admin, integración | STY-01, STY-06, STY-14, STY-15, STY-20, STY-27 | Facilitadora Minuta 1; revisión de integración |
 | Nadia Berrino | ORM, SQL, base de datos, autenticación, dominio | STY-02, STY-04, STY-05, STY-08, STY-09, STY-11, STY-23, STY-31 | Facilitadora Minuta 2; custodia del esquema |
 | Luisina Movio | Frontend, CRUDs, pagos, seeds, mobile, seguridad, notificaciones | STY-03, STY-10, STY-16, STY-17, STY-18, STY-19, STY-22, STY-24, STY-25, STY-26, STY-28, STY-29 | Facilitadora Minutas 3 y 4; QA funcional |
 
@@ -486,7 +486,7 @@ El repositorio registra **271 commits** en `main` al 26/10/2026. Los contadores 
 | Integrante | Commits | Participación aproximada |
 |---|---|---|
 | Luisina Movio (`LuliMovio` + `Luli`) | 175 | 64,6 % |
-| Felicitas de Pentima (`Felicitas26` + `Maria Felicitas Di Pentima`) | 48 | 17,7 % |
+| Felicitas Di Pentima (`Felicitas26` + `Maria Felicitas Di Pentima`) | 48 | 17,7 % |
 | Nadia Berrino (`NadiaBerrino` + `Nadia Berrino`) | 48 | 17,7 % |
 
 Ejemplos de commits usados como evidencia:
@@ -509,9 +509,9 @@ Ejemplos de commits usados como evidencia:
 | STY-36 | Un test automatizado por integrante | Test | Equipo | Alta | Pendiente |
 | STY-37 | Test de integración del flujo reserva → contrato → pago | Test | Nadia Berrino | Alta | Pendiente |
 | STY-38 | Test unitario de componente React | Test | Luisina Movio | Media | Pendiente |
-| STY-39 | Test end-to-end del login y la reserva | Test | Felicitas de Pentima | Media | Pendiente |
+| STY-39 | Test end-to-end del login y la reserva | Test | Felicitas Di Pentima | Media | Pendiente |
 | STY-40 | Build de producción del frontend (`npm run build`) | QA | Luisina Movio | Media | Pendiente |
-| STY-41 | README final con instalación y credenciales | Documentación | Felicitas de Pentima | Alta | Pendiente |
+| STY-41 | README final con instalación y credenciales | Documentación | Felicitas Di Pentima | Alta | Pendiente |
 | STY-42 | Video demostrativo y guion de defensa | Documentación | Equipo | Alta | Pendiente |
 | STY-43 | Verificación final de Swagger y variables de entorno | Documentación | Nadia Berrino | Media | Pendiente |
 
