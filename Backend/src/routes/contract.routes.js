@@ -12,6 +12,7 @@ router.post("/", authenticate, requireRole(["administrador"]), contractControlle
 router.put("/:id", authenticate, contractController.update);
 router.put("/:id/edit", authenticate, requireRole(["administrador"]), contractController.updateAdmin);
 router.delete("/:id", authenticate, requireRole(["administrador"]), contractController.delete);
+router.delete("/:id/cliente", authenticate, contractController.eliminarCliente);
 router.post("/:id/enviar", authenticate, contractController.enviar);
 router.post("/:id/aceptar", authenticate, contractController.firmar);
 router.put("/:id/revision", authenticate, requireRole(["administrador"]), contractController.review);

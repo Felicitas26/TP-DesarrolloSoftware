@@ -111,6 +111,16 @@ class ContractController {
         });
     });
 
+    eliminarCliente = asyncHandler(async (req, res) => {
+        await this.loadContract(req);
+
+        await contractService.eliminarCliente(req.params.id);
+
+        return res.status(200).json({
+            message: "El contrato fue eliminado y el evento dado de baja. No se realizan reembolsos de lo pagado."
+        });
+    });
+
     enviar = asyncHandler(async (req, res) => {
         await this.loadContract(req);
 

@@ -645,6 +645,10 @@
     line-height: 1.6;
 }
 
+.contract-terms-warning {
+    color: #ff9b9b;
+}
+
 .contract-reason-textarea {
     width: 100%;
     padding: 13px 15px;

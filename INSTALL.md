@@ -52,6 +52,7 @@ TP-DesarrolloSoftware/
 │   ├── scripts/             # setup + seeds (datos de ejemplo)
 │   ├── src/                 # rutas, controladores, servicios, modelos
 │   ├── server.js            # punto de entrada (puerto 3000)
+│   ├── db.js                # pool MySQL de legado (sin uso actual; el acceso real es vía Prisma)
 │   └── .env                 # variables de entorno (se crea, NO se versiona)
 ├── frontend/                # Aplicación React + Vite
 │   ├── src/
@@ -93,13 +94,13 @@ git clone https://github.com/Felicitas26/TP-DesarrolloSoftware.git
 cd TP-DesarrolloSoftware
 ```
 
-> El repositorio **no tiene scripts en la raíz** (`package.json` vacío): el backend y el frontend se instalan y ejecutan por separado, cada uno en su carpeta.
+> El repositorio **no tiene `package.json` en la raíz** (sólo quedó un `package-lock.json` suelto, heredado de la estructura inicial): el backend y el frontend se instalan y ejecutan por separado, cada uno en su carpeta.
 
 ### 4.2. Base de datos MySQL
 
 No es necesario crear tablas a mano: el backend las crea y carga los datos automáticamente.
 
-Sólo hay que asegurarse de tener un usuario de MySQL con permisos para **crear bases de datos**. Por defecto el proyecto usa el usuario `root`.
+Sólo hay que asegurarse de tener un usuario de MySQL con permisos para **crear bases de datos** y escribirlo en `DATABASE_URL` del `.env` (sección 4.3). No hay un usuario "por defecto" impuesto por el código: las credenciales se toman de la URL.
 
 > No hace falta importar ningún SQL: el paso 4.3 crea la base y todas las tablas automáticamente. El archivo `database/new_event_hall.sql` es sólo una **referencia del esquema inicial** (puede estar desactualizado). Si preferís usarlo, después ejecutá `npx prisma db push` y `npm run seed:all` para completar el esquema y los datos.
 
@@ -122,11 +123,12 @@ JWT_SECRET=UNA_CLAVE_SECRETA_LARGA_Y_ALEATORIA
 JWT_EXPIRES_IN=8h
 ```
 
-> - `DATABASE_URL` debe tener la forma `mysql://USUARIO:CONTRASEÑA@HOST:PUERTO/BASE`.
-> - `DB_*` y `DATABASE_URL` deben apuntar al **mismo** usuario, contraseña y base (el pool de MySQL usa `DB_*` y Prisma usa `DATABASE_URL`).
-> - Si la contraseña contiene caracteres especiales (`@`, `:`, `/`, `#`, etc.), deben codificarse en formato URL (por ejemplo `@` → `%40`).
+> - `DATABASE_URL` es **la única credencial que el sistema usa realmente** (en formato `mysql://USUARIO:CONTRASEÑA@HOST:PUERTO/BASE`). Prisma la usa para el ORM, y el script de setup extrae de ahí el host, puerto, usuario y contraseña para crear la base.
+> - Las variables `DB_*` son de configuración de legado: el pool de MySQL (`Backend/db.js`) que las leería ya no es consumido por ninguna capa actual del backend. Se mantienen por compatibilidad, pero deben reflejar los mismos datos que `DATABASE_URL` si se van a usar.
+> - Si la contraseña contiene caracteres especiales (`@`, `:`, `/`, `#`, etc.), deben codificarse en formato URL (por ejemplo `@` → `%40`) **en `DATABASE_URL`**.
 > - Si el usuario de MySQL **no tiene contraseña**, dejar `DB_PASSWORD=` vacío y usar `DATABASE_URL="mysql://root@localhost:3306/event_hall"`.
-> - `JWT_SECRET` es la clave con la que se firman los tokens de sesión. Usar un valor propio y privado.
+> - No se exige que el usuario sea `root`: sirve cualquier usuario de MySQL con permisos para **crear bases de datos** (necesario para el paso de setup).
+> - `JWT_SECRET` es la clave con la que se firman los tokens de sesión y es **obligatoria**: sin ella el login falla. Usar un valor propio y privado. `JWT_EXPIRES_IN` es opcional (por defecto `8h`).
 > - El archivo `.env` **no se sube al repositorio** (está en `.gitignore`); si trabajás en el mismo entorno del equipo, pedí los valores reales al grupo.
 
 **2) Instalar dependencias:**
@@ -202,6 +204,8 @@ Credenciales del administrador creadas por el seed:
 |---------|------------|
 | `admin` | `admin123` |
 
+Los usuarios **clientes** no vienen con el seed: se registran desde el propio sitio (`POST /api/client` o el formulario de registro). El alta crea además la cuenta de usuario con `rol: "cliente"` y **contraseña inicial temporal igual al DNI** (`passwordTemporal: true`); al cambiarla desde la pantalla de cambio de contraseña se marca como definitiva.
+
 ---
 
 ## 6. Scripts disponibles
@@ -272,6 +276,7 @@ La especificación vive en `Backend/src/docs/openapi.js`.
 | El frontend carga pero no trae datos | El backend no está corriendo o está en otro puerto. | Verificar que el backend esté en `http://localhost:3000` o definir `VITE_API_URL`. |
 | Error de versión de Node al iniciar el frontend | Node.js desactualizado o en una rama no soportada (21.x / 22.0–22.11). | Instalar Node.js 20.19+ (rama 20) o 22.12+ (rama 22). |
 | `Prisma Client did not initialize` | No se ejecutó `prisma generate`. | Ejecutar `npm install` en `Backend` o `npx prisma generate`. |
+| Error al hacer login (500) | Falta `JWT_SECRET` en `Backend/.env`. | Agregar `JWT_SECRET` al `.env` y reiniciar el backend. |
 | No aparecen ciudades en el formulario | Seed de ubicaciones no ejecutado. | Ejecutar `npm run seed:locations` en `Backend`. |
 
 ---

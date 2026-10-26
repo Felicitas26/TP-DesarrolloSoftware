@@ -283,7 +283,7 @@ Completar el caso de uso central del negocio —realizar una reserva— e integr
 
 | ID | Tarea | Tipo | Responsable | Prioridad | Criterio de aceptación |
 |---|---|---|---|---|---|
-| STY-14 | Completar CRUD de reservas en admin | Feature | Felicitas Di Pentima | Alta | Listado, detalle, aceptación y rechazo funcionando |
+| STY-14 | Completar CRUD de reservas en admin | Feature | Luisina Movio/Felicitas Di Pentima  | Alta | Listado, detalle, aceptación y rechazo funcionando |
 | STY-15 | Completar CRUD de contratos en admin | Feature | Felicitas Di Pentima / Luisina Movio | Alta | Generación, edición, revisión y anulación |
 | STY-16 | Integrar pago al flujo del cliente | Feature | Luisina Movio | Alta | El cliente registra el pago y ve el estado |
 | STY-17 | Mejorar notificaciones de rechazo y cambios de estado | Feature | Luisina Movio | Media | El cliente recibe y visualiza la notificación |
@@ -377,7 +377,7 @@ Refinar la aplicación de cara a la entrega: mejorar la experiencia mobile first
 | STY-24 | Agregar pruebas automatizadas (1 por integrante + integración) | Test | Equipo | Alta | Suite ejecutable y evidencia de resultados |
 | STY-25 | Incorporar pruebas unitarias de componentes y E2E | Test | Luisina Movio | Media | Al menos un test de componente y un E2E |
 | STY-26 | Revisar consistencia de seeds y datos de demo | Refactor | Nadia Berrino | Media | Setup reproducible desde cero |
-| STY-27 | Completar README e instructivo de despliegue | Documentación | Felicitas Di Pentima | Media | Instalación reproducible sin conocimiento previo |
+| STY-27 | Completar README e instructivo de despliegue | Documentación | Luisina Movio | Media | Instalación reproducible sin conocimiento previo |
 | STY-28 | Preparar video demostrativo y guion de defensa | Documentación | Equipo | Alta | Video y guion disponibles para la entrega |
 | STY-29 | Verificar build de producción del frontend | QA | Luisina Movio | Media | `npm run build` sin errores |
 | STY-30 | Revisar Swagger y credenciales de la app | Documentación | Nadia Berrino | Media | Swagger completo y credenciales documentadas |

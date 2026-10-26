@@ -53,6 +53,7 @@ function ContractDetail() {
     const [commentMod, setCommentMod] = useState("");
     const [showTerminos, setShowTerminos] = useState(false);
     const [confirmCancelar, setConfirmCancelar] = useState(false);
+    const [confirmEliminar, setConfirmEliminar] = useState(false);
     const [rejectOpen, setRejectOpen] = useState(false);
     const [rejectMotivo, setRejectMotivo] = useState("");
     const [pendingRedirect, setPendingRedirect] = useState(false);
@@ -386,6 +387,26 @@ function ContractDetail() {
 
             setPendingRedirect(true);
             showMessage("success", "Evento cancelado", data.message);
+        } catch (error) {
+            showMessage("error", "Error", error.message);
+        } finally {
+            setSaving(false);
+        }
+    };
+
+    const handleEliminarContrato = async () => {
+        setMessage(null);
+        setSaving(true);
+
+        try {
+            await contractService.eliminarCliente(id);
+
+            setPendingRedirect(true);
+            showMessage(
+                "success",
+                "Contrato eliminado",
+                "El contrato fue eliminado y el evento quedó dado de baja. No se realizan reembolsos del dinero pagado."
+            );
         } catch (error) {
             showMessage("error", "Error", error.message);
         } finally {
@@ -1102,6 +1123,17 @@ function ContractDetail() {
                         </button>
                     )}
 
+                    {rol === "cliente" &&
+                        contract.status === "firmado" &&
+                        !modificando &&
+                        !tieneModPendiente &&
+                        diasHastaEvento !== null &&
+                        diasHastaEvento >= 1 && (
+                            <button className="contract-btn-reject" onClick={() => setConfirmEliminar(true)} disabled={saving}>
+                                Eliminar contrato
+                            </button>
+                        )}
+
                     {rol === "cliente" && contract.status === "firmado" && modificando && (
                         <>
                             <button className="contract-btn-primary" onClick={handleSolicitarMod} disabled={saving}>
@@ -1300,6 +1332,31 @@ function ContractDetail() {
                             </button>
                             <button className="contract-btn-reject" onClick={handleCancelarEvento} disabled={saving}>
                                 {saving ? "Cancelando..." : "Sí, cancelar el evento"}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {confirmEliminar && (
+                <div className="contract-terms-backdrop" onClick={() => setConfirmEliminar(false)}>
+                    <div className="contract-terms-modal" onClick={(e) => e.stopPropagation()}>
+                        <button className="contract-terms-close" onClick={() => setConfirmEliminar(false)} aria-label="Cerrar">✕</button>
+                        <h3>Eliminar el contrato</h3>
+                        <p className="contract-terms-intro">
+                            Esta acción elimina el contrato #{contract.idContract} y da de baja tu evento
+                            {fecEvento ? ` del ${formatDate(fecEvento)}` : ""}. No se puede deshacer.
+                        </p>
+                        <p className="contract-terms-intro contract-terms-warning">
+                            <strong>No habrá reembolso del dinero:</strong> los pagos que hayas realizado
+                            no se devuelven.
+                        </p>
+                        <div className="contract-terms-actions">
+                            <button className="contract-btn-save" onClick={() => setConfirmEliminar(false)} disabled={saving}>
+                                Volver
+                            </button>
+                            <button className="contract-btn-reject" onClick={handleEliminarContrato} disabled={saving}>
+                                {saving ? "Eliminando..." : "Sí, eliminar el contrato"}
                             </button>
                         </div>
                     </div>

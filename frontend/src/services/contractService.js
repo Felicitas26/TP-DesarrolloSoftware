@@ -28,5 +28,6 @@ export const contractService = {
     revisarModificacion: (id, data) =>
         call(api.put(`/api/contract/${id}/modificacion/revision`, data)),
     resolverModificacion: (id, data) =>
-        call(api.post(`/api/contract/${id}/modificacion/rechazo`, data))
+        call(api.post(`/api/contract/${id}/modificacion/rechazo`, data)),
+    eliminarCliente: (id) => api.del(`/api/contract/${id}/cliente`)
 };
