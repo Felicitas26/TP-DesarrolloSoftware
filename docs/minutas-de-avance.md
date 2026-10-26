@@ -34,15 +34,13 @@ Se adoptó **Scrum** como marco de gestión, adaptado a un equipo de tres integr
 | Artefactos | Product Backlog, Sprint Backlog, tablero Kanban, minutas e historial de commits |
 | Definición de terminado (DoD) | Código integrado en `main`, validaciones y manejo de errores, revisión de un par, documentación mínima y prueba manual del flujo |
 
-> **Nota de honestidad técnica:** las pruebas automatizadas (unitarias, de integración y end-to-end) quedaron registradas como deuda técnica priorizada para el cierre, no como parte de los incrementos ya entregados. Se documentan en la sección 3.7.
-
 ### 1.2. Roles y responsabilidades
 
 | Integrante | Usuario GitHub | Rol técnico | Responsabilidad de gestión |
 |---|---|---|---|
-| Felicitas26 | `Felicitas26` | Backend, modelos, unificación de vistas de administración | Facilitadora de la Minuta 1; revisión de integración y consistencia de vistas admin |
-| NadiaBerrino | `NadiaBerrino` | Backend, ORM, scripts SQL, base de datos, autenticación y modelos de dominio | Facilitadora de la Minuta 2; custodia del esquema, migraciones y entorno |
-| LuliMovio | `LuliMovio` | Frontend, componentes React, CRUDs, integración de pagos, seeds, mobile first, seguridad y notificaciones | Facilitadora de las Minutas 3 y 4; QA funcional y validación de UX |
+| Felicitas Di Pentima | `Felicitas26` | Backend, modelos, unificación de vistas de administración | Facilitadora de la Minuta 1; revisión de integración y consistencia de vistas admin |
+| Nadia Berrino | `NadiaBerrino` | Backend, ORM, scripts SQL, base de datos, autenticación y modelos de dominio | Facilitadora de la Minuta 2; custodia del esquema, migraciones y entorno |
+| Luisina Movio | `LuliMovio` | Frontend, componentes React, CRUDs, integración de pagos, seeds, mobile first, seguridad y notificaciones | Facilitadora de las Minutas 3 y 4; QA funcional y validación de UX |
 
 **Scrum Master:** rotativo por corte, según la facilitadora indicada en cada minuta.
 **Product Owner:** el equipo en su conjunto, con validación del docente como stakeholder.
