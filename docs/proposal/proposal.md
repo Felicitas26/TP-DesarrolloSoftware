@@ -41,7 +41,7 @@ Adicionales
 ### Alcance Adicional Voluntario
 |Req|Detalle|
 |:-|:-|
-|Listados |1. Listado de clientes, muestra nombre y apellido, dni, telèfono, email ⇒ detalle muestra datos completos del cliente<br>2. Listado de contratos filtra por estado del contrato, muestra id, nombre y apellido del cliente, fecha de evento, cantidad de invitados estimada, valor final, estado ⇒ detalle muestra datos completos del contrato, precios y pagos<br>3. Listado de servicios extras muestra nombre, detalle, costo ⇒ detalle muestra datos del servicio<br>3. Listado de menues muestra imagen, nombre, detalle, presupuesto ⇒ detalle muestra descripciòn detallada del plato<br>3. Listado de precios de tipos de salones|
+|Listados |1. Listado de clientes, muestra nombre y apellido, dni, telèfono, email ⇒ detalle muestra datos completos del cliente<br>2. Listado de contratos filtra por estado del contrato, muestra id, nombre y apellido del cliente, fecha de evento, cantidad de invitados estimada, valor final, estado ⇒ detalle muestra datos completos del contrato, precios y pagos<br>3. Listado de servicios extras muestra nombre, detalle, costo ⇒ detalle muestra datos del servicio<br>3. Listado de menues muestra imagen, nombre, detalle, presupuesto ⇒ detalle muestra descripciòn detallada del plato<br>3. Listado de precios de tipos de salones muestra nombre del tipo de salòn, fecha de vigencia desde, feche de vigencia hasta, valor ⇒ detalle muestra datos completos de los precios|
 |CUU/Epic|1. Anular contrato vigente<br>2. Modificar contrato de salón<br>3. Registrar pago del evento<br>4. Alta/Baja/Edición de menues<br>5. Alta/Baja/Edición de servicios extra|
 |Otros |1. Envío de notificaciones sobre novedades de la reserva| 
 
