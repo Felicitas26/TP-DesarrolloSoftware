@@ -43,5 +43,5 @@ Adicionales
 |:-|:-|
 |Listados |1. Listados de <br>2. bb<br>3. cc|
 |CUU/Epic|1. Anular contrato vigente<br>2. Modificar contrato de salón<br>3. Registrar pago del evento<br>4. Alta/Baja/Edición de menues<br>5. Alta/Baja/Edición de servicios extra|
-|Otros |1. Listado de salones filtrado por id de salón, muestra nombre, dirección, localidad ⇒ detalle muestra datos completos de tipos de salón<br>2. Listado de reservas filtrado por cliente, muestra id  de reserva, fecha de reserva, fecha de evento, tipo de evento, cantidad invitados, estado de reserva, salon, tipo de salon⇒ detalle muestra datos completos del cliente| 
+|Otros |1. Envío de notificaciones sobre novedades de la reserva| 
 
