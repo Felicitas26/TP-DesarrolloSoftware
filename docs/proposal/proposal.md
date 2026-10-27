@@ -41,7 +41,7 @@ Adicionales
 ### Alcance Adicional Voluntario
 |Req|Detalle|
 |:-|:-|
-|Listados |1. Listados de <br>2. bb<br>3. cc|
+|Listados |1. Listados de clientes<br>2. Listado de contratos<br>3. Listados de servicios extras<br>3. Listados de menues<br>3. Listados de precios de tipos de salones|
 |CUU/Epic|1. Anular contrato vigente<br>2. Modificar contrato de salón<br>3. Registrar pago del evento<br>4. Alta/Baja/Edición de menues<br>5. Alta/Baja/Edición de servicios extra|
 |Otros |1. Envío de notificaciones sobre novedades de la reserva| 
 
