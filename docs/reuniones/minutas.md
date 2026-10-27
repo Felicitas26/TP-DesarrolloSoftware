@@ -5,7 +5,10 @@
 - Berrino Nadia Belén
 - Di Pentima María Felicitas
 
-> Las fechas de estas minutas son propuestas a partir de los cortes de commits del repositorio.
+## Medios de comunicación
+Comunicación principal mediante Whatsapp y reuniones presenciales.
+
+## Reuniones registradas
 
 - [29/04/2026](2026-04-29-minuta.md) - Propuesta, alcance y casos de uso.
 - [21/07/2026](2026-07-21-minuta.md) - Estructura inicial del backend.
@@ -15,6 +18,7 @@
 - [10/09/2026](2026-09-10-minuta.md) - Reservas, contratos, pagos y seeds.
 - [16/10/2026](2026-10-16-minuta.md) - Servicios, errores y mobile first.
 - [23/10/2026](2026-10-23-minuta.md) - Notificaciones, filtros, seguridad y cierre.
+Las fechas anteriores documentan hitos de coordinación y avance.
 
 ## Documento consolidado
 
