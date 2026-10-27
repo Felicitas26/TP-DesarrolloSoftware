@@ -11,3 +11,15 @@ node_modules
 .copilot/
 .continue/
 .windsurf/
+
+# AI assistant skills
+**/skills/
+.agents/skills/
+.claude/skills/
+.cursor/skills/
+.devin/skills/
+.opencode/skills/
+.aider/skills/
+.copilot/skills/
+.continue/skills/
+.windsurf/skills/
