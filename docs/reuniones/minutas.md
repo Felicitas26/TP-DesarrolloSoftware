@@ -21,6 +21,3 @@ Comunicación principal mediante Whatsapp y reuniones presenciales.
 
 Las fechas anteriores documentan hitos de coordinación y avance.
 
-## Documento consolidado
-
-- [Minutas de avance y seguimiento](../minutas-de-avance.md)
