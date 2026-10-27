@@ -1,6 +1,6 @@
 # Minutas de reuniones
 
-> Las fechas de estas minutas son propuestas a partir de los cortes de commits del repositorio y quedan pendientes de validación por el equipo.
+> Las fechas de estas minutas son propuestas a partir de los cortes de commits del repositorio.
 
 - [29/04/2026](2026-04-29-minuta.md) - Propuesta, alcance y casos de uso.
 - [21/07/2026](2026-07-21-minuta.md) - Estructura inicial del backend.
