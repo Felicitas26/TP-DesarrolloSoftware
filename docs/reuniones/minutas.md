@@ -1,9 +1,9 @@
 # Minutas de reuniones
 
 ## Participantes
--Movio Luisina
--Berrino Nadia Belén
--Di Pentima María Felicitas
+- Movio Luisina
+- Berrino Nadia Belén
+- Di Pentima María Felicitas
 
 > Las fechas de estas minutas son propuestas a partir de los cortes de commits del repositorio.
 
