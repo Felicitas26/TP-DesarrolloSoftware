@@ -21,3 +21,5 @@ Comunicación principal mediante Whatsapp y reuniones presenciales.
 
 Las fechas anteriores documentan hitos de coordinación y avance.
 
+## Planilla de seguimiento
+https://docs.google.com/spreadsheets/d/1qjnj3YXzJuS9Uy6VyxEd3MKzakLTjEH_/edit?usp=sharing&ouid=114366817934415432241&rtpof=true&sd=true 
