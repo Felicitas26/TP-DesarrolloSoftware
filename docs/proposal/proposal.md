@@ -34,5 +34,5 @@ el cliente accede al contrato y debe firmarlo para continuar con el pago.Desde e
 Adicionales
 |Req|Detalle|
 |:-|:-|
-|CRUD |1. CRUD Client<br>2. CRUD LoungeType<br>3. CRUD Location<br>4. CRUD Lounge<br>5. CRUD Price<br>6. CRUD Reservation<br>7. Contract<br>8. CardDetail<br>9. ExtraService|
+|CRUD |1. CRUD Client<br>2. CRUD LoungeType<br>3. CRUD Location<br>4. CRUD Lounge<br>5. CRUD Price<br>6. CRUD Reservation<br>7. Contract<br>8. CardDetail<br>9. ExtraService<br>10. Payment|
 |CUU/Epic|1. Anular contrato vigente<br>2. Modificar contrato de salón<br>3. Registrar pago del evento|
