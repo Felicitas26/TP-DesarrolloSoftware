@@ -18,6 +18,7 @@ Comunicación principal mediante Whatsapp y reuniones presenciales.
 - [10/09/2026](2026-09-10-minuta.md) - Reservas, contratos, pagos y seeds.
 - [16/10/2026](2026-10-16-minuta.md) - Servicios, errores y mobile first.
 - [23/10/2026](2026-10-23-minuta.md) - Notificaciones, filtros, seguridad y cierre.
+
 Las fechas anteriores documentan hitos de coordinación y avance.
 
 ## Documento consolidado
