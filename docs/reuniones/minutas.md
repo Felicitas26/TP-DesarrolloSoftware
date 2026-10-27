@@ -1,5 +1,10 @@
 # Minutas de reuniones
 
+## Participantes
+-Movio Luisina
+-Berrino Nadia Belén
+-Di Pentima María Felicitas
+
 > Las fechas de estas minutas son propuestas a partir de los cortes de commits del repositorio.
 
 - [29/04/2026](2026-04-29-minuta.md) - Propuesta, alcance y casos de uso.
