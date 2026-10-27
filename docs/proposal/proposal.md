@@ -24,15 +24,24 @@ el cliente accede al contrato y debe firmarlo para continuar con el pago.Desde e
 ### Alcance Mínimo
 |Req|Detalle|
 |:-|:-|
-|CRUD simple |1. CRUD Client<br>2. CRUD LoungeType<br>3. CRUD Location|
-|CRUD dependiente |1. CRUD Reservation (depende de) CRUD Client<br>2. CRUD Lounge(depende de) CRUD LoungeType|
-|Listado<br>+<br>detalle |1. Listado de salones filtrado por tipo de salón o nombre, muestra nombre, cantidad mínima y máxima de invitados ⇒ detalle CRUD Lounge<br>2. Listado de reservas filtrado por cliente, muestra id  de reserva, fecha, cantidad invitados y estado de reserva ⇒ detalle muestra datos completos de la reserva, del cliente y servicios incluidos| 
-|CUU/Epic|1. Realizar reserva de salón para un evento<br>2. Aprobación / Rechazo de una reserva<br>3. Generación y envío del contrato.|
+|CRUD simple |1. CRUD Client<br>2. CRUD Lounge<br>3. CRUD Location|
+|CRUD dependiente |1. CRUD Reservation (depende de) CRUD Client + CRUD Lounge<br>2. CRUD LoungeType(depende de) CRUD Lounge|
+|Listado<br>+<br>detalle |1. Listado de salones filtrado por id de salón, muestra nombre, dirección, localidad ⇒ detalle muestra datos completos de tipos de salón<br>2. Listado de reservas filtrado por cliente, muestra id  de reserva, fecha de reserva, fecha de evento, tipo de evento, cantidad invitados, estado de reserva, salon, tipo de salon⇒ detalle muestra datos completos del cliente| 
+|CUU/Epic|1. Realizar reserva de salón para un evento<br>2. Aprobación / Rechazo de una reserva|
 
 
 
 Adicionales
 |Req|Detalle|
 |:-|:-|
-|CRUD |1. CRUD Client<br>2. CRUD LoungeType<br>3. CRUD Location<br>4. CRUD Lounge<br>5. CRUD Price<br>6. CRUD Reservation<br>7. Contract<br>8. CardDetail<br>9. ExtraService|
-|CUU/Epic|1. Anular contrato vigente<br>2. Modificar contrato de salón<br>3. Registrar pago del evento|
+|CRUD simple |1. CRUD Client<br>2. CRUD Lounge<br>3. CRUD Location<br>4. CardDetail<br>5. ExtraService|
+|CRUD dependiente |1. CRUD Reservation (depende de) CRUD Client + CRUD Lounge<br>2. CRUD LoungeType(depende de) CRUD Lounge<br>3. CRUD Contract(depende de) CRUD Reservation<br>4. CRUD Payment(depende de) CRUD Contract<br>5. CRUD Price(depende de) CRUD LoungeType|
+|CUU/Epic|1. Realizar reserva de salón para un evento<br>2. Aprobación / Rechazo de una reserva<br>3. Generación y envío del contrato|
+
+### Alcance Adicional Voluntario
+|Req|Detalle|
+|:-|:-|
+|Listados |1. Listados de clientes<br>2. Listado de contratos<br>3. Listados de servicios extras<br>3. Listados de menues<br>3. Listados de precios de tipos de salones|
+|CUU/Epic|1. Anular contrato vigente<br>2. Modificar contrato de salón<br>3. Registrar pago del evento<br>4. Alta/Baja/Edición de menues<br>5. Alta/Baja/Edición de servicios extra|
+|Otros |1. Envío de notificaciones sobre novedades de la reserva| 
+
