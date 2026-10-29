@@ -264,6 +264,44 @@
     color: #64748b;
 }
 
+.password-input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.password-input-wrapper input {
+    padding-right: 42px;
+}
+
+.password-toggle {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+
+    display: flex;
+    padding: 4px;
+
+    color: #64748b;
+    background: none;
+    border: none;
+
+    cursor: pointer;
+
+    transition: color 0.18s ease;
+}
+
+.password-toggle:hover {
+    color: #22d3ee;
+}
+
+.password-toggle:focus-visible {
+    outline: 2px solid #22d3ee;
+    outline-offset: 2px;
+    border-radius: 4px;
+}
+
 .form-group input:hover {
     border-color: rgba(148, 163, 184, 0.28);
 }

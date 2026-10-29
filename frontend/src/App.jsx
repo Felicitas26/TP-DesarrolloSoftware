@@ -53,6 +53,7 @@ function App() {
                 <Route path="/home" element={<Landing />} />
 
                 <Route path="/login" element={<Login />} />
+                <Route path="/registro" element={<NewClient />} />
                 <Route path="/recuperar-password" element={<ForgotPassword />} />
                 <Route
                     path="/cambiar-password"

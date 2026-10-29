@@ -131,7 +131,7 @@ function ChangePassword() {
                 onClick={() => setShowActual((prev) => !prev)}
                 aria-label={showActual ? "Ocultar" : "Mostrar"}
               >
-                {showActual ? <IconEyeOff /> : <IconEye />}
+                {showActual ? <IconEye /> : <IconEyeOff />}
               </button>
             </div>
 
@@ -151,7 +151,7 @@ function ChangePassword() {
                 onClick={() => setShowNueva((prev) => !prev)}
                 aria-label={showNueva ? "Ocultar" : "Mostrar"}
               >
-                {showNueva ? <IconEyeOff /> : <IconEye />}
+                {showNueva ? <IconEye /> : <IconEyeOff />}
               </button>
             </div>
 
@@ -171,7 +171,7 @@ function ChangePassword() {
                 onClick={() => setShowConfirmar((prev) => !prev)}
                 aria-label={showConfirmar ? "Ocultar" : "Mostrar"}
               >
-                {showConfirmar ? <IconEyeOff /> : <IconEye />}
+                {showConfirmar ? <IconEye /> : <IconEyeOff />}
               </button>
             </div>
 

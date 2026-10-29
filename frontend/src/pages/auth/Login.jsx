@@ -146,7 +146,7 @@ function Login() {
               onClick={() => setShowPassword((prev) => !prev)}
               aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
             >
-              {showPassword ? <IconEyeOff /> : <IconEye />}
+              {showPassword ? <IconEye /> : <IconEyeOff />}
             </button>
           </div>
 
@@ -172,9 +172,9 @@ function Login() {
               className="login-link-right"
               role="button"
               tabIndex="0"
-              onClick={() => navigate("/client/new", { state: { origin: "login" } })}
+              onClick={() => navigate("/registro", { state: { origin: "login" } })}
               onKeyDown={(e) => {
-                if (e.key === "Enter" || e.key === " ") navigate("/client/new", { state: { origin: "login" } });
+                if (e.key === "Enter" || e.key === " ") navigate("/registro", { state: { origin: "login" } });
               }}
             >
               ¿No tiene cuenta?

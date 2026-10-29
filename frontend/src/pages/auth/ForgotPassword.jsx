@@ -156,7 +156,7 @@ function ForgotPassword() {
                   onClick={() => setShowNueva((prev) => !prev)}
                   aria-label={showNueva ? "Ocultar contraseña" : "Mostrar contraseña"}
                 >
-                  {showNueva ? <IconEyeOff /> : <IconEye />}
+                  {showNueva ? <IconEye /> : <IconEyeOff />}
                 </button>
               </div>
 
@@ -176,7 +176,7 @@ function ForgotPassword() {
                   onClick={() => setShowConfirmar((prev) => !prev)}
                   aria-label={showConfirmar ? "Ocultar contraseña" : "Mostrar contraseña"}
                 >
-                  {showConfirmar ? <IconEyeOff /> : <IconEye />}
+                  {showConfirmar ? <IconEye /> : <IconEyeOff />}
                 </button>
               </div>
 

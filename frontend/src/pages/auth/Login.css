@@ -253,19 +253,27 @@
 }
 
 .login-links a,
+.login-link-left,
 .login-link-right {
   color: #9ca3af;
   text-decoration: none;
-  transition: color 0.18s ease;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: color 0.18s ease, text-shadow 0.18s ease;
 }
 
 .login-links a:hover,
+.login-link-left:hover,
 .login-link-right:hover {
   color: #22d3ee;
+  text-shadow: 0 0 10px rgba(34, 211, 238, 0.55);
 }
 
-.login-link-right {
-  cursor: pointer;
+.login-links a:focus-visible,
+.login-link-left:focus-visible,
+.login-link-right:focus-visible {
+  outline: 2px solid #22d3ee;
+  outline-offset: 3px;
 }
 
 @media (min-width: 1024px) {

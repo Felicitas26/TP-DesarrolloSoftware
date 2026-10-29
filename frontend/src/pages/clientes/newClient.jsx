@@ -22,6 +22,22 @@ const IconMapPin = () => (
   </svg>
 );
 
+const IconEye = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+    <circle cx="12" cy="12" r="3"/>
+  </svg>
+);
+
+const IconEyeOff = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/>
+    <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/>
+    <path d="M14.12 14.12a3 3 0 1 1-4.24-4.24"/>
+    <line x1="1" y1="1" x2="23" y2="23"/>
+  </svg>
+);
+
 const IconArrowLeft = () => (
   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/>
@@ -44,6 +60,7 @@ function NewClient() {
   const navigate = useNavigate();
   const location = useLocation();
   const origin = location.state?.origin || "admin";
+  const isSelfRegistration = location.pathname === "/registro" || origin === "login";
 
 const emptyClient = {
     nameCli: "",
@@ -68,6 +85,7 @@ const emptyClient = {
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [lastRegistered, setLastRegistered] = useState(null);
   const [emailAvailable, setEmailAvailable] = useState(null);
+  const [showPassword, setShowPassword] = useState(false);
   const emailTimerRef = useRef(null);
 
   // Normaliza mayúsculas y acentos para comparar nombres de ciudades
@@ -131,7 +149,7 @@ const emptyClient = {
     setClient((prev) => {
       const next = { ...prev, [name]: value };
 
-      if (name === "emailCli" && (!prev.username || prev.username === prev.emailCli)) {
+      if (name === "emailCli" && (isSelfRegistration || !prev.username || prev.username === prev.emailCli)) {
         next.username = value;
       }
 
@@ -264,7 +282,9 @@ const emptyClient = {
 
       await clientService.create({
         ...client,
-        idLocation: Number(matchingLocation.idLocation) // Aseguramos que viaje como número
+        username: isSelfRegistration ? client.emailCli.trim() : client.username,
+        idLocation: Number(matchingLocation.idLocation), // Aseguramos que viaje como número
+        ...(isSelfRegistration ? { passwordTemporal: client.password === client.dniCli } : {})
       });
 
       setShowSuccessModal(true);
@@ -273,6 +293,7 @@ const emptyClient = {
       setCityInput("");
       setPostalCode("");
       setFieldErrors({});
+      setShowPassword(false);
     } catch (err) {
       setGlobalError(getErrorMessage(err));
     } finally {
@@ -289,8 +310,12 @@ const emptyClient = {
               <IconUser />
             </div>
             <div>
-              <h1>Nuevo Registro</h1>
-              <p>Completá los campos requeridos para dar de alta al cliente en STYLO</p>
+              <h1>{isSelfRegistration ? "Crear Cuenta" : "Nuevo Registro"}</h1>
+              <p>
+                {isSelfRegistration
+                  ? "Completá tus datos para registrarte en STYLO"
+                  : "Completá los campos requeridos para dar de alta al cliente en STYLO"}
+              </p>
             </div>
           </div>
         </header>
@@ -478,29 +503,43 @@ const emptyClient = {
                     onChange={handleChange}
                     placeholder="ejemplo@mail.com"
                     autoComplete="off"
+                    readOnly={isSelfRegistration}
                     className={isFieldComplete("username") ? "input-complete" : ""}
                   />
                   {fieldErrors.username && <span className="error-message">{fieldErrors.username}</span>}
                 </div>
 
                 <div className={`form-group ${fieldErrors.password ? "has-error" : ""}`}>
-                  <label htmlFor="password">Contraseña Provisonal *</label>
-                  <input
-                    id="password"
-                    type="text"
-                    name="password"
-                    value={client.password}
-                    onChange={handleChange}
-                    placeholder="Provisoria (por defecto el DNI)"
-                    autoComplete="off"
-                    className={isFieldComplete("password") ? "input-complete" : ""}
-                  />
+                  <label htmlFor="password">
+                    {isSelfRegistration ? "Contraseña *" : "Contraseña Provisoria *"}
+                  </label>
+                  <div className="password-input-wrapper">
+                    <input
+                      id="password"
+                      type={showPassword ? "text" : "password"}
+                      name="password"
+                      value={client.password}
+                      onChange={handleChange}
+                      placeholder={isSelfRegistration ? "Por defecto tu DNI (mínimo 6 caracteres)" : "Provisoria (por defecto el DNI)"}
+                      autoComplete={isSelfRegistration ? "new-password" : "off"}
+                      className={isFieldComplete("password") ? "input-complete" : ""}
+                    />
+                    <button
+                      type="button"
+                      className="password-toggle"
+                      onClick={() => setShowPassword((prev) => !prev)}
+                      aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
+                    >
+                      {showPassword ? <IconEye /> : <IconEyeOff />}
+                    </button>
+                  </div>
                   {fieldErrors.password && <span className="error-message">{fieldErrors.password}</span>}
                 </div>
 
                 <p className="account-hint full-width">
-                  El cliente ingresará con su email y esta contraseña provisoria, y deberá
-                  cambiarla al iniciar sesión desde su dispositivo.
+                  {isSelfRegistration
+                    ? "El usuario se completa con tu email y la contraseña con tu DNI. Podés cambiar la contraseña antes de crear la cuenta."
+                    : "El cliente ingresará con su email y esta contraseña provisoria, y deberá cambiarla al iniciar sesión desde su dispositivo."}
                 </p>
               </div>
             </div>
@@ -510,7 +549,7 @@ const emptyClient = {
             <button
               type="button"
               className="btn-secondary-outline"
-              onClick={() => navigate(-1)}
+              onClick={() => navigate(isSelfRegistration ? "/login" : -1)}
             >
               <IconArrowLeft /> Cancelar
             </button>
@@ -520,7 +559,7 @@ const emptyClient = {
               className="btn-submit-cyan"
               disabled={submitting}
             >
-              {submitting ? "Guardando..." : "Guardar"}
+              {submitting ? "Guardando..." : isSelfRegistration ? "Crear cuenta" : "Guardar"}
             </button>
           </div>
         </form>
@@ -535,19 +574,21 @@ const emptyClient = {
               </div>
               <div className="modal-content-j">
                 <p className="modal-text-j">
-                  ¡Cliente registrado con éxito!
+                  {isSelfRegistration ? "¡Cuenta creada con éxito!" : "¡Cliente registrado con éxito!"}
                 </p>
 
                 <p className="modal-text-account">
-                  Usuario: {lastRegistered?.username || "—"} · Contraseña provisoria: {lastRegistered?.password || "—"}
+                  {isSelfRegistration
+                    ? "Ya podés iniciar sesión con tu email y contraseña."
+                    : `Usuario: ${lastRegistered?.username || "—"} · Contraseña provisoria: ${lastRegistered?.password || "—"}`}
                 </p>
 
                 <button
                   type="button"
                   className="btn-j-primary"
-                  onClick={() => navigate("/")}
+                  onClick={() => navigate(isSelfRegistration ? "/login" : "/")}
                 >
-                  Ir a la página principal
+                  {isSelfRegistration ? "Ir a iniciar sesión" : "Ir a la página principal"}
                 </button>
               </div>
             </div>

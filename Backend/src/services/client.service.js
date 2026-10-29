@@ -31,6 +31,20 @@ class ClientService {
     async create(client) {
         const data = await this.validateClientData(client, { checkEmailUnique: true, checkDniUnique: true });
 
+        const username = client.username
+            ? String(client.username).trim()
+            : data.emailCli;
+        const password = client.password || String(data.dniCli);
+        const passwordTemporal = client.passwordTemporal !== false;
+
+        const usernameExists = await usuarioModel.findByUsername(username);
+        if (usernameExists) {
+            throw {
+                statusCode: 409,
+                message: "Ya existe una cuenta con ese usuario/email. Iniciá sesión."
+            };
+        }
+
         // El alta del cliente crea además su cuenta de usuario.
         const created = await clientModel.create({
             nameCli: data.nameCli,
@@ -45,21 +59,22 @@ class ClientService {
         try {
             const existingUser = await usuarioModel.findByCli(created.idCli);
             if (!existingUser) {
-                const username = client.username
-                    ? String(client.username).trim()
-                    : data.emailCli;
-                const password = client.password || String(data.dniCli);
                 const passwordHash = await bcrypt.hash(String(password), SALT_ROUNDS);
                 await usuarioModel.create({
                     username,
                     password: passwordHash,
                     rol: "cliente",
                     idCli: created.idCli,
-                    passwordTemporal: true
+                    passwordTemporal
                 });
             }
         } catch (err) {
+            await clientModel.delete(created.idCli);
             console.error("No se pudo crear la cuenta de usuario para el cliente:", err.message);
+            throw {
+                statusCode: 409,
+                message: "No se pudo crear la cuenta de usuario. Verificá los datos e intentá nuevamente."
+            };
         }
 
         return created;
