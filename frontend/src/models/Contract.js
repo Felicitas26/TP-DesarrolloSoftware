@@ -86,12 +86,12 @@ export class Contract {
         return PAYMENT_STATUS_LABEL[payment.statusPayment] || payment.statusPayment;
     }
 
-    /** @returns {boolean} El cliente puede completar/editar el contrato */
+    /** @returns {boolean}  */
     get canBeEdited() {
         return EDITABLE_STATUSES.includes(this.status);
     }
 
-    /** @returns {boolean} Hay una solicitud de modificación pendiente de revisión */
+    /** @returns {boolean} */
     get hasPendingModification() {
         return this.modificationStatus === "pendiente";
     }
@@ -101,12 +101,12 @@ export class Contract {
         return this.payments?.[0] || null;
     }
 
-    /** @returns {string|null} Fecha del evento (de la reserva asociada) */
+    /** @returns {string|null}  */
     get eventDate() {
         return this.reservation?.dateEvent || null;
     }
 
-    /** @returns {boolean} El evento ya pasó (fecha anterior a hoy) */
+    /** @returns {boolean} */
     get isExpired() {
         if (!this.eventDate) return false;
         const dateOnly = String(this.eventDate).split("T")[0];
