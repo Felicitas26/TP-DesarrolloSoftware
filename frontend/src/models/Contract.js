@@ -51,62 +51,43 @@ export class Contract {
         Object.assign(this, data);
     }
 
-    /**
-     * Convierte la respuesta cruda del endpoint en una instancia de Contract.
-     * @param {ContractData} json
-     * @returns {Contract}
-     */
+ 
     static from(json) {
         return new Contract(json);
     }
 
-    /**
-     * Etiqueta legible del estado del contrato.
-     * @returns {string}
-     */
+
     get statusLabel() {
         return STATUS_LABEL[this.status] || this.status || "";
     }
 
-    /**
-     * Descripción larga del estado (vista de detalle).
-     * @returns {string}
-     */
     get statusDescription() {
         return STATUS_DESCRIPTION[this.status] || this.status || "";
     }
 
-    /**
-     * Estado del primer pago asociado, en formato legible.
-     * @returns {string}
-     */
+
     get paymentStatus() {
         const payment = this.payments?.[0];
         if (!payment) return "";
         return PAYMENT_STATUS_LABEL[payment.statusPayment] || payment.statusPayment;
     }
 
-    /** @returns {boolean}  */
     get canBeEdited() {
         return EDITABLE_STATUSES.includes(this.status);
     }
 
-    /** @returns {boolean} */
     get hasPendingModification() {
         return this.modificationStatus === "pendiente";
     }
 
-    /** @returns {ContractPayment|null} */
     get payment() {
         return this.payments?.[0] || null;
     }
 
-    /** @returns {string|null}  */
     get eventDate() {
         return this.reservation?.dateEvent || null;
     }
 
-    /** @returns {boolean} */
     get isExpired() {
         if (!this.eventDate) return false;
         const dateOnly = String(this.eventDate).split("T")[0];
