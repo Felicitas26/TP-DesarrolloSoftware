@@ -19,7 +19,7 @@ Comunicación principal mediante Whatsapp y reuniones presenciales.
 - [16/10/2026](2026-10-16-minuta.md) - Servicios, errores y mobile first.
 - [23/10/2026](2026-10-23-minuta.md) - Notificaciones, filtros, seguridad y cierre.
 
-Las fechas anteriores documentan hitos de coordinación y avance.
+Las fechas anteriores documentan hitos de coordinación y avance. Los cuatro cortes de avance consolidados (sprints de cierre con trackeo por tasks y evidencia de commits) se documentan en [`docs/tracking/minuta.md`](../tracking/minuta.md).
 
 ## Planilla de seguimiento
 https://docs.google.com/spreadsheets/d/1qjnj3YXzJuS9Uy6VyxEd3MKzakLTjEH_/edit?usp=sharing&ouid=114366817934415432241&rtpof=true&sd=true 
