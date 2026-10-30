@@ -119,10 +119,6 @@
     text-shadow: 0 0 20px rgba(0, 229, 255, 0.25);
 }
 
-.my-profile-bar .my-profile-back-button {
-    display: none;
-}
-
 /* CONTENIDO */
 
 .my-profile-content {
@@ -321,10 +317,6 @@
 
     .my-profile-logo {
         font-size: 1.15rem;
-    }
-
-    .my-profile-bar .my-profile-back-button {
-        display: inline-flex;
     }
 
     .my-profile-content {

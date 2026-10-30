@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { clientService, locationService } from "../../services";
 import CityAutocomplete from "../../components/CityAutocomplete";
@@ -56,6 +56,20 @@ const IconAlertCircle = () => (
   </svg>
 );
 
+// Normaliza mayúsculas y acentos para comparar nombres de ciudades
+const normalizeText = (value) =>
+  String(value || "")
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .trim();
+
+// "Failed to fetch" (TypeError) = el backend no fue alcanzable
+const getErrorMessage = (err) =>
+  err instanceof TypeError
+    ? "No se pudo conectar con el servidor. Verificá que el backend esté corriendo en el puerto 3000."
+    : err.message;
+
 function NewClient() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -84,65 +98,50 @@ const emptyClient = {
   const [globalError, setGlobalError] = useState(null);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [lastRegistered, setLastRegistered] = useState(null);
-  const [emailAvailable, setEmailAvailable] = useState(null);
+  const [emailCheck, setEmailCheck] = useState({ email: "", available: null });
   const [showPassword, setShowPassword] = useState(false);
-  const emailTimerRef = useRef(null);
 
-  // Normaliza mayúsculas y acentos para comparar nombres de ciudades
-  const normalizeText = (value) =>
-    String(value || "")
-      .toLowerCase()
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "")
-      .trim();
-
-  // "Failed to fetch" (TypeError) = el backend no fue alcanzable
-  const getErrorMessage = (err) =>
-    err instanceof TypeError
-      ? "No se pudo conectar con el servidor. Verificá que el backend esté corriendo en el puerto 3000."
-      : err.message;
+  const normalizedEmail = client.emailCli.trim();
+  const emailIsValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedEmail);
+  // Derivado: solo es válido el resultado si corresponde al email actual
+  const emailAvailable = emailCheck.email === normalizedEmail ? emailCheck.available : null;
 
   // Carga las ciudades de Argentina disponibles (tabla location)
-  const fetchLocations = async () => {
-    setLocationsLoading(true);
-    setLocationsError(null);
-    try {
-      const data = await locationService.getAll();
-      setLocations(data);
-    } catch (err) {
-      setLocationsError(getErrorMessage(err));
-    } finally {
-      setLocationsLoading(false);
-    }
-  };
-
   useEffect(() => {
-    fetchLocations();
+    let ignore = false;
+
+    const loadLocations = async () => {
+      try {
+        const data = await locationService.getAll();
+        if (!ignore) setLocations(data);
+      } catch (err) {
+        if (!ignore) setLocationsError(getErrorMessage(err));
+      } finally {
+        if (!ignore) setLocationsLoading(false);
+      }
+    };
+
+    loadLocations();
+
+    return () => {
+      ignore = true;
+    };
   }, []);
 
   useEffect(() => {
-    if (emailTimerRef.current) clearTimeout(emailTimerRef.current);
+    if (!emailIsValid) return;
 
-    if (!client.emailCli.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(client.emailCli)) {
-      setEmailAvailable(null);
-      return;
-    }
-
-    setEmailAvailable(null);
-
-    emailTimerRef.current = setTimeout(async () => {
+    const timer = setTimeout(async () => {
       try {
-        const data = await clientService.checkEmail(client.emailCli);
-        setEmailAvailable(data.available);
+        const data = await clientService.checkEmail(normalizedEmail);
+        setEmailCheck({ email: normalizedEmail, available: data.available });
       } catch {
-        setEmailAvailable(null);
+        setEmailCheck({ email: normalizedEmail, available: null });
       }
     }, 500);
 
-    return () => {
-      if (emailTimerRef.current) clearTimeout(emailTimerRef.current);
-    };
-  }, [client.emailCli]);
+    return () => clearTimeout(timer);
+  }, [normalizedEmail, emailIsValid]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;

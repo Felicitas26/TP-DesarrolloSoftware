@@ -69,13 +69,6 @@ function MyProfile() {
                     SALON STYLO
                 </div>
 
-                <button
-                    className="my-profile-back-button"
-                    onClick={() => navigate("/client-home")}
-                >
-                    Volver al menú
-                </button>
-
             </header>
 
             <main className="my-profile-content">
@@ -144,6 +137,15 @@ function MyProfile() {
                                 }
                             >
                                 Editar perfil
+                            </button>
+
+                            <button
+                                className="my-profile-back-button-bottom"
+                                onClick={() =>
+                                    navigate("/client-home")
+                                }
+                            >
+                                Volver al menú
                             </button>
 
                         </div>

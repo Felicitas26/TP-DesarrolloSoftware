@@ -140,11 +140,12 @@ function EditClient() {
       errors.surnameCli = "El apellido debe tener al menos 2 caracteres.";
     }
 
-    if (!client.dniCli?.trim()) {
+    const dni = String(client.dniCli ?? "").trim();
+    if (!dni) {
       errors.dniCli = "El DNI es obligatorio.";
-    } else if (!/^\d+$/.test(client.dniCli)) {
+    } else if (!/^\d+$/.test(dni)) {
       errors.dniCli = "El DNI solo puede contener números.";
-    } else if (client.dniCli.length < 7 || client.dniCli.length > 9) {
+    } else if (dni.length < 7 || dni.length > 9) {
       errors.dniCli = "El DNI debe tener entre 7 y 9 dígitos numéricos.";
     }
 

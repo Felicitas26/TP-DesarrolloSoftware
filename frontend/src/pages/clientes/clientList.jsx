@@ -47,6 +47,13 @@ const IconTrashWarning = () => (
   </svg>
 );
 
+const normalizeText = (value) =>
+  String(value || "")
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .trim();
+
 function ClientList() {
   const navigate = useNavigate();
   const [clients, setClients] = useState([]);
@@ -61,37 +68,31 @@ function ClientList() {
   const [savingEdit, setSavingEdit] = useState(false);
   const [editErrors, setEditErrors] = useState({});
 
-  const normalizeText = (value) =>
-    String(value || "")
-      .toLowerCase()
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "")
-      .trim();
-
-  const fetchClients = async () => {
-    try {
-      setLoading(true);
-      const data = await clientService.getAll();
-      setClients(data);
-    } catch (err) {
-      console.error("Error al cargar clientes:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
-    fetchClients();
+    let ignore = false;
 
-    const fetchLocations = async () => {
+    const loadData = async () => {
       try {
-        setLocations(await locationService.getAll());
+        const [clientsData, locationsData] = await Promise.all([
+          clientService.getAll(),
+          locationService.getAll(),
+        ]);
+        if (!ignore) {
+          setClients(clientsData);
+          setLocations(locationsData);
+        }
       } catch (err) {
-        console.error("Error al cargar ubicaciones:", err);
+        console.error("Error al cargar los datos:", err);
+      } finally {
+        if (!ignore) setLoading(false);
       }
     };
 
-    fetchLocations();
+    loadData();
+
+    return () => {
+      ignore = true;
+    };
   }, []);
 
   const handleConfirmDelete = async () => {
@@ -153,8 +154,8 @@ function ClientList() {
       errors.surnameCli = "El apellido debe tener al menos 2 caracteres.";
     }
 
-    const dni = clientToEdit.dniCli || "";
-    if (!dni.trim()) {
+    const dni = String(clientToEdit.dniCli ?? "").trim();
+    if (!dni) {
       errors.dniCli = "El DNI es obligatorio.";
     } else if (!/^\d+$/.test(dni)) {
       errors.dniCli = "El DNI solo puede contener números.";
@@ -212,9 +213,13 @@ function ClientList() {
         String(loc.zipCode) === String(postal.trim())
     );
 
-    const { cityInput, postalCode, ...cleanClient } = clientToEdit;
     const body = {
-      ...cleanClient,
+      nameCli,
+      surnameCli,
+      phoneCli: phone,
+      dniCli: dni,
+      emailCli: email,
+      addressCli: address,
       idLocation: Number(matchingLocation.idLocation)
     };
 
@@ -226,7 +231,12 @@ function ClientList() {
       setClients((prev) =>
         prev.map((c) =>
           (c.id_client || c.idCli || c.id) === id
-            ? { ...body, city: matchingLocation.city, zipCode: matchingLocation.zipCode }
+            ? {
+                ...c,
+                ...body,
+                city: matchingLocation.city,
+                zipCode: matchingLocation.zipCode,
+              }
             : c
         )
       );
