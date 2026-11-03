@@ -23,3 +23,7 @@ node_modules
 .copilot/skills/
 .continue/skills/
 .windsurf/skills/
+.vercel
+.env*
+
+.env.aiven

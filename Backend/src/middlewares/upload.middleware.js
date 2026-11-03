@@ -4,9 +4,16 @@ import fs from "fs";
 import { fileURLToPath } from "url";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const uploadsDir = path.join(__dirname, "..", "..", "uploads");
+let uploadsDir = path.join(__dirname, "..", "..", "uploads");
 
-if (!fs.existsSync(uploadsDir)) {
+// El FS del proyecto puede ser read-only en serverless: se degrada a /tmp
+try {
+    if (!fs.existsSync(uploadsDir)) {
+        fs.mkdirSync(uploadsDir, { recursive: true });
+    }
+    fs.accessSync(uploadsDir, fs.constants.W_OK);
+} catch {
+    uploadsDir = path.join(process.env.TMPDIR || "/tmp", "stylo-uploads");
     fs.mkdirSync(uploadsDir, { recursive: true });
 }
 
