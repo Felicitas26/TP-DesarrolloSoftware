@@ -41,14 +41,21 @@ class LoungeModel {
         }
     }
 
+    async countReservations(id) {
+        return await prisma.reservation.count({
+            where: { idLounge: Number(id) }
+        });
+    }
+
     async delete(id) {
         try {
             await prisma.lounge.delete({
                 where: { idLounge: Number(id) }
             });
             return true;
-        } catch {
-            return null;
+        } catch (error) {
+            if (error.code === "P2025") return null;
+            throw error;
         }
     }
 }

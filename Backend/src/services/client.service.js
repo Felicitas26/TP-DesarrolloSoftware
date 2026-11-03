@@ -116,6 +116,24 @@ class ClientService {
     }
 
     async delete(id) {
+        const client = await clientModel.getById(id);
+        if (!client) {
+            throw { statusCode: 404, message: "No se ha encontrado al cliente." };
+        }
+
+        const reservationsCount = await clientModel.countReservations(id);
+        if (reservationsCount > 0) {
+            throw {
+                statusCode: 409,
+                message: `No se puede eliminar al cliente '${client.nameCli} ${client.surnameCli}' porque tiene ${reservationsCount} reserva${reservationsCount > 1 ? "s" : ""} asociada${reservationsCount > 1 ? "s" : ""}.`
+            };
+        }
+
+        const linkedUser = await usuarioModel.findByCli(Number(id));
+        if (linkedUser) {
+            await usuarioModel.delete(linkedUser.idUsuario);
+        }
+
         const deleted = await clientModel.delete(id);
         if (!deleted) {
             throw { statusCode: 404, message: "No se ha encontrado al cliente." };
@@ -123,11 +141,6 @@ class ClientService {
         return deleted;
     }
 
-    /**
-     * Valida y normaliza los datos de un cliente.
-     * @param {object} client
-     * @param {{checkEmailUnique?: boolean, checkDniUnique?: boolean, excludeClientId?: number}} opts
-     */
     async validateClientData(client, { checkEmailUnique = false, checkDniUnique = false, excludeClientId = null } = {}) {
         requireFields(client, [
             "nameCli",

@@ -121,14 +121,21 @@ class ClientModel {
         }
     }
 
+    async countReservations(id) {
+        return await prisma.reservation.count({
+            where: { idCli: Number(id) }
+        });
+    }
+
     async delete(id) {
         try {
             await prisma.client.delete({
                 where: { idCli: Number(id) }
             });
             return true;
-        } catch {
-            return null;
+        } catch (error) {
+            if (error.code === "P2025") return null;
+            throw error;
         }
     }
 }

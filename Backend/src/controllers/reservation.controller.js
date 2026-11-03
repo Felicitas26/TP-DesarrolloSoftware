@@ -37,6 +37,10 @@ class ReservationController {
     });
 
     create = asyncHandler(async (req, res) => {
+        if (req.usuario.idCli == null) {
+            throw httpError(400, "Tu cuenta de administrador no está asociada a un cliente. Solo las cuentas de cliente pueden crear reservas a su nombre.");
+        }
+
         const newReservation = await reservationService.create(
             req.body,
             req.usuario.idCli
