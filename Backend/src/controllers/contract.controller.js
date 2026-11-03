@@ -107,7 +107,7 @@ class ContractController {
         await contractService.cancelar(req.params.id, motivo);
 
         return res.status(200).json({
-            message: "Contrato eliminado y evento dado de baja correctamente."
+            message: "Contrato dado de baja y evento cancelado correctamente."
         });
     });
 
@@ -117,7 +117,7 @@ class ContractController {
         await contractService.eliminarCliente(req.params.id);
 
         return res.status(200).json({
-            message: "El contrato fue eliminado y el evento dado de baja. No se realizan reembolsos de lo pagado."
+            message: "El contrato fue dado de baja y el evento cancelado. No se realizan reembolsos de lo pagado."
         });
     });
 

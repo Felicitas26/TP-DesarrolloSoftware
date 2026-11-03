@@ -42,6 +42,12 @@ class UsuarioService {
         const existing = await usuarioModel.findByCli(client.idCli);
 
         if (existing) {
+            if (!existing.activo) {
+                throw {
+                    statusCode: 409,
+                    message: "Este DNI ya posee una cuenta que fue dada de baja. Contactá a la administración."
+                };
+            }
             throw {
                 statusCode: 409,
                 message: "Este DNI ya posee una cuenta. Iniciá sesión con tu email."

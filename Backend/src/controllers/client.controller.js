@@ -46,7 +46,7 @@ class ClientController {
 
     delete = asyncHandler(async (req, res) => {
         await clientService.delete(req.params.id);
-        return res.status(200).json({ message: "Cliente eliminado correctamente." });
+        return res.status(200).json({ message: "Cliente dado de baja correctamente." });
     });
 
     checkEmail = asyncHandler(async (req, res) => {

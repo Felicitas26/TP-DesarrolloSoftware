@@ -44,8 +44,6 @@ class LoungeTypeService {
             if (existing.activo) {
                 throw { statusCode: 409, message: `Ya existe un tipo de salón llamado "${nameLoungeType}" en este salón.` };
             }
-            // El tipo existía pero está dado de baja: se reactiva con los datos nuevos
-            // (el unique [idLounge, nameLoungeType] no permite crear otra fila igual).
             return await loungeTypeModel.update(existing.idLoungeType, loungeType);
         }
 

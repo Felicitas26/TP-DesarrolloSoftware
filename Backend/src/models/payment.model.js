@@ -4,6 +4,7 @@ class PaymentModel {
 
     async getAll() {
         return await prisma.payment.findMany({
+            where: { activo: true },
             include: { contract: true }
         });
     }
@@ -53,8 +54,9 @@ class PaymentModel {
 
     async delete(id) {
         try {
-            await prisma.payment.delete({
-                where: { idPayment: Number(id) }
+            await prisma.payment.update({
+                where: { idPayment: Number(id) },
+                data: { activo: false }
             });
             return true;
         } catch {

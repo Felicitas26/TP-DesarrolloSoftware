@@ -41,6 +41,12 @@ class AuthController {
             throw error;
         }
 
+        if (!usuario.activo) {
+            const error = new Error("La cuenta está dada de baja. Contactá a la administración.");
+            error.statusCode = 401;
+            throw error;
+        }
+
         const token = generarToken(usuario);
 
         return res.status(200).json({

@@ -67,7 +67,7 @@ class CardDetailController {
         removeUploadedFile(existing?.imageUrl);
 
         return res.status(200).json({
-            message: "Detalle de tarjeta eliminado correctamente."
+            message: "Detalle de tarjeta dado de baja correctamente."
         });
     });
 }

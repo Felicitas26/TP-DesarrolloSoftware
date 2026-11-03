@@ -44,14 +44,8 @@ class LoungeService {
             throw { statusCode: 404, message: `No se encontró el salón con ID ${id}.` };
         }
 
-        const reservationsCount = await loungeModel.countReservations(id);
-        if (reservationsCount > 0) {
-            throw {
-                statusCode: 409,
-                message: `No se puede eliminar el salón '${lounge.name}' porque tiene ${reservationsCount} reserva${reservationsCount > 1 ? "s" : ""} asociada${reservationsCount > 1 ? "s" : ""}. Gestioná o eliminá primero esas reservas.`
-            };
-        }
-
+        // Baja lógica: el salón no se borra físicamente, por lo que sus reservas
+        // históricas quedan intactas — no hay conflicto con la FK.
         const deleted = await loungeModel.delete(id);
         if (!deleted) {
             throw { statusCode: 404, message: `No se encontró el salón con ID ${id}.` };

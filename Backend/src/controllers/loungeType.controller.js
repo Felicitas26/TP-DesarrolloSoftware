@@ -25,7 +25,7 @@ class LoungeTypeController {
 
     delete = asyncHandler(async (req, res) => {
         await loungeTypeService.delete(req.params.id);
-        return res.status(200).json({ message: "Tipo de salón eliminado correctamente." });
+        return res.status(200).json({ message: "Tipo de salón dado de baja correctamente." });
     });
 
 }

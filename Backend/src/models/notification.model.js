@@ -4,7 +4,7 @@ class NotificationModel {
 
     async getByUser(idUsuario) {
         return await prisma.notification.findMany({
-            where: { idUsuario: Number(idUsuario) },
+            where: { idUsuario: Number(idUsuario), activo: true },
             orderBy: { fecha: "desc" },
             take: 50,
             include: {
@@ -20,7 +20,7 @@ class NotificationModel {
 
     async countUnread(idUsuario) {
         return await prisma.notification.count({
-            where: { idUsuario: Number(idUsuario), leida: false }
+            where: { idUsuario: Number(idUsuario), activo: true, leida: false }
         });
     }
 
@@ -54,11 +54,13 @@ class NotificationModel {
     }
 
     async remove(idNotificacion, idUsuario) {
-        return await prisma.notification.deleteMany({
+        // Baja lógica: la notificación no se borra físicamente.
+        return await prisma.notification.updateMany({
             where: {
                 idNotificacion: Number(idNotificacion),
                 idUsuario: Number(idUsuario)
-            }
+            },
+            data: { activo: false }
         });
     }
 }

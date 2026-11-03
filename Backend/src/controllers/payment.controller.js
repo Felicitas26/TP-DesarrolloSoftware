@@ -34,7 +34,7 @@ class PaymentController {
         await paymentService.delete(req.params.id);
 
         return res.status(200).json({
-            message: "Pago eliminado correctamente."
+            message: "Pago dado de baja correctamente."
         });
     });
 }

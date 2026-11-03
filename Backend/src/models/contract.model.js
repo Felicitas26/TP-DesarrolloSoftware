@@ -86,6 +86,7 @@ class ContractModel {
 
     async getAll() {
         const contracts = await prisma.contract.findMany({
+            where: { activo: true },
             include: CONTRACT_INCLUDE,
             orderBy: { dateContract: "desc" }
         });
@@ -96,6 +97,7 @@ class ContractModel {
     async getByClient(idCli) {
         const contracts = await prisma.contract.findMany({
             where: {
+                activo: true,
                 reservation: {
                     idCli: Number(idCli)
                 }
@@ -244,23 +246,23 @@ class ContractModel {
     }
 
     async remove(id) {
+        // Baja lógica: el contrato, sus pagos y sus notificaciones dejan de ser visibles,
+        // pero ninguna fila se borra físicamente (historial conservado).
         try {
             return await prisma.$transaction(async (tx) => {
-                await tx.payment.deleteMany({
-                    where: { idContract: Number(id) }
+                await tx.payment.updateMany({
+                    where: { idContract: Number(id) },
+                    data: { activo: false }
                 });
-                await tx.contractExtraService.deleteMany({
-                    where: { idContract: Number(id) }
+                await tx.notification.updateMany({
+                    where: { idContract: Number(id) },
+                    data: { activo: false }
                 });
-                await tx.notification.deleteMany({
-                    where: { idContract: Number(id) }
-                });
-                await tx.contract.delete({
-                    where: { idContract: Number(id) }
+                await tx.contract.update({
+                    where: { idContract: Number(id) },
+                    data: { activo: false }
                 });
             });
-
-            return true;
         } catch {
             return null;
         }

@@ -19,7 +19,7 @@ class UsuarioController {
     darDeBaja = asyncHandler(async (req, res) => {
         await usuarioService.darDeBaja(req.usuario.idUsuario);
         return res.status(200).json({
-            message: "Cuenta eliminada correctamente."
+            message: "Tu cuenta fue dada de baja."
         });
     });
 
@@ -47,7 +47,7 @@ class UsuarioController {
     deleteAdministrador = asyncHandler(async (req, res) => {
         await usuarioService.deleteAdministrador(req.params.id);
         return res.status(200).json({
-            message: "Administrador eliminado correctamente."
+            message: "Administrador dado de baja correctamente."
         });
     });
 }

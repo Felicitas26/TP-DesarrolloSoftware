@@ -25,7 +25,7 @@ class LoungeController {
 
     delete = asyncHandler(async (req, res) => {
         await loungeService.delete(req.params.id);
-        return res.status(200).json({ message: "Salón eliminado exitosamente." });
+        return res.status(200).json({ message: "Salón dado de baja exitosamente." });
     });
 
 }

@@ -34,7 +34,7 @@ class ExtraServiceController {
         await extraServiceService.delete(req.params.id);
 
         return res.status(200).json({
-            message: "Servicio extra eliminado correctamente."
+            message: "Servicio extra dado de baja correctamente."
         });
     });
 }
