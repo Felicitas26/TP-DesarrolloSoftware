@@ -3,7 +3,9 @@ import prisma from "../lib/prisma.js";
 class CardDetailModel {
 
     async getAll() {
-        return await prisma.cardDetail.findMany();
+        return await prisma.cardDetail.findMany({
+            where: { activo: true }
+        });
     }
 
     async getById(id) {
@@ -51,8 +53,9 @@ class CardDetailModel {
 
     async delete(id) {
         try {
-            await prisma.cardDetail.delete({
-                where: { idCardDetail: Number(id) }
+            await prisma.cardDetail.update({
+                where: { idCardDetail: Number(id) },
+                data: { activo: false }
             });
             return true;
         } catch {

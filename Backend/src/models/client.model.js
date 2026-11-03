@@ -4,6 +4,7 @@ class ClientModel {
 
     async getAll() {
         const clients = await prisma.client.findMany({
+            where: { activo: true },
             include: { location: true }
         });
         return clients.map(c => ({
@@ -129,13 +130,25 @@ class ClientModel {
 
     async delete(id) {
         try {
-            await prisma.client.delete({
-                where: { idCli: Number(id) }
+            await prisma.client.update({
+                where: { idCli: Number(id) },
+                data: { activo: false }
             });
             return true;
         } catch (error) {
             if (error.code === "P2025") return null;
             throw error;
+        }
+    }
+
+    async reactivate(id, clientData) {
+        try {
+            return await prisma.client.update({
+                where: { idCli: Number(id) },
+                data: { ...clientData, activo: true }
+            });
+        } catch {
+            return null;
         }
     }
 }

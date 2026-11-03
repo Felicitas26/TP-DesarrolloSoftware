@@ -3,7 +3,9 @@ import prisma from "../lib/prisma.js";
 class ExtraServiceModel {
 
     async getAll() {
-        return await prisma.extraService.findMany();
+        return await prisma.extraService.findMany({
+            where: { activo: true }
+        });
     }
 
     async getById(id) {
@@ -43,8 +45,9 @@ class ExtraServiceModel {
 
     async delete(id) {
         try {
-            await prisma.extraService.delete({
-                where: { idService: Number(id) }
+            await prisma.extraService.update({
+                where: { idService: Number(id) },
+                data: { activo: false }
             });
             return true;
         } catch {

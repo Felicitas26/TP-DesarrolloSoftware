@@ -88,8 +88,9 @@ class UsuarioModel {
 
     async delete(id) {
         try {
-            await prisma.usuario.delete({
-                where: { idUsuario: Number(id) }
+            await prisma.usuario.update({
+                where: { idUsuario: Number(id) },
+                data: { activo: false }
             });
             return true;
         } catch {
@@ -97,9 +98,21 @@ class UsuarioModel {
         }
     }
 
+    async reactivate(id) {
+        try {
+            await prisma.usuario.update({
+                where: { idUsuario: Number(id) },
+                data: { activo: true }
+            });
+            return this.findById(id);
+        } catch {
+            return null;
+        }
+    }
+
     async getAllAdministradores() {
         return await prisma.usuario.findMany({
-            where: { rol: "administrador" },
+            where: { rol: "administrador", activo: true },
             select: {
                 idUsuario: true,
                 username: true,

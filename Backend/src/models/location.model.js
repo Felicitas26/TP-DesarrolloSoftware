@@ -3,7 +3,9 @@ import prisma from "../lib/prisma.js";
 class LocationModel {
 
     async findAll() {
-        return await prisma.location.findMany();
+        return await prisma.location.findMany({
+            where: { activo: true }
+        });
     }
 
     async findByPk(id) {
@@ -35,8 +37,9 @@ class LocationModel {
 
     async delete(id) {
         try {
-            await prisma.location.delete({
-                where: { idLocation: Number(id) }
+            await prisma.location.update({
+                where: { idLocation: Number(id) },
+                data: { activo: false }
             });
             return true;
         } catch {

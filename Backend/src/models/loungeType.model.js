@@ -4,6 +4,7 @@ class LoungeTypeModel {
 
     async getAll() {
         return await prisma.loungeType.findMany({
+            where: { activo: true },
             include: { lounge: { select: { name: true } } }
         });
     }
@@ -40,7 +41,8 @@ class LoungeTypeModel {
                     nameLoungeType,
                     minQuantity: Number(minQuantity),
                     maxQuantity: Number(maxQuantity),
-                    idLounge: Number(idLounge)
+                    idLounge: Number(idLounge),
+                    activo: true
                 }
             });
 
@@ -52,8 +54,9 @@ class LoungeTypeModel {
 
     async delete(id) {
         try {
-            await prisma.loungeType.delete({
-                where: { idLoungeType: Number(id) }
+            await prisma.loungeType.update({
+                where: { idLoungeType: Number(id) },
+                data: { activo: false }
             });
             return true;
         } catch {
@@ -62,6 +65,12 @@ class LoungeTypeModel {
     }
 
     async existsByName(nameLoungeType, idLounge, excludeId = null) {
+        const found =
+            await this.findByName(nameLoungeType, idLounge, excludeId);
+        return found !== null;
+    }
+
+    async findByName(nameLoungeType, idLounge, excludeId = null) {
         const where = {
             nameLoungeType,
             idLounge: Number(idLounge)
@@ -71,8 +80,7 @@ class LoungeTypeModel {
             where.idLoungeType = { not: Number(excludeId) };
         }
 
-        const found = await prisma.loungeType.findFirst({ where });
-        return found !== null;
+        return await prisma.loungeType.findFirst({ where });
     }
 }
 

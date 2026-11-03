@@ -39,9 +39,14 @@ class LoungeTypeService {
             throw { statusCode: 404, message: `No existe el salón con ID ${idLounge}.` };
         }
 
-        const exists = await loungeTypeModel.existsByName(nameLoungeType, idLounge);
-        if (exists) {
-            throw { statusCode: 409, message: `Ya existe un tipo de salón llamado "${nameLoungeType}" en este salón.` };
+        const existing = await loungeTypeModel.findByName(nameLoungeType, idLounge);
+        if (existing) {
+            if (existing.activo) {
+                throw { statusCode: 409, message: `Ya existe un tipo de salón llamado "${nameLoungeType}" en este salón.` };
+            }
+            // El tipo existía pero está dado de baja: se reactiva con los datos nuevos
+            // (el unique [idLounge, nameLoungeType] no permite crear otra fila igual).
+            return await loungeTypeModel.update(existing.idLoungeType, loungeType);
         }
 
         return await loungeTypeModel.create(loungeType);

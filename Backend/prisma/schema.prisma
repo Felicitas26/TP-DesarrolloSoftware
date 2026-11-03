@@ -21,6 +21,7 @@ model CardDetail {
   starter       String?  @db.VarChar(500)
   mainCourse    String?  @db.VarChar(500)
   dessert       String?  @db.VarChar(500)
+  activo        Boolean  @default(true)
 
   reservations Reservation[]
 }
@@ -29,6 +30,7 @@ model Location {
   idLocation Int      @id @default(autoincrement())
   city       String   @db.VarChar(100)
   zipCode    String   @db.VarChar(20)
+  activo     Boolean  @default(true)
 
   clients Client[]
   lounges Lounge[]
@@ -39,6 +41,7 @@ model Lounge {
   name          String @db.VarChar(100)
   loungeAddress String @db.VarChar(200)
   idLocation    Int
+  activo        Boolean @default(true)
 
   location     Location     @relation(fields: [idLocation], references: [idLocation])
   loungeTypes  LoungeType[]
@@ -51,6 +54,7 @@ model LoungeType {
   minQuantity    Int
   maxQuantity    Int
   idLounge       Int
+  activo         Boolean @default(true)
 
   lounge       Lounge        @relation(fields: [idLounge], references: [idLounge], onDelete: Cascade)
   prices       Price[]
@@ -79,6 +83,7 @@ model Client {
   addressCli String @db.VarChar(200)
   emailCli   String @db.VarChar(150)
   idLocation Int
+  activo     Boolean @default(true)
 
   location    Location      @relation(fields: [idLocation], references: [idLocation])
   reservations Reservation[]
@@ -112,6 +117,7 @@ model ExtraService {
   nameService   String   @db.VarChar(100)
   detailService String   @db.VarChar(255)
   cost          Decimal  @db.Decimal(10, 2)
+  activo        Boolean  @default(true)
 
   reservations ReservationExtraService[]
   contracts    ContractExtraService[]
@@ -142,6 +148,7 @@ model Contract {
   modificationReviewedAt  DateTime?
   clausulas             Json?
   idReservation  Int
+  activo         Boolean @default(true)
 
   reservation    Reservation          @relation(fields: [idReservation], references: [idReservation])
   payments       Payment[]
@@ -167,6 +174,7 @@ model Payment {
   statusPayment String   @db.VarChar(50)
   datePayment   DateTime @db.Date
   idContract    Int
+  activo        Boolean  @default(true)
 
   contract Contract @relation(fields: [idContract], references: [idContract])
 }
@@ -178,6 +186,7 @@ model Usuario {
   rol              Rol
   idCli            Int?
   passwordTemporal Boolean @default(true)
+  activo           Boolean @default(true)
 
   client        Client?        @relation(fields: [idCli], references: [idCli])
   notifications Notification[]
@@ -191,6 +200,7 @@ model Notification {
   fecha          DateTime @default(now())
   idContract     Int?
   idUsuario      Int
+  activo         Boolean  @default(true)
 
   contract Contract? @relation(fields: [idContract], references: [idContract])
   usuario  Usuario   @relation(fields: [idUsuario], references: [idUsuario])

@@ -3,7 +3,9 @@ import prisma from "../lib/prisma.js";
 class LoungeModel {
 
     async getAll() {
-        return await prisma.lounge.findMany();
+        return await prisma.lounge.findMany({
+            where: { activo: true }
+        });
     }
 
     async getById(id) {
@@ -49,8 +51,9 @@ class LoungeModel {
 
     async delete(id) {
         try {
-            await prisma.lounge.delete({
-                where: { idLounge: Number(id) }
+            await prisma.lounge.update({
+                where: { idLounge: Number(id) },
+                data: { activo: false }
             });
             return true;
         } catch (error) {
