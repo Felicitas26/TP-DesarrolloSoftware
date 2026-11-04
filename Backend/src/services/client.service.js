@@ -29,14 +29,20 @@ class ClientService {
     }
 
     async create(client) {
-        const data = await this.validateClientData(client, { checkEmailUnique: true, checkDniUnique: true });
-
         // Baja lógica: si el DNI coincide con un cliente dado de baja, se reactiva
         // con los datos nuevos en lugar de chocar contra su cuenta de usuario inactiva.
-        const existingByDni = await clientModel.findByDni(data.dniCli);
+        const dniValue = validateDni(client.dniCli);
+        const existingByDni = await clientModel.findByDni(dniValue);
         if (existingByDni && !existingByDni.activo) {
+            const data = await this.validateClientData(client, {
+                checkEmailUnique: true,
+                checkDniUnique: true,
+                excludeClientId: existingByDni.idCli
+            });
             return await this.reactivar(existingByDni, data);
         }
+
+        const data = await this.validateClientData(client, { checkEmailUnique: true, checkDniUnique: true });
 
         const username = client.username
             ? String(client.username).trim()

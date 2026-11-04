@@ -25,7 +25,7 @@ class LocationController {
 
     delete = asyncHandler(async (req, res) => {
         await locationService.delete(req.params.id);
-        return res.status(200).json({ message: "Ubicación eliminada exitosamente." });
+        return res.status(200).json({ message: "Ubicación dada de baja exitosamente." });
     });
 
 }

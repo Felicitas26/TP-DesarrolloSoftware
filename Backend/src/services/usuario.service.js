@@ -204,6 +204,19 @@ class UsuarioService {
             await usuarioModel.findByUsername(usuario);
 
         if (existing) {
+            if (existing.rol === "administrador" && !existing.activo) {
+                // Baja lógica: el administrador existía pero estaba dado de baja.
+                const passwordHash =
+                    await bcrypt.hash(passwordValida, SALT_ROUNDS);
+                await usuarioModel.updateAdministrador(
+                    existing.idUsuario,
+                    { username: usuario, password: passwordHash }
+                );
+                await usuarioModel.reactivate(existing.idUsuario);
+                const reactivated = await usuarioModel.findById(existing.idUsuario);
+                const { password: _, ...perfil } = reactivated;
+                return perfil;
+            }
             throw {
                 statusCode: 409,
                 message: "Ya existe un usuario con ese nombre."

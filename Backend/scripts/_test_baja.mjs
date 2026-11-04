@@ -39,7 +39,7 @@ log("3. login cliente", { status: cliLogin.status, data: { idCli: cliLogin.data?
 // 4) reserva sobre lounge 2
 const reservation = await req("/api/reservation", "POST", {
     dateEvent: "2099-06-15", eventType: "cumpleanos", cantInvit: 10,
-    idLounge: 2, idLoungeType: 3, idCardDetail: null
+    status: "pendiente", idLounge: 2, idLoungeType: 3, idCardDetail: null
 }, cliLogin.data.token);
 log("4. reserva creada", reservation);
 

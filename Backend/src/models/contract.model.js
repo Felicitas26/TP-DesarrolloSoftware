@@ -51,7 +51,7 @@ const CONTRACT_INCLUDE = {
             }
         }
     },
-    payments: true
+    payments: { where: { activo: true } }
 };
 
 export function timeToDate(value) {
