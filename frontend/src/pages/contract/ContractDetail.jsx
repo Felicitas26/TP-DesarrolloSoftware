@@ -201,18 +201,6 @@ function ContractDetail() {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [contract?.reservation?.idLoungeType, form.dateEvent]);
 
-    const guestRanges = mountData.loungeTypes
-        .filter(
-            (type) =>
-                String(type.idLounge) ===
-                String(contract?.reservation?.idLounge)
-        )
-        .map((type) => ({
-            min: type.minQuantity,
-            max: type.maxQuantity,
-            label: type.guestRangeLabel
-        }));
-
     const handleChange = (e) => {
         setForm({ ...form, [e.target.name]: e.target.value });
     };

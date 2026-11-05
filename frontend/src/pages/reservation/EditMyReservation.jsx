@@ -23,6 +23,10 @@ function EditMyReservation() {
     const [cardDetails, setCardDetails] = useState([]);
     const [extraServices, setExtraServices] = useState([]);
 
+    // Entidades actuales de la reserva, para mostrarlas aunque estén dadas de baja.
+    const [currentLounge, setCurrentLounge] = useState(null);
+    const [currentType, setCurrentType] = useState(null);
+
     const [message, setMessage] = useState(null);
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
@@ -85,6 +89,9 @@ function EditMyReservation() {
                         ) || []
                 });
 
+                setCurrentLounge(data.lounge || null);
+                setCurrentType(data.loungeType || null);
+
             } catch (error) {
                 showMessage("error", error.message);
             } finally {
@@ -104,33 +111,89 @@ function EditMyReservation() {
         });
     };
 
-    const handleRangeChange = (range) => {
+    const handleLoungeChange = (idLounge) => {
+        const types = loungeTypes.filter(
+            (type) => String(type.idLounge) === String(idLounge)
+        );
+
+        // Si el salón tiene una única capacidad, se selecciona sola (cascada).
+        const onlyType = types.length === 1 ? types[0] : null;
+
         setReservation({
             ...reservation,
-            cantInvit: String(range.min),
-            maxCantInvit: String(range.max)
+            idLounge,
+            idLoungeType: onlyType ? String(onlyType.idLoungeType) : "",
+            cantInvit: onlyType ? String(onlyType.minQuantity) : "",
+            maxCantInvit: onlyType ? String(onlyType.maxQuantity) : ""
         });
     };
 
-    const handleTypeChange = (e) => {
+    const handleTypeChange = (type) => {
         setReservation({
             ...reservation,
-            idLoungeType: e.target.value,
-            cantInvit: "",
-            maxCantInvit: ""
+            idLoungeType: String(type.idLoungeType),
+            cantInvit: String(type.minQuantity),
+            maxCantInvit: String(type.maxQuantity)
         });
     };
 
-    const guestRanges = loungeTypes
-        .filter(
-            (type) => String(type.idLounge) === String(reservation.idLounge)
+    const loungeOptions = [...lounges];
+
+    if (
+        reservation.idLounge &&
+        !lounges.some(
+            (lounge) => String(lounge.idLounge) === String(reservation.idLounge)
         )
-        .map((type) => ({
-            id: String(type.idLoungeType),
-            min: type.minQuantity,
-            max: type.maxQuantity,
-            label: type.guestRangeLabel
+    ) {
+        loungeOptions.push({
+            idLounge: Number(reservation.idLounge),
+            name: currentLounge?.name || `Salón #${reservation.idLounge}`,
+            loungeAddress: currentLounge?.loungeAddress || "",
+            inactivo: true
+        });
+    }
+
+    const activeSalonTypes = loungeTypes.filter(
+        (type) => String(type.idLounge) === String(reservation.idLounge)
+    );
+
+    const salonTypes = [...activeSalonTypes];
+
+    if (
+        reservation.idLoungeType &&
+        !salonTypes.some(
+            (type) =>
+                String(type.idLoungeType) === String(reservation.idLoungeType)
+        )
+    ) {
+        salonTypes.push({
+            idLoungeType: Number(reservation.idLoungeType),
+            nameLoungeType:
+                currentType?.nameLoungeType ||
+                `Capacidad #${reservation.idLoungeType}`,
+            minQuantity: currentType?.minQuantity ?? reservation.cantInvit,
+            maxQuantity: currentType?.maxQuantity ?? reservation.maxCantInvit,
+            idLounge: Number(reservation.idLounge),
+            inactivo: true
+        });
+    }
+
+    // Cascada: si el salón tiene una sola capacidad activa y la reserva no tenía
+    // una seleccionada, se completa sola.
+    useEffect(() => {
+        if (!reservation.idLounge || reservation.idLoungeType) return;
+        if (activeSalonTypes.length !== 1) return;
+
+        const onlyType = activeSalonTypes[0];
+
+        setReservation((prev) => ({
+            ...prev,
+            idLoungeType: String(onlyType.idLoungeType),
+            cantInvit: String(onlyType.minQuantity),
+            maxCantInvit: String(onlyType.maxQuantity)
         }));
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [loungeTypes, reservation.idLounge, reservation.idLoungeType]);
 
     const handleServiceChange = (idService) => {
         let updatedServices = [...reservation.idServices];
@@ -165,46 +228,24 @@ function EditMyReservation() {
             return;
         }
 
-        const selectedLoungeType = loungeTypes.find(
+        const selectedLoungeType = salonTypes.find(
             (type) =>
                 String(type.idLoungeType) === String(reservation.idLoungeType)
         );
 
         if (!selectedLoungeType) {
-            showMessage("error", "Seleccioná un tipo de salón.");
+            showMessage("error", "Seleccioná la capacidad del salón.");
             return;
         }
-
-        const selectedRange = guestRanges.find(
-            (r) => String(r.min) === String(reservation.cantInvit)
-        );
-
-        if (!selectedRange) {
-            showMessage("error", "Seleccioná la cantidad de invitados.");
-            return;
-        }
-
-        if (
-            selectedRange.min !== selectedLoungeType.minQuantity ||
-            selectedRange.max !== selectedLoungeType.maxQuantity
-        ) {
-            showMessage(
-                "error",
-                `El rango de invitados elegido (${selectedRange.min} - ${selectedRange.max}) no coincide con la capacidad del tipo de salón "${selectedLoungeType.nameLoungeType}" (${selectedLoungeType.minQuantity} - ${selectedLoungeType.maxQuantity} invitados).`
-            );
-            return;
-        }
-
-        const cantInvitNum = selectedRange.min;
 
         const reservationData = {
             dateEvent: reservation.dateEvent,
             eventType: reservation.eventType,
             status: "pendiente",
-            cantInvit: cantInvitNum,
-            maxCantInvit: selectedRange.max,
+            cantInvit: selectedLoungeType.minQuantity,
+            maxCantInvit: selectedLoungeType.maxQuantity,
             idCli: Number(localStorage.getItem("sty_idCli")),
-            idLounge: selectedLoungeType.idLounge,
+            idLounge: selectedLoungeType.idLounge ?? Number(reservation.idLounge),
             idLoungeType: selectedLoungeType.idLoungeType,
             idCardDetail: reservation.idCardDetail
                 ? Number(reservation.idCardDetail)
@@ -293,7 +334,7 @@ function EditMyReservation() {
                         Salón
                     </label>
 
-                    {lounges.map((lounge) => (
+                    {loungeOptions.map((lounge) => (
                         <label
                             className="reservation-option"
                             key={lounge.idLounge}
@@ -307,39 +348,68 @@ function EditMyReservation() {
                                     String(lounge.idLounge)
                                 }
                                 onChange={(e) =>
-                                    setReservation({
-                                        ...reservation,
-                                        idLounge: e.target.value,
-                                        idLoungeType: "",
-                                        cantInvit: "",
-                                        maxCantInvit: ""
-                                    })
+                                    handleLoungeChange(e.target.value)
                                 }
+                                disabled={lounge.inactivo}
                                 required
                             />
                             <span>
                                 <strong>{lounge.name}</strong>
                                 {" - "}
                                 {lounge.loungeAddress}
+                                {lounge.inactivo && " (dado de baja)"}
                             </span>
                         </label>
                     ))}
+
+                    {reservation.idLounge && loungeOptions.some(
+                        (lounge) =>
+                            String(lounge.idLounge) === String(reservation.idLounge) &&
+                            lounge.inactivo
+                    ) && (
+                        <p className="reservation-hint">
+                            El salón de tu reserva fue dado de baja. Podés elegir otro salón disponible.
+                        </p>
+                    )}
 
                 </div>
 
                 <div className="reservation-new-field">
 
                     <label>
-                        Tipo de salón
+                        Capacidad del salón
                     </label>
 
-                    {loungeTypes
-                        .filter(
-                            (type) =>
-                                String(type.idLounge) ===
-                                String(reservation.idLounge)
-                        )
-                        .map((type) => (
+                    {!reservation.idLounge && (
+                        <p className="reservation-hint">
+                            Primero seleccioná un salón.
+                        </p>
+                    )}
+
+                    {reservation.idLounge && salonTypes.length === 0 && (
+                        <p className="reservation-hint">
+                            Este salón no tiene capacidades cargadas.
+                        </p>
+                    )}
+
+                    {salonTypes.length === 1 && (
+                        <label className="reservation-option">
+                            <span>
+                                <strong>
+                                    {salonTypes[0].nameLoungeType}
+                                </strong>
+                                {" — "}
+                                {salonTypes[0].minQuantity}
+                                {" a "}
+                                {salonTypes[0].maxQuantity}
+                                {" invitados (única capacidad del salón)"}
+                                {salonTypes[0].inactivo && " — dada de baja"}
+                            </span>
+                        </label>
+                    )}
+
+                    {salonTypes.length > 1 &&
+                        salonTypes.map((type) => (
                             <label
                                 className="reservation-option"
                                 key={type.idLoungeType}
@@ -352,91 +422,33 @@ function EditMyReservation() {
                                         reservation.idLoungeType ===
                                         String(type.idLoungeType)
                                     }
-                                    onChange={handleTypeChange}
+                                    onChange={() => handleTypeChange(type)}
+                                    disabled={type.inactivo}
                                     required
                                 />
                                 <span>
                                     <strong>
                                         {type.nameLoungeType}
                                     </strong>
-                                    {" ("}
+                                    {" — "}
                                     {type.minQuantity}
-                                    {" - "}
+                                    {" a "}
                                     {type.maxQuantity}
-                                    {" invitados)"}
+                                    {" invitados"}
+                                    {type.inactivo && " (dada de baja)"}
                                 </span>
                             </label>
                         ))}
 
-                    {reservation.idLounge &&
-                        loungeTypes.filter(
-                            (type) =>
-                                String(type.idLounge) ===
-                                String(reservation.idLounge)
-                        ).length === 0 && (
-                            <p className="reservation-hint">
-                                Este salón no tiene tipos de salón cargados.
-                            </p>
-                        )}
-
-                </div>
-
-                <div className="reservation-new-field">
-
-                    <label>
-                        Cantidad de invitados
-                    </label>
-
-                    {!reservation.idLounge && (
+                    {reservation.idLoungeType && salonTypes.some(
+                        (type) =>
+                            String(type.idLoungeType) === String(reservation.idLoungeType) &&
+                            type.inactivo
+                    ) && (
                         <p className="reservation-hint">
-                            Primero seleccioná un salón.
+                            La capacidad de tu reserva fue dada de baja. Podés elegir otra disponible.
                         </p>
                     )}
-
-                    {reservation.idLounge && guestRanges.length === 0 && (
-                        <p className="reservation-hint">
-                            Este salón no tiene tipos de salón cargados.
-                        </p>
-                    )}
-
-                    {guestRanges.map((range) => (
-                        <label
-                            className="reservation-option"
-                            key={range.id}
-                        >
-                            <input
-                                type="radio"
-                                name="cantInvit"
-                                value={String(range.min)}
-                                checked={
-                                    reservation.cantInvit ===
-                                    String(range.min)
-                                }
-                                onChange={() => handleRangeChange(range)}
-                                required
-                            />
-                            <span>
-                                {range.label}
-                            </span>
-                        </label>
-                    ))}
-
-                    {reservation.idLoungeType &&
-                        (() => {
-                            const selectedLoungeType = loungeTypes.find(
-                                (type) =>
-                                    String(type.idLoungeType) ===
-                                    String(reservation.idLoungeType)
-                            );
-                            return selectedLoungeType ? (
-                                <p className="reservation-hint">
-                                    Este tipo de salón admite entre{" "}
-                                    {selectedLoungeType.minQuantity} y{" "}
-                                    {selectedLoungeType.maxQuantity}{" "}
-                                    invitados.
-                                </p>
-                            ) : null;
-                        })()}
 
                 </div>
 

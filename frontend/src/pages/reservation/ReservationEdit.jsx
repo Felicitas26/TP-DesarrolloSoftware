@@ -1,23 +1,48 @@
 import { useEffect, useState } from "react";
-import { reservationService } from "../../services";
+import { useParams } from "react-router-dom";
+import {
+    reservationService,
+    loungeService,
+    loungeTypeService,
+    clientService
+} from "../../services";
 import FeedbackModal from "../../components/FeedbackModal";
 import "./ReservationEdit.css";
 
+const initialReservation = {
+    dateEvent: "",
+    status: "",
+    cantInvit: "",
+    maxCantInvit: "",
+    idCli: "",
+    idLounge: "",
+    idLoungeType: ""
+};
+
 function ReservationEdit() {
+
+    const { id } = useParams();
 
     const [reservations, setReservations] = useState([]);
     const [selectedId, setSelectedId] = useState("");
 
-    const [reservation, setReservation] = useState({
-        dateEvent: "",
-        status: "",
-        cantInvit: "",
-        idCli: "",
-        idLounge: "",
-        idLoungeType: ""
-    });
+    const [reservation, setReservation] = useState(initialReservation);
+
+    const [lounges, setLounges] = useState([]);
+    const [loungeTypes, setLoungeTypes] = useState([]);
+    const [clients, setClients] = useState([]);
+
+    // Datos de las entidades actuales, para poder mostrarlas aunque hayan
+    // sido dadas de baja (el listado de catálogo solo trae activas).
+    const [currentLounge, setCurrentLounge] = useState(null);
+    const [currentType, setCurrentType] = useState(null);
+    const [currentClient, setCurrentClient] = useState(null);
 
     const [feedback, setFeedback] = useState(null);
+
+    // El backend exige un motivo para que el cliente sepa por qué se canceló.
+    const [deleteOpen, setDeleteOpen] = useState(false);
+    const [deleteMotivo, setDeleteMotivo] = useState("");
 
     const getReservations = async () => {
 
@@ -32,47 +57,89 @@ function ReservationEdit() {
         }
     };
 
-    useEffect(() => {
-        getReservations();
-    }, []);
+    const loadReservation = async (reservationId) => {
 
-    const handleSelect = async (e) => {
-
-        const id = e.target.value;
-
-        setSelectedId(id);
-
-        if (!id) {
-            setReservation({
-                dateEvent: "",
-                status: "",
-                cantInvit: "",
-                maxCantInvit: "",
-                idCli: "",
-                idLounge: "",
-                idLoungeType: ""
-            });
-
+        if (!reservationId) {
+            setSelectedId("");
+            setReservation(initialReservation);
+            setCurrentLounge(null);
+            setCurrentType(null);
+            setCurrentClient(null);
             return;
         }
 
         try {
-            const data = await reservationService.getById(id);
+            const data = await reservationService.getById(reservationId);
+
+            setSelectedId(String(reservationId));
 
             setReservation({
-                dateEvent: data.dateEvent,
-                status: data.status,
-                cantInvit: data.cantInvit,
-                maxCantInvit: data.maxCantInvit || data.cantInvit,
-                idCli: data.idCli,
-                idLounge: data.idLounge,
+                dateEvent: data.dateEvent
+                    ? data.dateEvent.split("T")[0]
+                    : "",
+                status: data.status || "",
+                cantInvit: data.cantInvit ?? "",
+                maxCantInvit: data.maxCantInvit ?? data.cantInvit ?? "",
+                idCli: data.idCli ? String(data.idCli) : "",
+                idLounge: data.idLounge ? String(data.idLounge) : "",
                 idLoungeType: data.idLoungeType
+                    ? String(data.idLoungeType)
+                    : ""
             });
+
+            setCurrentLounge(data.lounge || null);
+            setCurrentType(data.loungeType || null);
+            setCurrentClient(data.client || null);
 
         } catch (error) {
             console.error(error);
             setFeedback({ type: "error", title: "Error", message: error.message });
         }
+    };
+
+    useEffect(() => {
+
+        const getCatalog = async () => {
+
+            try {
+                const [loungesData, typesData, clientsData] =
+                    await Promise.all([
+                        loungeService.getAll(),
+                        loungeTypeService.getAll(),
+                        clientService.getAll()
+                    ]);
+
+                setLounges(loungesData);
+                setLoungeTypes(typesData);
+                setClients(clientsData);
+
+            } catch (error) {
+                console.error("Error al obtener el catálogo:", error);
+                setFeedback({ type: "error", title: "Error", message: error.message });
+            }
+        };
+
+        getReservations();
+        getCatalog();
+
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
+    useEffect(() => {
+        if (id) loadReservation(id);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [id]);
+
+    const handleSelect = (e) => {
+
+        const value = e.target.value;
+
+        if (!value) {
+            loadReservation("");
+            return;
+        }
+
+        loadReservation(value);
     };
 
     const handleChange = (e) => {
@@ -83,16 +150,101 @@ function ReservationEdit() {
         });
     };
 
+    const loungeOptions = [...lounges];
+
+    if (
+        reservation.idLounge &&
+        !lounges.some(
+            (lounge) => String(lounge.idLounge) === String(reservation.idLounge)
+        )
+    ) {
+        loungeOptions.push({
+            idLounge: Number(reservation.idLounge),
+            name: currentLounge?.name || `Salón #${reservation.idLounge}`,
+            loungeAddress: currentLounge?.loungeAddress || "",
+            inactivo: true
+        });
+    }
+
+    const typeOptions = loungeTypes.filter(
+        (type) => String(type.idLounge) === String(reservation.idLounge)
+    );
+
+    if (
+        reservation.idLoungeType &&
+        !typeOptions.some(
+            (type) =>
+                String(type.idLoungeType) === String(reservation.idLoungeType)
+        )
+    ) {
+        typeOptions.push({
+            idLoungeType: Number(reservation.idLoungeType),
+            nameLoungeType:
+                currentType?.nameLoungeType ||
+                `Capacidad #${reservation.idLoungeType}`,
+            minQuantity: currentType?.minQuantity ?? reservation.cantInvit,
+            maxQuantity: currentType?.maxQuantity ?? reservation.maxCantInvit,
+            idLounge: Number(reservation.idLounge),
+            inactivo: true
+        });
+    }
+
+    const handleLoungeChange = (idLounge) => {
+
+        const activeTypes = loungeTypes.filter(
+            (type) => String(type.idLounge) === String(idLounge)
+        );
+
+        // Cascada: si el salón tiene una única capacidad, se selecciona sola.
+        const onlyType = activeTypes.length === 1 ? activeTypes[0] : null;
+
+        setReservation((prev) => ({
+            ...prev,
+            idLounge: String(idLounge),
+            idLoungeType: onlyType ? String(onlyType.idLoungeType) : "",
+            cantInvit: onlyType ? String(onlyType.minQuantity) : "",
+            maxCantInvit: onlyType ? String(onlyType.maxQuantity) : ""
+        }));
+    };
+
+    const handleTypeChange = (idLoungeType) => {
+
+        const selected = typeOptions.find(
+            (type) => String(type.idLoungeType) === String(idLoungeType)
+        );
+
+        setReservation((prev) => ({
+            ...prev,
+            idLoungeType: String(idLoungeType),
+            cantInvit: selected ? String(selected.minQuantity) : "",
+            maxCantInvit: selected ? String(selected.maxQuantity) : ""
+        }));
+    };
+
     const handleUpdate = async (e) => {
 
         e.preventDefault();
+
+        const selectedType = typeOptions.find(
+            (type) =>
+                String(type.idLoungeType) === String(reservation.idLoungeType)
+        );
+
+        if (!reservation.idCli || !reservation.idLounge || !selectedType) {
+            setFeedback({
+                type: "error",
+                title: "Datos incompletos",
+                message: "Seleccioná el cliente, el salón y la capacidad del salón."
+            });
+            return;
+        }
 
         try {
             await reservationService.update(selectedId, {
                 dateEvent: reservation.dateEvent,
                 status: reservation.status,
-                cantInvit: Number(reservation.cantInvit),
-                maxCantInvit: Number(reservation.maxCantInvit) || Number(reservation.cantInvit),
+                cantInvit: Number(selectedType.minQuantity),
+                maxCantInvit: Number(selectedType.maxQuantity),
                 idCli: Number(reservation.idCli),
                 idLounge: Number(reservation.idLounge),
                 idLoungeType: Number(reservation.idLoungeType)
@@ -101,6 +253,7 @@ function ReservationEdit() {
             setFeedback({ type: "success", title: "Reserva actualizada", message: "La reserva se actualizó correctamente." });
 
             await getReservations();
+            await loadReservation(selectedId);
 
         } catch (error) {
             console.error(error);
@@ -109,28 +262,36 @@ function ReservationEdit() {
     };
 
     const handleDeleteClick = () => {
-        setFeedback({ type: "confirm", title: "Eliminar reserva", message: "¿Está seguro de que desea eliminar esta reserva?", confirmLabel: "Eliminar", onConfirm: handleDeleteConfirm, onCancel: () => setFeedback(null) });
+        setDeleteMotivo("");
+        setDeleteOpen(true);
     };
 
     const handleDeleteConfirm = async () => {
 
-        setFeedback(null);
+        const motivo = deleteMotivo.trim();
+
+        if (!motivo) {
+            setFeedback({
+                type: "error",
+                title: "Falta el motivo",
+                message: "Indicá el motivo de la eliminación para avisarle al cliente."
+            });
+            return;
+        }
 
         try {
-            await reservationService.remove(selectedId);
+            await reservationService.remove(selectedId, { motivo });
+
+            setDeleteOpen(false);
+            setDeleteMotivo("");
 
             setFeedback({ type: "success", title: "Reserva eliminada", message: "La reserva se eliminó correctamente." });
 
             setSelectedId("");
-
-            setReservation({
-                dateEvent: "",
-                status: "",
-                cantInvit: "",
-                idCli: "",
-                idLounge: "",
-                idLoungeType: ""
-            });
+            setReservation(initialReservation);
+            setCurrentLounge(null);
+            setCurrentType(null);
+            setCurrentClient(null);
 
             await getReservations();
 
@@ -139,6 +300,14 @@ function ReservationEdit() {
             setFeedback({ type: "error", title: "Error", message: error.message });
         }
     };
+
+    const selectedClient = clients.find(
+        (client) => String(client.idCli) === String(reservation.idCli)
+    );
+
+    const clientFallbackName = currentClient
+        ? `${currentClient.nameCli || ""} ${currentClient.surnameCli || ""}`.trim()
+        : "";
 
     return (
         <div className="reservation-edit-container">
@@ -165,6 +334,12 @@ function ReservationEdit() {
                             value={item.idReservation}
                         >
                             Reserva #{item.idReservation}
+                            {item.client
+                                ? ` — ${item.client.nameCli} ${item.client.surnameCli}`
+                                : ""}
+                            {item.dateEvent
+                                ? ` (${new Date(item.dateEvent).toLocaleDateString("es-AR")})`
+                                : ""}
                         </option>
 
                     ))}
@@ -209,6 +384,10 @@ function ReservationEdit() {
                                 Pendiente
                             </option>
 
+                            <option value="aceptada">
+                                Aceptada
+                            </option>
+
                             <option value="confirmada">
                                 Confirmada
                             </option>
@@ -223,61 +402,122 @@ function ReservationEdit() {
 
                     <div className="reservation-edit-field">
 
-                        <label>Cantidad de invitados</label>
+                        <label>Cliente</label>
 
-                        <input
-                            type="number"
-                            name="cantInvit"
-                            value={reservation.cantInvit}
-                            onChange={handleChange}
-                            min="1"
-                            required
-                        />
-
-                    </div>
-
-                    <div className="reservation-edit-field">
-
-                        <label>ID del cliente</label>
-
-                        <input
-                            type="number"
+                        <select
                             name="idCli"
                             value={reservation.idCli}
                             onChange={handleChange}
-                            min="1"
                             required
-                        />
+                        >
+                            <option value="" disabled>
+                                Seleccionar cliente
+                            </option>
+
+                            {clients.map((client) => (
+
+                                <option
+                                    key={client.idCli}
+                                    value={client.idCli}
+                                >
+                                    {client.nameCli} {client.surnameCli}
+                                    {client.dniCli ? ` — DNI ${client.dniCli}` : ""}
+                                </option>
+
+                            ))}
+
+                            {reservation.idCli && !selectedClient && (
+                                <option value={reservation.idCli} disabled>
+                                    {clientFallbackName || `Cliente #${reservation.idCli}`}
+                                    {" — dado de baja"}
+                                </option>
+                            )}
+
+                        </select>
 
                     </div>
 
                     <div className="reservation-edit-field">
 
-                        <label>ID del salón</label>
+                        <label>Salón</label>
 
-                        <input
-                            type="number"
+                        <select
                             name="idLounge"
                             value={reservation.idLounge}
-                            onChange={handleChange}
-                            min="1"
+                            onChange={(e) => handleLoungeChange(e.target.value)}
                             required
-                        />
+                        >
+                            <option value="" disabled>
+                                Seleccionar salón
+                            </option>
+
+                            {loungeOptions.map((lounge) => (
+
+                                <option
+                                    key={lounge.idLounge}
+                                    value={lounge.idLounge}
+                                    disabled={lounge.inactivo}
+                                >
+                                    {lounge.name}
+                                    {lounge.loungeAddress
+                                        ? ` — ${lounge.loungeAddress}`
+                                        : ""}
+                                    {lounge.inactivo ? " — dado de baja" : ""}
+                                </option>
+
+                            ))}
+
+                        </select>
+
+                        {reservation.idLounge && typeOptions.length === 0 && (
+                            <small className="reservation-edit-hint">
+                                Este salón no tiene capacidades cargadas.
+                            </small>
+                        )}
 
                     </div>
 
                     <div className="reservation-edit-field">
 
-                        <label>ID del tipo de salón</label>
+                        <label>Capacidad del salón</label>
 
-                        <input
-                            type="number"
+                        <select
                             name="idLoungeType"
                             value={reservation.idLoungeType}
-                            onChange={handleChange}
-                            min="1"
+                            onChange={(e) => handleTypeChange(e.target.value)}
+                            disabled={!reservation.idLounge || typeOptions.length === 0}
                             required
-                        />
+                        >
+                            <option value="" disabled>
+                                {!reservation.idLounge
+                                    ? "Primero seleccioná un salón"
+                                    : typeOptions.length === 0
+                                        ? "Sin capacidades cargadas"
+                                        : "Seleccionar capacidad"}
+                            </option>
+
+                            {typeOptions.map((type) => (
+
+                                <option
+                                    key={type.idLoungeType}
+                                    value={type.idLoungeType}
+                                    disabled={type.inactivo}
+                                >
+                                    {type.nameLoungeType}
+                                    {` — ${type.minQuantity} a ${type.maxQuantity} invitados`}
+                                    {type.inactivo ? " (dada de baja)" : ""}
+                                </option>
+
+                            ))}
+
+                        </select>
+
+                        {reservation.idLoungeType && (
+                            <small className="reservation-edit-hint">
+                                La capacidad se define con el salón: no hace falta
+                                cargar invitados a mano.
+                            </small>
+                        )}
 
                     </div>
 
@@ -302,6 +542,43 @@ function ReservationEdit() {
 
                 </form>
 
+            )}
+
+            {deleteOpen && (
+                <div className="reservation-edit-modal-backdrop">
+                    <div className="reservation-edit-modal">
+                        <h2>Eliminar reserva</h2>
+                        <p>
+                            La reserva se marcará como cancelada y se le avisará
+                            al cliente. Indicá el motivo:
+                        </p>
+
+                        <textarea
+                            value={deleteMotivo}
+                            onChange={(e) => setDeleteMotivo(e.target.value)}
+                            rows={3}
+                            placeholder="Motivo de la eliminación"
+                        />
+
+                        <div className="reservation-edit-modal-actions">
+                            <button
+                                type="button"
+                                className="reservation-edit-modal-cancel"
+                                onClick={() => setDeleteOpen(false)}
+                            >
+                                Cancelar
+                            </button>
+
+                            <button
+                                type="button"
+                                className="reservation-edit-modal-confirm"
+                                onClick={handleDeleteConfirm}
+                            >
+                                Eliminar
+                            </button>
+                        </div>
+                    </div>
+                </div>
             )}
 
             {feedback && (

@@ -219,13 +219,24 @@ class ReservationModel {
                 data: {
                     dateEvent: new Date(dateEvent),
                     status,
-                    eventType: eventType || null,
+                    // Campos opcionales: si no vienen en el body se conservan
+                    // (antes, editar una reserva desde el admin borraba el
+                    // tipo de evento y el menú).
+                    ...(eventType !== undefined
+                        ? { eventType: eventType || null }
+                        : {}),
                     cantInvit: Number(cantInvit),
                     maxCantInvit: Number(maxCantInvit) || Number(cantInvit),
                     idCli: Number(idCli),
                     idLounge: Number(idLounge),
                     idLoungeType: Number(idLoungeType),
-                    idCardDetail: idCardDetail ? Number(idCardDetail) : null,
+                    ...(idCardDetail !== undefined
+                        ? {
+                            idCardDetail: idCardDetail
+                                ? Number(idCardDetail)
+                                : null
+                        }
+                        : {}),
                     ...(Array.isArray(idServices)
                         ? {
                             extraServices: {
