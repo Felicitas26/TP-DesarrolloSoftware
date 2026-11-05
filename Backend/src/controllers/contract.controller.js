@@ -4,7 +4,6 @@ import httpError from "../utils/httpError.js";
 
 class ContractController {
 
-    // Carga el contrato y valida que el cliente sea su dueño.
     async loadContract(req) {
         const contract = await contractService.getById(req.params.id);
 

@@ -14,7 +14,6 @@ export class Lounge {
     }
 
     /**
-     * Convierte la respuesta cruda del endpoint en una instancia de Lounge.
      * @param {LoungeData} json
      * @returns {Lounge}
      */
@@ -22,7 +21,7 @@ export class Lounge {
         return new Lounge(json);
     }
 
-    /** @returns {string} Ciudad o "No asignada" */
+    /** @returns {string}  */
     get cityLabel() {
         return this.cityName || "No asignada";
     }

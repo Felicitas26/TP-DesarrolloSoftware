@@ -205,7 +205,6 @@ class UsuarioService {
 
         if (existing) {
             if (existing.rol === "administrador" && !existing.activo) {
-                // Baja lógica: el administrador existía pero estaba dado de baja.
                 const passwordHash =
                     await bcrypt.hash(passwordValida, SALT_ROUNDS);
                 await usuarioModel.updateAdministrador(

@@ -27,7 +27,6 @@ export class Reservation {
     }
 
     /**
-     * Convierte la respuesta cruda del endpoint en una instancia de Reservation.
      * @param {ReservationData} json
      * @returns {Reservation}
      */
@@ -40,7 +39,7 @@ export class Reservation {
         return STATUS_LABEL[this.status] || this.status || "";
     }
 
-    /** @returns {string} Fecha formateada como dd/mm/yyyy */
+    /** @returns {string}*/
     get formattedDate() {
         if (!this.dateEvent) return "";
         const dateOnly = String(this.dateEvent).split("T")[0];
@@ -54,7 +53,7 @@ export class Reservation {
         return this.status === "pendiente";
     }
 
-    /** @returns {boolean} El evento ya pasó (fecha anterior a hoy) */
+    /** @returns {boolean}*/
     get isExpired() {
         if (!this.dateEvent) return false;
         const dateOnly = String(this.dateEvent).split("T")[0];

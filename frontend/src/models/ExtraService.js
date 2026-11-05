@@ -13,7 +13,6 @@ export class ExtraService {
     }
 
     /**
-     * Convierte la respuesta cruda del endpoint en una instancia de ExtraService.
      * @param {ExtraServiceData} json
      * @returns {ExtraService}
      */
@@ -21,7 +20,7 @@ export class ExtraService {
         return new ExtraService(json);
     }
 
-    /** @returns {string} Costo formateado como moneda ARS */
+    /** @returns {string} */
     get formattedCost() {
         return `$${Number(this.cost || 0).toLocaleString("es-AR")}`;
     }

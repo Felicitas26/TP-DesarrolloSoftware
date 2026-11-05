@@ -219,9 +219,6 @@ class ReservationModel {
                 data: {
                     dateEvent: new Date(dateEvent),
                     status,
-                    // Campos opcionales: si no vienen en el body se conservan
-                    // (antes, editar una reserva desde el admin borraba el
-                    // tipo de evento y el menú).
                     ...(eventType !== undefined
                         ? { eventType: eventType || null }
                         : {}),

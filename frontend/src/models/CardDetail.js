@@ -17,7 +17,6 @@ export class CardDetail {
     }
 
     /**
-     * Convierte la respuesta cruda del endpoint en una instancia de CardDetail.
      * @param {CardDetailData} json
      * @returns {CardDetail}
      */
@@ -26,7 +25,6 @@ export class CardDetail {
     }
 
     /**
-     * Plato del menú en formato { label, text } para render.
      * @returns {Array<{label: string, text: string}>}
      */
     get courses() {
@@ -44,7 +42,7 @@ export class CardDetail {
         ];
     }
 
-    /** @returns {string} Presupuesto formateado como moneda ARS */
+    /** @returns {string} */
     get formattedBudget() {
         return `$${Number(this.budget || 0).toLocaleString("es-AR")}`;
     }

@@ -246,8 +246,6 @@ class ContractModel {
     }
 
     async remove(id) {
-        // Baja lógica: el contrato, sus pagos y sus notificaciones dejan de ser visibles,
-        // pero ninguna fila se borra físicamente (historial conservado).
         try {
             return await prisma.$transaction(async (tx) => {
                 await tx.payment.updateMany({

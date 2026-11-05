@@ -13,7 +13,6 @@ export class Price {
     }
 
     /**
-     * Convierte la respuesta cruda del endpoint en una instancia de Price.
      * @param {PriceData} json
      * @returns {Price}
      */
@@ -22,7 +21,6 @@ export class Price {
     }
 
     /**
-     * Clave compuesta usada por el endpoint /api/price/:idLoungeType/:date.
      * @param {Partial<PriceData>} price
      * @returns {string}
      */
@@ -31,12 +29,12 @@ export class Price {
         return `${price.idLoungeType}/${encodeURIComponent(date)}`;
     }
 
-    /** @returns {string} Clave de esta instancia */
+    /** @returns {string} */
     get key() {
         return Price.key(this);
     }
 
-    /** @returns {string} Valor formateado como moneda ARS */
+    /** @returns {string} */
     get formattedValue() {
         return `$${Number(this.value).toLocaleString("es-AR")}`;
     }

@@ -44,8 +44,6 @@ class LoungeService {
             throw { statusCode: 404, message: `No se encontró el salón con ID ${id}.` };
         }
 
-        // Baja lógica: el salón no se borra físicamente, por lo que sus reservas
-        // históricas quedan intactas — no hay conflicto con la FK.
         const deleted = await loungeModel.delete(id);
         if (!deleted) {
             throw { statusCode: 404, message: `No se encontró el salón con ID ${id}.` };

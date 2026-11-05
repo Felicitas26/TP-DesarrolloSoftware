@@ -49,8 +49,6 @@ class ReservationService {
             throw error;
         }
 
-        // La capacidad la define el salón/tipo, no el cliente: así el rango
-        // guardado siempre coincide con el que se muestra en pantalla.
         return await reservationModel.create(
             {
                 ...reservation,

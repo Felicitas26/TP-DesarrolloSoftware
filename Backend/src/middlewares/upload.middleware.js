@@ -6,7 +6,6 @@ import { fileURLToPath } from "url";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 let uploadsDir = path.join(__dirname, "..", "..", "uploads");
 
-// El FS del proyecto puede ser read-only en serverless: se degrada a /tmp
 try {
     if (!fs.existsSync(uploadsDir)) {
         fs.mkdirSync(uploadsDir, { recursive: true });

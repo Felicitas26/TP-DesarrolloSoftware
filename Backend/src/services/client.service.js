@@ -29,8 +29,6 @@ class ClientService {
     }
 
     async create(client) {
-        // Baja lógica: si el DNI coincide con un cliente dado de baja, se reactiva
-        // con los datos nuevos en lugar de chocar contra su cuenta de usuario inactiva.
         const dniValue = validateDni(client.dniCli);
         const existingByDni = await clientModel.findByDni(dniValue);
         if (existingByDni && !existingByDni.activo) {
@@ -58,7 +56,6 @@ class ClientService {
             };
         }
 
-        // El alta del cliente crea además su cuenta de usuario.
         const created = await clientModel.create({
             nameCli: data.nameCli,
             surnameCli: data.surnameCli,
@@ -97,7 +94,6 @@ class ClientService {
         const linkedUser = await usuarioModel.findByCli(client.idCli);
 
         if (linkedUser) {
-            // El username de la cuenta va de la mano del email del cliente.
             if (linkedUser.username && linkedUser.username !== data.emailCli) {
                 const usernameTaken = await usuarioModel.findByUsername(data.emailCli);
                 if (usernameTaken && usernameTaken.idUsuario !== linkedUser.idUsuario) {
@@ -160,8 +156,6 @@ class ClientService {
             throw { statusCode: 404, message: "No se ha encontrado al cliente." };
         }
 
-        // Baja lógica: el cliente no se borra físicamente, por lo que sus reservas
-        // históricas quedan intactas — no hay conflicto con la FK.
         const linkedUser = await usuarioModel.findByCli(Number(id));
         if (linkedUser) {
             await usuarioModel.delete(linkedUser.idUsuario);
