@@ -19,6 +19,13 @@ const initialReservation = {
     idLoungeType: ""
 };
 
+const STATUS_LABELS = {
+    pendiente: "Pendiente",
+    aceptada: "Aceptada",
+    confirmada: "Confirmada",
+    cancelada: "Cancelada"
+};
+
 function ReservationEdit() {
 
     const { id } = useParams();
@@ -27,6 +34,7 @@ function ReservationEdit() {
     const [selectedId, setSelectedId] = useState("");
 
     const [reservation, setReservation] = useState(initialReservation);
+    const [savedStatus, setSavedStatus] = useState("");
 
     const [lounges, setLounges] = useState([]);
     const [loungeTypes, setLoungeTypes] = useState([]);
@@ -62,6 +70,7 @@ function ReservationEdit() {
         if (!reservationId) {
             setSelectedId("");
             setReservation(initialReservation);
+            setSavedStatus("");
             setCurrentLounge(null);
             setCurrentType(null);
             setCurrentClient(null);
@@ -86,6 +95,8 @@ function ReservationEdit() {
                     ? String(data.idLoungeType)
                     : ""
             });
+
+            setSavedStatus(data.status || "");
 
             setCurrentLounge(data.lounge || null);
             setCurrentType(data.loungeType || null);
@@ -221,23 +232,16 @@ function ReservationEdit() {
         }));
     };
 
-    const handleUpdate = async (e) => {
+    const saveChanges = async () => {
 
-        e.preventDefault();
+        setFeedback(null);
 
         const selectedType = typeOptions.find(
             (type) =>
                 String(type.idLoungeType) === String(reservation.idLoungeType)
         );
 
-        if (!reservation.idCli || !reservation.idLounge || !selectedType) {
-            setFeedback({
-                type: "error",
-                title: "Datos incompletos",
-                message: "Seleccioná el cliente, el salón y la capacidad del salón."
-            });
-            return;
-        }
+        if (!selectedType) return;
 
         try {
             await reservationService.update(selectedId, {
@@ -259,6 +263,45 @@ function ReservationEdit() {
             console.error(error);
             setFeedback({ type: "error", title: "Error", message: error.message });
         }
+    };
+
+    const handleUpdate = (e) => {
+
+        e.preventDefault();
+
+        const selectedType = typeOptions.find(
+            (type) =>
+                String(type.idLoungeType) === String(reservation.idLoungeType)
+        );
+
+        if (!reservation.idCli || !reservation.idLounge || !selectedType) {
+            setFeedback({
+                type: "error",
+                title: "Datos incompletos",
+                message: "Seleccioná el cliente, el salón y la capacidad del salón."
+            });
+            return;
+        }
+
+        if (reservation.status !== savedStatus) {
+            const estadoAnterior = STATUS_LABELS[savedStatus] || "sin estado";
+            const estadoNuevo = STATUS_LABELS[reservation.status] || "sin estado";
+            const avisoCancelada = reservation.status === "cancelada"
+                ? " La reserva quedará cancelada y no se puede deshacer. Para avisarle al cliente, usá la opción Eliminar reserva con motivo."
+                : "";
+
+            setFeedback({
+                type: "confirm",
+                title: "Cambiar estado de la reserva",
+                message: `¿Confirmás que querés cambiar el estado de la reserva de "${estadoAnterior}" a "${estadoNuevo}"?${avisoCancelada}`,
+                confirmLabel: "Sí, guardar",
+                onConfirm: saveChanges,
+                onCancel: () => setFeedback(null)
+            });
+            return;
+        }
+
+        saveChanges();
     };
 
     const handleDeleteClick = () => {

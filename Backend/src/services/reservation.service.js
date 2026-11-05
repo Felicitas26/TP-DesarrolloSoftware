@@ -17,8 +17,6 @@ class ReservationService {
     }
 
     async create(reservation, idCli) {
-        // Baja lógica: no se puede reservar sobre un salón o tipo de salón dado de baja,
-        // aunque alguien llegue por API directa sin pasar por el listado del front.
         const lounge = await loungeModel.getById(reservation.idLounge);
         if (!lounge || !lounge.activo) {
             const error = new Error("El salón seleccionado fue dado de baja y ya no acepta reservas.");

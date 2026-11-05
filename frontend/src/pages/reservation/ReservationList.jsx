@@ -90,7 +90,20 @@ function ReservationList() {
         ? reservations
         : reservations.filter(r => r.status === statusFilter);
 
+    const handleAcceptClick = (id) => {
+        setFeedback({
+            type: "confirm",
+            title: "Aceptar reserva",
+            message: `¿Confirmás que querés aceptar la reserva #${id}? Se notificará al cliente y el contrato quedará disponible para completar.`,
+            confirmLabel: "Sí, aceptar",
+            onConfirm: () => acceptReservation(id),
+            onCancel: () => setFeedback(null)
+        });
+    };
+
     const acceptReservation = async (id) => {
+
+        setFeedback(null);
 
         try {
 
@@ -298,7 +311,7 @@ function ReservationList() {
                                                         <button
                                                             className="reservation-btn-accept"
                                                             onClick={() =>
-                                                                acceptReservation(
+                                                                handleAcceptClick(
                                                                     reservation.idReservation
                                                                 )
                                                             }
@@ -435,8 +448,8 @@ function ReservationList() {
                     message={feedback.message}
                     confirmLabel={feedback.confirmLabel}
                     cancelLabel="Volver"
-                    onConfirm={feedback.type === "confirm" ? performCancel : undefined}
-                    onCancel={() => { setFeedback(null); setReservationToCancelId(null); }}
+                    onConfirm={feedback.onConfirm}
+                    onCancel={feedback.onCancel || (() => setFeedback(null))}
                     onClose={() => {
                         setFeedback(null);
                         if (feedback.type === "success" || feedback.type === "error") {

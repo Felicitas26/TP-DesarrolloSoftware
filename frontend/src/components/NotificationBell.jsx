@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { notificationService } from "../services";
+import FeedbackModal from "./FeedbackModal";
 import "./NotificationBell.css";
 
 const NOTIFICATION_LABEL = {
@@ -40,6 +41,7 @@ function NotificationBell() {
     const [loading, setLoading] = useState(false);
     const [unread, setUnread] = useState(0);
     const [notifications, setNotifications] = useState([]);
+    const [notificationToDelete, setNotificationToDelete] = useState(null);
     const ref = useRef(null);
 
     const fetchNotifications = async () => {
@@ -132,8 +134,17 @@ function NotificationBell() {
         }
     };
 
-    const handleDelete = async (event, notification) => {
+    const handleDeleteClick = (event, notification) => {
         event.stopPropagation();
+        setNotificationToDelete(notification);
+    };
+
+    const handleDeleteConfirm = async () => {
+        const notification = notificationToDelete;
+        setNotificationToDelete(null);
+
+        if (!notification) return;
+
         try {
             await notificationService.eliminar(notification.idNotificacion);
             setNotifications((prev) =>
@@ -198,7 +209,7 @@ function NotificationBell() {
                                     <button
                                         type="button"
                                         className="bell-item-delete"
-                                        onClick={(event) => handleDelete(event, n)}
+                                        onClick={(event) => handleDeleteClick(event, n)}
                                         aria-label="Eliminar notificación"
                                         title="Eliminar"
                                     >
@@ -209,6 +220,18 @@ function NotificationBell() {
                         )}
                     </div>
                 </div>
+            )}
+
+            {notificationToDelete && (
+                <FeedbackModal
+                    type="confirm"
+                    title="Eliminar notificación"
+                    message="¿Estás seguro de que querés eliminar esta notificación? Esta acción no se puede deshacer."
+                    confirmLabel="Sí, eliminar"
+                    cancelLabel="Volver"
+                    onConfirm={handleDeleteConfirm}
+                    onCancel={() => setNotificationToDelete(null)}
+                />
             )}
         </div>
     );

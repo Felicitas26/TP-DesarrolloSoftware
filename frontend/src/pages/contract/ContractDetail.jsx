@@ -54,6 +54,11 @@ function ContractDetail() {
     const [showTerminos, setShowTerminos] = useState(false);
     const [confirmCancelar, setConfirmCancelar] = useState(false);
     const [confirmEliminar, setConfirmEliminar] = useState(false);
+    const [confirmContinuar, setConfirmContinuar] = useState(false);
+    const [confirmEnviar, setConfirmEnviar] = useState(false);
+    const [confirmAprobarMod, setConfirmAprobarMod] = useState(false);
+    const [confirmSolicitarMod, setConfirmSolicitarMod] = useState(false);
+    const [confirmPago, setConfirmPago] = useState(null);
     const [rejectOpen, setRejectOpen] = useState(false);
     const [rejectMotivo, setRejectMotivo] = useState("");
     const [pendingRedirect, setPendingRedirect] = useState(false);
@@ -255,6 +260,7 @@ function ContractDetail() {
     };
 
     const handleEnviar = async () => {
+        setConfirmEnviar(false);
         setMessage(null);
         setSaving(true);
 
@@ -285,6 +291,7 @@ function ContractDetail() {
     };
 
     const handleSolicitarMod = async () => {
+        setConfirmSolicitarMod(false);
         setMessage(null);
         setSaving(true);
 
@@ -350,6 +357,7 @@ function ContractDetail() {
     };
 
     const handleContinuarContrato = async () => {
+        setConfirmContinuar(false);
         setMessage(null);
         setSaving(true);
 
@@ -404,6 +412,7 @@ function ContractDetail() {
 
     const handleCambiarPago = async (statusPayment) => {
         if (!payment) return;
+        setConfirmPago(null);
         setMessage(null);
         setSaving(true);
 
@@ -898,7 +907,7 @@ function ContractDetail() {
                                 {payment.statusPayment !== "pagado" ? (
                                     <button
                                         className="contract-btn-accept"
-                                        onClick={() => handleCambiarPago("pagado")}
+                                        onClick={() => setConfirmPago("pagado")}
                                         disabled={saving}
                                     >
                                         {saving ? "Procesando..." : "Marcar saldo como abonado"}
@@ -906,7 +915,7 @@ function ContractDetail() {
                                 ) : (
                                     <button
                                         className="contract-btn-save"
-                                        onClick={() => handleCambiarPago("pendiente")}
+                                        onClick={() => setConfirmPago("pendiente")}
                                         disabled={saving}
                                     >
                                         {saving ? "Procesando..." : "Reabrir como pendiente"}
@@ -994,7 +1003,7 @@ function ContractDetail() {
                             Decidí cómo querés continuar con el evento:
                         </p>
                         <div className="contract-actions">
-                            <button className="contract-btn-save" onClick={handleContinuarContrato} disabled={saving}>
+                            <button className="contract-btn-save" onClick={() => setConfirmContinuar(true)} disabled={saving}>
                                 {saving ? "Procesando..." : "Continuar con el contrato como estaba"}
                             </button>
                             <button className="contract-btn-reject" onClick={() => setConfirmCancelar(true)} disabled={saving}>
@@ -1078,7 +1087,7 @@ function ContractDetail() {
 <button className="contract-btn-reject" onClick={() => setRejectOpen(true)} disabled={saving}>
                         Rechazar modificación
                     </button>
-                            <button className="contract-btn-accept" onClick={() => handleRevisarMod("aprobar")} disabled={saving}>
+                            <button className="contract-btn-accept" onClick={() => setConfirmAprobarMod(true)} disabled={saving}>
                                 Aprobar modificación
                             </button>
                         </div>
@@ -1093,7 +1102,7 @@ function ContractDetail() {
                             <button className="contract-btn-save" onClick={handleSave} disabled={saving}>
                                 {saving ? "Guardando..." : "Guardar cambios"}
                             </button>
-                            <button className="contract-btn-primary" onClick={handleEnviar} disabled={saving}>
+                            <button className="contract-btn-primary" onClick={() => setConfirmEnviar(true)} disabled={saving}>
                                 Enviar para revisión
                             </button>
                         </>
@@ -1124,7 +1133,7 @@ function ContractDetail() {
 
                     {rol === "cliente" && contract.status === "firmado" && modificando && (
                         <>
-                            <button className="contract-btn-primary" onClick={handleSolicitarMod} disabled={saving}>
+                            <button className="contract-btn-primary" onClick={() => setConfirmSolicitarMod(true)} disabled={saving}>
                                 {saving ? "Enviando..." : "Enviar solicitud de modificación"}
                             </button>
                             <button className="contract-btn-save" onClick={() => setModificando(false)} disabled={saving}>
@@ -1264,7 +1273,7 @@ function ContractDetail() {
                             <button className="contract-btn-save" onClick={() => setModificando(false)} disabled={saving}>
                                 Cancelar
                             </button>
-                            <button className="contract-btn-accept" onClick={handleSolicitarMod} disabled={saving}>
+                            <button className="contract-btn-accept" onClick={() => setConfirmSolicitarMod(true)} disabled={saving}>
                                 {saving ? "Enviando..." : "Enviar solicitud de modificación"}
                             </button>
                         </div>
@@ -1377,6 +1386,71 @@ function ContractDetail() {
                         </div>
                     </div>
                 </div>
+            )}
+
+            {confirmEnviar && (
+                <FeedbackModal
+                    type="confirm"
+                    title="Enviar contrato para revisión"
+                    message={`¿Confirmás que querés enviar el contrato #${contract.idContract} al administrador? Una vez enviado no podrás editarlo hasta que lo revise.`}
+                    confirmLabel="Sí, enviar"
+                    cancelLabel="Volver"
+                    onConfirm={handleEnviar}
+                    onCancel={() => setConfirmEnviar(false)}
+                />
+            )}
+
+            {confirmSolicitarMod && (
+                <FeedbackModal
+                    type="confirm"
+                    title="Enviar solicitud de modificación"
+                    message="¿Confirmás que querés enviar esta solicitud de modificación? El administrador deberá aprobarla o rechazarla, y si la aprueba tendrás que firmar el contrato nuevamente."
+                    confirmLabel="Sí, enviar solicitud"
+                    cancelLabel="Volver"
+                    onConfirm={handleSolicitarMod}
+                    onCancel={() => setConfirmSolicitarMod(false)}
+                />
+            )}
+
+            {confirmContinuar && (
+                <FeedbackModal
+                    type="confirm"
+                    title="Continuar con el contrato"
+                    message="¿Confirmás que querés continuar con el contrato tal como estaba? Se descarta la modificación rechazada y el evento sigue vigente con los datos originales."
+                    confirmLabel="Sí, continuar"
+                    cancelLabel="Volver"
+                    onConfirm={handleContinuarContrato}
+                    onCancel={() => setConfirmContinuar(false)}
+                />
+            )}
+
+            {confirmAprobarMod && (
+                <FeedbackModal
+                    type="confirm"
+                    title="Aprobar modificación"
+                    message={`¿Confirmás que querés aprobar la modificación del contrato #${contract.idContract}? Los cambios se aplicarán y el cliente deberá firmar el contrato nuevamente.`}
+                    confirmLabel="Sí, aprobar"
+                    cancelLabel="Volver"
+                    onConfirm={() => {
+                        setConfirmAprobarMod(false);
+                        handleRevisarMod("aprobar");
+                    }}
+                    onCancel={() => setConfirmAprobarMod(false)}
+                />
+            )}
+
+            {confirmPago && (
+                <FeedbackModal
+                    type="confirm"
+                    title={confirmPago === "pagado" ? "Marcar saldo como abonado" : "Reabrir pago como pendiente"}
+                    message={confirmPago === "pagado"
+                        ? "¿Confirmás que el saldo del contrato ya fue abonado? Se registrará el pago como completado."
+                        : "¿Confirmás que querés volver a marcar el pago como pendiente? El contrato dejará de figurar como abonado."}
+                    confirmLabel={confirmPago === "pagado" ? "Sí, marcar abonado" : "Sí, reabrir pago"}
+                    cancelLabel="Volver"
+                    onConfirm={() => handleCambiarPago(confirmPago)}
+                    onCancel={() => setConfirmPago(null)}
+                />
             )}
 
             {message && (

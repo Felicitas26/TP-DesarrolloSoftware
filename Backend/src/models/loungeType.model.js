@@ -4,8 +4,6 @@ class LoungeTypeModel {
 
     async getAll() {
         return await prisma.loungeType.findMany({
-            // Si el salón está dado de baja, sus capacidades tampoco se
-            // ofrecen en los formularios (vuelven solas al reactivar el salón).
             where: { activo: true, lounge: { activo: true } },
             include: { lounge: { select: { name: true } } }
         });

@@ -88,7 +88,24 @@ function ContractList() {
         return contracts.filter((c) => c.status === statusFilter);
     })();
 
+    const handleReviewClick = (id, decision) => {
+        const aprobar = decision === "aprobar";
+
+        setFeedback({
+            type: "confirm",
+            title: aprobar ? "Aprobar contrato" : "Rechazar contrato",
+            message: aprobar
+                ? `¿Confirmás que querés aprobar el contrato #${id}? El cliente podrá firmarlo y el evento quedará confirmado.`
+                : `¿Confirmás que querés rechazar el contrato #${id}? El cliente deberá corregir los datos y enviarlo de nuevo.`,
+            confirmLabel: aprobar ? "Sí, aprobar" : "Sí, rechazar",
+            onConfirm: () => review(id, decision),
+            onCancel: () => setFeedback(null)
+        });
+    };
+
     const review = async (id, decision) => {
+        setFeedback(null);
+
         try {
             const data = await contractService.revision(id, { decision });
 
@@ -236,13 +253,13 @@ function ContractList() {
                                                         <>
                                                             <button
                                                                 className="contract-action-approve"
-                                                                onClick={() => review(contract.idContract, "aprobar")}
+                                                                onClick={() => handleReviewClick(contract.idContract, "aprobar")}
                                                             >
                                                                 Aprobar
                                                             </button>
                                                             <button
                                                                 className="contract-action-reject"
-                                                                onClick={() => review(contract.idContract, "rechazar")}
+                                                                onClick={() => handleReviewClick(contract.idContract, "rechazar")}
                                                             >
                                                                 Rechazar
                                                             </button>
@@ -267,6 +284,10 @@ function ContractList() {
                     type={feedback.type}
                     title={feedback.title}
                     message={feedback.message}
+                    confirmLabel={feedback.confirmLabel}
+                    onConfirm={feedback.onConfirm}
+                    cancelLabel="Volver"
+                    onCancel={feedback.onCancel || (() => setFeedback(null))}
                     onClose={() => setFeedback(null)}
                 />
             )}
