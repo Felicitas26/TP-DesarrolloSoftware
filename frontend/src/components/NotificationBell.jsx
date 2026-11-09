@@ -26,13 +26,8 @@ const IconBell = () => (
     </svg>
 );
 
-const IconLogout = () => (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-        <polyline points="16 17 21 12 16 7" />
-        <line x1="21" y1="12" x2="9" y2="12" />
-    </svg>
-);
+const POLL_INTERVAL = 3000;
+const FULL_SYNC_EVERY_PINGS = 20;
 
 function NotificationBell() {
     const navigate = useNavigate();
@@ -43,22 +38,70 @@ function NotificationBell() {
     const [notifications, setNotifications] = useState([]);
     const [notificationToDelete, setNotificationToDelete] = useState(null);
     const ref = useRef(null);
+    const unreadBaselineRef = useRef(null);
+    const pingCountRef = useRef(0);
+
+    const applyData = (data) => {
+        setNotifications(data.notifications || []);
+        setUnread(data.unread || 0);
+        unreadBaselineRef.current = data.unread ?? 0;
+    };
 
     const fetchNotifications = async () => {
         try {
             const data = await notificationService.getAll();
-            setNotifications(data.notifications || []);
-            setUnread(data.unread || 0);
+            applyData(data);
         } catch {
-            // silencioso
+        }
+    };
+
+    const ping = async () => {
+        if (document.hidden) return;
+
+        try {
+            const { unread: count } = await notificationService.contador();
+            const previous = unreadBaselineRef.current;
+
+            pingCountRef.current += 1;
+            if (pingCountRef.current >= FULL_SYNC_EVERY_PINGS) {
+                pingCountRef.current = 0;
+                await fetchNotifications();
+                return;
+            }
+
+            if (previous !== null && count !== previous) {
+                await fetchNotifications();
+            }
+        } catch {
         }
     };
 
     useEffect(() => {
+        let mounted = true;
+
         fetchNotifications();
-        const interval = setInterval(fetchNotifications, 30000);
-        return () => clearInterval(interval);
+
+        const timer = setInterval(() => {
+            if (mounted) ping();
+        }, POLL_INTERVAL);
+
+        const handleVisible = () => {
+            if (!document.hidden && mounted) fetchNotifications();
+        };
+        document.addEventListener("visibilitychange", handleVisible);
+        window.addEventListener("focus", handleVisible);
+
+        return () => {
+            mounted = false;
+            clearInterval(timer);
+            document.removeEventListener("visibilitychange", handleVisible);
+            window.removeEventListener("focus", handleVisible);
+        };
     }, []);
+
+    useEffect(() => {
+        document.title = unread > 0 ? `(${unread}) STYLO` : "STYLO";
+    }, [unread]);
 
     useEffect(() => {
         const handleClickOutside = (event) => {
@@ -87,6 +130,7 @@ function NotificationBell() {
                 await notificationService.marcarTodas();
                 setNotifications((prev) => prev.map((n) => ({ ...n, leida: true })));
                 setUnread(0);
+                unreadBaselineRef.current = 0;
             } catch {
                 // silencioso
             }
@@ -152,9 +196,9 @@ function NotificationBell() {
             );
             if (!notification.leida) {
                 setUnread((prev) => Math.max(0, prev - 1));
+                unreadBaselineRef.current = Math.max(0, (unreadBaselineRef.current ?? 0) - 1);
             }
         } catch {
-            // silencioso
         }
     };
 
