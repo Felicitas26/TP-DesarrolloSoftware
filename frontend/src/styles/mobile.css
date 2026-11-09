@@ -87,7 +87,9 @@
     .contract-list-table th:first-child,
     .contract-list-table td:first-child,
     .loungetypes-table th:first-child,
-    .loungetypes-table td:first-child {
+    .loungetypes-table td:first-child,
+    .users-table th:first-child,
+    .users-table td:first-child {
     position: sticky;
         left: 0;
         z-index: 2;

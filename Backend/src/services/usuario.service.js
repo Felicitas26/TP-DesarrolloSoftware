@@ -1,10 +1,15 @@
 import bcrypt from "bcryptjs";
 import usuarioModel from "../models/usuario.model.js";
+import clientModel from "../models/client.model.js";
 import {
     validatePassword,
     validateUsername,
     validateDni,
-    validateEmail
+    validateEmail,
+    validateName,
+    validatePhone,
+    validateAddress,
+    validateId
 } from "../utils/validators.js";
 
 const SALT_ROUNDS = 10;
@@ -196,9 +201,140 @@ class UsuarioService {
         return await usuarioModel.getAllAdministradores();
     }
 
-    async createAdministrador({ username, password }) {
+    // ============================== DESACTIVADOS / REACTIVACIÓN
+
+    async getDesactivados() {
+        return usuarioModel.getDesactivados();
+    }
+
+    async reactivarUsuario(id) {
+        const usuario = await usuarioModel.findById(id);
+
+        if (!usuario) {
+            throw {
+                statusCode: 404,
+                message: "Usuario no encontrado."
+            };
+        }
+
+        if (usuario.activo) {
+            throw {
+                statusCode: 409,
+                message: "La cuenta ya está activa."
+            };
+        }
+
+        // Guardas: no reactivar si otra cuenta activa pisa sus datos de acceso.
+        if (usuario.username) {
+            const existente =
+                await usuarioModel.findByUsername(usuario.username);
+
+            if (
+                existente &&
+                existente.idUsuario !== usuario.idUsuario &&
+                existente.activo
+            ) {
+                throw {
+                    statusCode: 409,
+                    message: "Ya existe una cuenta activa con ese usuario."
+                };
+            }
+        }
+
+        if (usuario.idCli && usuario.client) {
+            const existenteDni = await clientModel.findByDni(
+                usuario.client.dniCli
+            );
+
+            if (
+                existenteDni &&
+                existenteDni.activo &&
+                existenteDni.idCli !== usuario.idCli
+            ) {
+                throw {
+                    statusCode: 409,
+                    message: "Ya existe una cuenta activa con ese DNI."
+                };
+            }
+
+            const existenteEmail = await clientModel.findByEmail(
+                usuario.client.emailCli
+            );
+
+            if (
+                existenteEmail &&
+                existenteEmail.activo &&
+                existenteEmail.idCli !== usuario.idCli
+            ) {
+                throw {
+                    statusCode: 409,
+                    message: "Ya existe una cuenta activa con ese email."
+                };
+            }
+        }
+
+        await usuarioModel.reactivate(usuario.idUsuario);
+
+        if (usuario.idCli) {
+            await clientModel.reactivate(usuario.idCli, {});
+        }
+
+        return usuarioModel.findById(usuario.idUsuario);
+    }
+
+    // ============================== DATOS PERSONALES (todos los usuarios)
+
+    async validarDatosPersona(body, { excludeClientId = null } = {}) {
+        const nombre = validateName(body.nameCli, "nombre");
+        const apellido = validateName(body.surnameCli, "apellido");
+        const telefono = validatePhone(body.phoneCli);
+        const dni = validateDni(body.dniCli);
+        const email = validateEmail(body.emailCli);
+        const direccion = validateAddress(body.addressCli);
+        const idLocation = validateId(body.idLocation, "localidad");
+
+        const existenteDni = await clientModel.findByDni(dni);
+        if (
+            existenteDni &&
+            existenteDni.activo &&
+            existenteDni.idCli !== excludeClientId
+        ) {
+            throw {
+                statusCode: 409,
+                message: "Ya existe una cuenta registrada con ese DNI."
+            };
+        }
+
+        const existenteEmail = await clientModel.findByEmail(email);
+        if (
+            existenteEmail &&
+            existenteEmail.activo &&
+            existenteEmail.idCli !== excludeClientId
+        ) {
+            throw {
+                statusCode: 409,
+                message: "Ya existe una cuenta registrada con ese email."
+            };
+        }
+
+        return {
+            nameCli: nombre,
+            surnameCli: apellido,
+            phoneCli: telefono,
+            dniCli: dni,
+            emailCli: email,
+            addressCli: direccion,
+            idLocation
+        };
+    }
+
+    async createAdministrador(body) {
+        const { username, password } = body;
+
         const usuario = validateUsername(username);
         const passwordValida = validatePassword(password);
+
+        const persona = await this.validarDatosPersona(body);
 
         const existing =
             await usuarioModel.findByUsername(usuario);
@@ -222,19 +358,36 @@ class UsuarioService {
             };
         }
 
-        const passwordHash =
-            await bcrypt.hash(passwordValida, SALT_ROUNDS);
+        // Datos personales de la persona: se guardan como registro de Client
+        // vinculado, para que toda cuenta tenga sus datos completos.
+        const clientCreado = await clientModel.create(persona);
 
-        return usuarioModel.create({
-            username: usuario,
-            password: passwordHash,
-            rol: "administrador",
-            idCli: null,
-            passwordTemporal: false
-        });
+        try {
+            const passwordHash =
+                await bcrypt.hash(passwordValida, SALT_ROUNDS);
+
+            const creado = await usuarioModel.create({
+                username: usuario,
+                password: passwordHash,
+                rol: "administrador",
+                idCli: clientCreado.idCli,
+                passwordTemporal: false
+            });
+
+            const { password: _, ...perfil } = creado;
+            return perfil;
+        } catch (err) {
+            await clientModel.delete(clientCreado.idCli);
+            throw {
+                statusCode: 409,
+                message: "No se pudo crear la cuenta de administrador. Verificá los datos e intentá nuevamente."
+            };
+        }
     }
 
-    async updateAdministrador(id, { username, password }) {
+    async updateAdministrador(id, body) {
+        const { username, password } = body;
+
         const usuario = validateUsername(username);
         const passwordValida = validatePassword(password, { required: false });
 
@@ -264,6 +417,10 @@ class UsuarioService {
             };
         }
 
+        const persona = await this.validarDatosPersona(body, {
+            excludeClientId: administrador.idCli
+        });
+
         let passwordHash = null;
 
         if (passwordValida) {
@@ -279,6 +436,15 @@ class UsuarioService {
                     password: passwordHash
                 }
             );
+
+        // Datos personales: se actualizan los de la Client vinculada y,
+        // si la cuenta no tenía, se le crea y se vincula.
+        if (administrador.idCli) {
+            await clientModel.update(administrador.idCli, persona);
+        } else {
+            const clientCreado = await clientModel.create(persona);
+            await usuarioModel.setIdCli(administrador.idUsuario, clientCreado.idCli);
+        }
 
         const { password: _, ...perfil } = updated;
 
@@ -300,6 +466,14 @@ class UsuarioService {
             };
         }
 
+        // La cuenta raíz "admin" es el usuario principal del sistema: no se elimina.
+        if (administrador.username === "admin") {
+            throw {
+                statusCode: 409,
+                message: "La cuenta principal del sistema no puede ser eliminada."
+            };
+        }
+
         const deleted =
             await usuarioModel.delete(id);
 
@@ -308,6 +482,11 @@ class UsuarioService {
                 statusCode: 404,
                 message: "Administrador no encontrado."
             };
+        }
+
+        // Se da de baja también los datos personales de la persona.
+        if (administrador.idCli) {
+            await clientModel.delete(administrador.idCli);
         }
 
         return deleted;

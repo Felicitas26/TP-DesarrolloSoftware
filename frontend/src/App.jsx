@@ -31,6 +31,7 @@ import NewPrice from "./pages/price/newPrice";
 import CardDetailList from "./pages/cardDetail/cardDetailList";
 import NewCardDetail from "./pages/cardDetail/newCardDetail";
 import EditCardDetail from "./pages/cardDetail/editCardDetail";
+import UsuariosList from "./pages/usuarios/usuariosList";
 import ContractList from "./pages/contract/ContractList";
 import ContractDetail from "./pages/contract/ContractDetail";
 import ContractEdit from "./pages/contract/ContractEdit";
@@ -244,6 +245,15 @@ function App() {
                     element={
                         <ProtectedRoute roles={ADMIN}>
                             <NewPrice />
+                        </ProtectedRoute>
+                    }
+                />
+
+                <Route
+                    path="/usuario"
+                    element={
+                        <ProtectedRoute roles={ADMIN}>
+                            <UsuariosList />
                         </ProtectedRoute>
                     }
                 />

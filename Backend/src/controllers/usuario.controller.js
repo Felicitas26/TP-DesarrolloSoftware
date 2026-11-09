@@ -23,6 +23,22 @@ class UsuarioController {
         });
     });
 
+    // DESACTIVADOS / REACTIVACIÓN
+
+    getDesactivados = asyncHandler(async (req, res) => {
+        const desactivados = await usuarioService.getDesactivados();
+        return res.status(200).json(desactivados);
+    });
+
+    reactivarUsuario = asyncHandler(async (req, res) => {
+        const usuario = await usuarioService.reactivarUsuario(req.params.id);
+        const { password, ...perfil } = usuario;
+        return res.status(200).json({
+            message: "Cuenta reactivada correctamente.",
+            usuario: perfil
+        });
+    });
+
     // ADMINISTRADORES
 
     getAdministradores = asyncHandler(async (req, res) => {
@@ -45,6 +61,12 @@ class UsuarioController {
     });
 
     deleteAdministrador = asyncHandler(async (req, res) => {
+        if (Number(req.params.id) === Number(req.usuario.idUsuario)) {
+            const error = new Error("No podés eliminar tu propia cuenta.");
+            error.statusCode = 409;
+            throw error;
+        }
+
         await usuarioService.deleteAdministrador(req.params.id);
         return res.status(200).json({
             message: "Administrador dado de baja correctamente."

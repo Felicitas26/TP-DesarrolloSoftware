@@ -9,5 +9,6 @@ export { contractService } from "./contractService";
 export { priceService, priceKey } from "./priceService";
 export { cardDetailService } from "./cardDetailService";
 export { extraServiceService } from "./extraServiceService";
+export { usuarioService } from "./usuarioService";
 export { notificationService } from "./notificationService";
 export { paymentService } from "./paymentService";

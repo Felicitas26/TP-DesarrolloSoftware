@@ -5,12 +5,22 @@ class ClientModel {
     async getAll() {
         const clients = await prisma.client.findMany({
             where: { activo: true },
-            include: { location: true }
+            include: {
+                location: true,
+                usuarios: {
+                    where: { activo: true },
+                    select: { idUsuario: true, username: true, rol: true },
+                    take: 1
+                }
+            }
         });
-        return clients.map(c => ({
+        return clients.map(({ usuarios, ...c }) => ({
             ...c,
             city: c.location?.city || "",
-            zipCode: c.location?.zipCode || ""
+            zipCode: c.location?.zipCode || "",
+            idUsuario: usuarios?.[0]?.idUsuario ?? null,
+            usernameLogin: usuarios?.[0]?.username ?? null,
+            rol: usuarios?.[0]?.rol ?? "cliente"
         }));
     }
 

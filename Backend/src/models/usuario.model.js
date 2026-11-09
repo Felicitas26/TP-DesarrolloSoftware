@@ -111,14 +111,74 @@ class UsuarioModel {
     }
 
     async getAllAdministradores() {
-        return await prisma.usuario.findMany({
+        const rows = await prisma.usuario.findMany({
             where: { rol: "administrador", activo: true },
             select: {
                 idUsuario: true,
                 username: true,
                 rol: true,
-                passwordTemporal: true
+                passwordTemporal: true,
+                idCli: true,
+                client: {
+                    select: {
+                        idCli: true,
+                        nameCli: true,
+                        surnameCli: true,
+                        dniCli: true,
+                        emailCli: true,
+                        phoneCli: true,
+                        addressCli: true,
+                        location: true
+                    }
+                }
             }
+        });
+
+        return rows.map(({ client, ...u }) => ({
+            ...u,
+            nameCli: client?.nameCli || "",
+            surnameCli: client?.surnameCli || "",
+            dniCli: client?.dniCli ?? "",
+            emailCli: client?.emailCli || "",
+            phoneCli: client?.phoneCli || "",
+            addressCli: client?.addressCli || "",
+            city: client?.location?.city || "",
+            zipCode: client?.location?.zipCode || ""
+        }));
+    }
+
+    async getDesactivados() {
+        const rows = await prisma.usuario.findMany({
+            where: { activo: false },
+            select: {
+                idUsuario: true,
+                username: true,
+                rol: true,
+                idCli: true,
+                client: {
+                    select: {
+                        nameCli: true,
+                        surnameCli: true,
+                        dniCli: true,
+                        emailCli: true
+                    }
+                }
+            }
+        });
+
+        return rows.map(({ client, ...u }) => ({
+            ...u,
+            nameCli: client?.nameCli || "",
+            surnameCli: client?.surnameCli || "",
+            dniCli: client?.dniCli ?? "",
+            emailCli: client?.emailCli || ""
+        }));
+    }
+
+    async setIdCli(id, idCli) {
+        await prisma.usuario.update({
+            where: { idUsuario: Number(id) },
+            data: { idCli: Number(idCli) }
         });
     }
 
