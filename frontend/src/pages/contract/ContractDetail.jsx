@@ -59,6 +59,9 @@ function ContractDetail() {
     const [confirmAprobarMod, setConfirmAprobarMod] = useState(false);
     const [confirmSolicitarMod, setConfirmSolicitarMod] = useState(false);
     const [confirmPago, setConfirmPago] = useState(null);
+    const [historialOpen, setHistorialOpen] = useState(false);
+    const [historial, setHistorial] = useState([]);
+    const [historialLoading, setHistorialLoading] = useState(false);
     const [rejectOpen, setRejectOpen] = useState(false);
     const [rejectMotivo, setRejectMotivo] = useState("");
     const [pendingRedirect, setPendingRedirect] = useState(false);
@@ -119,6 +122,18 @@ function ContractDetail() {
             style: "currency",
             currency: "ARS"
         }).format(Number(value) || 0);
+    };
+
+    const openHistorial = async () => {
+        setHistorialOpen(true);
+        setHistorialLoading(true);
+        try {
+            setHistorial((await contractService.getHistorial(id)) || []);
+        } catch {
+            setHistorial([]);
+        } finally {
+            setHistorialLoading(false);
+        }
     };
 
     useEffect(() => {
@@ -1097,6 +1112,10 @@ function ContractDetail() {
                 {/* ACCIONES */}
                 <section className="contract-actions">
 
+                    <button className="contract-btn-history" onClick={openHistorial}>
+                        Ver historial de versiones
+                    </button>
+
                     {rol === "cliente" && canEdit && (
                         <>
                             <button className="contract-btn-save" onClick={handleSave} disabled={saving}>
@@ -1384,6 +1403,81 @@ function ContractDetail() {
                                 {saving ? "Rechazando..." : "Confirmar rechazo"}
                             </button>
                         </div>
+                    </div>
+                </div>
+            )}
+
+            {historialOpen && (
+                <div className="contract-terms-backdrop" onClick={() => setHistorialOpen(false)}>
+                    <div className="contract-terms-modal contract-history-modal" onClick={(e) => e.stopPropagation()}>
+                        <button className="contract-terms-close" onClick={() => setHistorialOpen(false)} aria-label="Cerrar">✕</button>
+                        <h3>Historial del contrato</h3>
+                        <p className="contract-terms-intro">
+                            Versiones anteriores del contrato, que quedaron desactualizadas al aprobar la siguiente.
+                        </p>
+
+                        {historialLoading ? (
+                            <p className="contract-history-empty">Cargando historial...</p>
+                        ) : historial.length === 0 ? (
+                            <p className="contract-history-empty">
+                                Este contrato todavía no tiene versiones registradas.
+                                El historial arranca cuando el administrador aprueba el contrato por primera vez.
+                            </p>
+                        ) : (
+                            historial.map((version, index) => (
+                                <div className="contract-history-item" key={version.idContractVersion}>
+                                    <div className="contract-history-head">
+                                        <strong>Versión {version.nroVersion}</strong>
+                                        <span className="contract-history-origen">
+                                            {version.origen === "modificacion"
+                                                ? "Con modificación aprobada"
+                                                : "Original (primera aprobación)"}
+                                            {index === 0 ? " — última versión" : ""}
+                                        </span>
+                                        <span className="contract-history-fecha">
+                                            {new Date(version.fecha).toLocaleString("es-AR", {
+                                                day: "2-digit",
+                                                month: "2-digit",
+                                                year: "numeric",
+                                                hour: "2-digit",
+                                                minute: "2-digit"
+                                            })}
+                                        </span>
+                                    </div>
+
+                                    {version.motivo && (
+                                        <p className="contract-history-motivo">
+                                            Cambios solicitados: “{version.motivo}”
+                                        </p>
+                                    )}
+
+                                    <div className="contract-history-grid">
+                                        <div><small>Fecha del evento</small><span>{formatDate(version.snapshot.dateEvent)}</span></div>
+                                        <div><small>Tipo de evento</small><span>{version.snapshot.eventType}</span></div>
+                                        <div><small>Salón</small><span>{version.snapshot.lounge}</span></div>
+                                        <div><small>Invitados confirmados</small><span>{version.snapshot.cantExactaInvit ?? "—"}</span></div>
+                                        <div><small>Horario</small><span>
+                                            {version.snapshot.eventStartTime
+                                                ? `${version.snapshot.eventStartTime} a ${version.snapshot.eventEndTime}`
+                                                : "—"}
+                                        </span></div>
+                                        <div><small>Menú</small><span>
+                                            {version.snapshot.menu
+                                                ? `${version.snapshot.menu.name} (${currency(version.snapshot.menu.cost)} por persona)`
+                                                : "—"}
+                                        </span></div>
+                                        <div className="contract-history-wide"><small>Servicios extras</small><span>
+                                            {version.snapshot.extras && version.snapshot.extras.length > 0
+                                                ? version.snapshot.extras
+                                                    .map((extra) => `${extra.name} (${currency(extra.cost)})`)
+                                                    .join(", ")
+                                                : "Sin extras"}
+                                        </span></div>
+                                        <div><small>Valor final</small><span>{currency(version.snapshot.finalValue)}</span></div>
+                                    </div>
+                                </div>
+                            ))
+                        )}
                     </div>
                 </div>
             )}

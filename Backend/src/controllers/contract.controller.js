@@ -39,6 +39,14 @@ class ContractController {
         return res.status(200).json({ ...contract, calc });
     });
 
+    getHistorial = asyncHandler(async (req, res) => {
+        const contract = await this.loadContract(req);
+
+        const versions = await contractService.getHistorial(contract.idContract);
+
+        return res.status(200).json(versions);
+    });
+
     update = asyncHandler(async (req, res) => {
         await this.loadContract(req);
 

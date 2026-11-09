@@ -17,6 +17,7 @@ export const contractService = {
     getAll: async () => hydrateList(await api.get("/api/contract")),
     getMine: async () => hydrateList(await api.get("/api/contract/mis-contratos")),
     getById: async (id) => Contract.from(await api.get(`/api/contract/${id}`)),
+    getHistorial: (id) => api.get(`/api/contract/${id}/historial`),
     revision: (id, data) => call(api.put(`/api/contract/${id}/revision`, data)),
     update: (id, data) => call(api.put(`/api/contract/${id}`, data)),
     updateEdit: (id, data) => call(api.put(`/api/contract/${id}/edit`, data)),

@@ -307,7 +307,8 @@
 .contract-btn-save,
 .contract-btn-primary,
 .contract-btn-accept,
-.contract-btn-reject {
+.contract-btn-reject,
+.contract-btn-history {
     padding: 13px 26px;
     font-family: "Montserrat", system-ui, sans-serif;
     font-size: 0.78rem;
@@ -324,6 +325,103 @@
         box-shadow 0.2s ease;
     width: 100%;
 }
+
+.contract-btn-history {
+    order: 99;
+    color: #ffffff;
+    background: transparent;
+    border: 1px dashed rgba(255, 255, 255, 0.35);
+}
+
+.contract-btn-history:hover {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(255, 255, 255, 0.6);
+    transform: translateY(-2px);
+}
+
+/* HISTORIAL DE VERSIONES DEL CONTRATO */
+.contract-history-modal {
+    max-width: 640px;
+    max-height: 82vh;
+    overflow-y: auto;
+    text-align: left;
+}
+
+.contract-history-empty {
+    color: rgba(255, 255, 255, 0.65);
+    font-size: 0.86rem;
+    line-height: 1.5;
+    text-align: center;
+    padding: 14px 0 6px;
+}
+
+.contract-history-item {
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 14px;
+    padding: 16px 18px;
+    margin-top: 14px;
+    background: rgba(255, 255, 255, 0.03);
+}
+
+.contract-history-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 6px 12px;
+}
+
+.contract-history-head strong {
+    font-size: 0.95rem;
+    letter-spacing: 0.05em;
+}
+
+.contract-history-origen {
+    color: rgba(34, 211, 238, 0.9);
+    font-size: 0.72rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.contract-history-fecha {
+    margin-left: auto;
+    color: rgba(255, 255, 255, 0.55);
+    font-size: 0.72rem;
+}
+
+.contract-history-motivo {
+    margin-top: 8px;
+    color: rgba(255, 255, 255, 0.75);
+    font-size: 0.82rem;
+    line-height: 1.45;
+}
+
+.contract-history-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px 18px;
+    margin-top: 12px;
+}
+
+.contract-history-grid small {
+    display: block;
+    color: rgba(255, 255, 255, 0.45);
+    font-size: 0.66rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 2px;
+}
+
+.contract-history-grid span {
+    color: #ffffff;
+    font-size: 0.86rem;
+    line-height: 1.4;
+    overflow-wrap: anywhere;
+}
+
+.contract-history-wide {
+    grid-column: 1 / -1;
+}
+
 
 .contract-btn-save {
     color: #ffffff;

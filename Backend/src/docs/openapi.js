@@ -1873,8 +1873,45 @@ const openapi = {
                 }
             }
         },
-        "/api/contract": {
+        "/api/contract/{id}/historial": {
+            parameters: [
+                { name: "id", in: "path", required: true, schema: { type: "integer" } }
+            ],
             get: {
+                tags: ["contract"],
+                summary: "Historial de versiones del contrato (admin y cliente dueño)",
+                description: "Devuelve las versiones registradas del contrato, de la más reciente a la más antigua. Cada versión se consolida cuando el administrador aprueba el contrato, y se agrega una al aprobar una modificación.",
+                security: bearerAuth,
+                responses: {
+                    200: {
+                        description: "Lista de versiones.",
+                        content: {
+                            "application/json": {
+                                schema: {
+                                    type: "array",
+                                    items: {
+                                        type: "object",
+                                        properties: {
+                                            idContractVersion: { type: "integer" },
+                                            idContract: { type: "integer" },
+                                            nroVersion: { type: "integer" },
+                                            origen: { type: "string", enum: ["original", "modificacion"] },
+                                            motivo: { type: "string", nullable: true },
+                                            snapshot: { type: "object" },
+                                            fecha: { type: "string", format: "date-time" }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    401: { $ref: "#/components/responses/Unauthorized" },
+                    403: { $ref: "#/components/responses/Forbidden" },
+                    404: { $ref: "#/components/responses/NotFound" }
+                }
+            }
+        },
+        "/api/contract": {            get: {
                 tags: ["contract"],
                 summary: "Listar todos los contratos (admin)",
                 security: bearerAuth,

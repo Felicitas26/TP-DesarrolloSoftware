@@ -272,6 +272,31 @@ class ContractModel {
             extraServices: contract.extraServices.map((es) => es.extraService)
         };
     }
+
+    async createVersion(idContract, { nroVersion, origen, motivo, snapshot }) {
+        return await prisma.contractVersion.create({
+            data: {
+                idContract: Number(idContract),
+                nroVersion: Number(nroVersion),
+                origen,
+                motivo: motivo && String(motivo).trim() ? String(motivo).trim() : null,
+                snapshot
+            }
+        });
+    }
+
+    async countVersions(idContract) {
+        return await prisma.contractVersion.count({
+            where: { idContract: Number(idContract) }
+        });
+    }
+
+    async getVersions(idContract) {
+        return await prisma.contractVersion.findMany({
+            where: { idContract: Number(idContract) },
+            orderBy: { nroVersion: "desc" }
+        });
+    }
 }
 
 export default new ContractModel();

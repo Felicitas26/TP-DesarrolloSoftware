@@ -8,6 +8,7 @@ const router = Router();
 router.get("/", authenticate, requireRole(["administrador"]), contractController.getAll);
 router.get("/mis-contratos", authenticate, contractController.getByClient);
 router.get("/:id", authenticate, contractController.getById);
+router.get("/:id/historial", authenticate, contractController.getHistorial);
 router.post("/", authenticate, requireRole(["administrador"]), contractController.create);
 router.put("/:id", authenticate, contractController.update);
 router.put("/:id/edit", authenticate, requireRole(["administrador"]), contractController.updateAdmin);

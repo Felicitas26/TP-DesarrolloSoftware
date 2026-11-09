@@ -16,7 +16,54 @@ function toDateString(value) {
     return `${y}-${m}-${day}`;
 }
 
+function fmtTime(value) {
+    if (!value) return null;
+    const d = value instanceof Date ? value : new Date(value);
+    if (Number.isNaN(d.getTime())) return null;
+    return d.toISOString().slice(11, 16);
+}
+
+// Arma la "foto" con los datos visibles del contrato en su estado actual.
+function buildSnapshot(contract) {
+    const r = contract.reservation;
+
+    return {
+        dateEvent: toDateString(r.dateEvent),
+        eventType: r.eventType,
+        lounge: r.lounge
+            ? r.loungeType
+                ? `${r.lounge.name} — ${r.loungeType.nameLoungeType}`
+                : r.lounge.name
+            : null,
+        cantExactaInvit: contract.cantExactaInvit,
+        eventStartTime: fmtTime(contract.eventStartTime),
+        eventEndTime: fmtTime(contract.eventEndTime),
+        menu: r.cardDetail
+            ? { name: r.cardDetail.menuStage, cost: Number(r.cardDetail.budget) }
+            : null,
+        extras: (contract.extraServices || []).map((s) => ({
+            name: s.extraService?.nameService || s.nameService,
+            cost: Number(s.extraService?.cost ?? s.cost)
+        })),
+        finalValue: Number(contract.finalValue)
+    };
+}
+
 class ContractService {
+    // Registra una nueva versión del contrato (historial de versiones).
+    async saveVersion(idContract, origen, motivo, snapshotSource) {
+        const count = await contractModel.countVersions(idContract);
+        return await contractModel.createVersion(idContract, {
+            nroVersion: count + 1,
+            origen,
+            motivo,
+            snapshot: buildSnapshot(snapshotSource)
+        });
+    }
+
+    async getHistorial(idContract) {
+        return await contractModel.getVersions(idContract);
+    }
 
     async getAll() {
         return await contractModel.getAll();
@@ -277,6 +324,13 @@ class ContractService {
 
         await contractModel.updateStatus(id, newStatus);
 
+        const current = await contractModel.getById(id);
+
+        // Cada aprobación consolida una versión en el historial del contrato.
+        if (decision === "aprobar") {
+            await this.saveVersion(id, "original", null, current);
+        }
+
         await notificationService.notifyClient({
             idCli: contract.reservation.idCli,
             mensaje: decision === "aprobar"
@@ -286,7 +340,7 @@ class ContractService {
             idContract: id
         });
 
-        return await contractModel.getById(id);
+        return current;
     }
 
     async firmar(id) {
@@ -591,14 +645,22 @@ class ContractService {
 
         await contractModel.updateStatus(id, "aprobado");
 
+        const updatedContract = await contractModel.getById(id);
+
+        // La aprobación de la modificación consolida otra versión en el historial.
+        await this.saveVersion(
+            id,
+            "modificacion",
+            contract.modificationComment,
+            updatedContract
+        );
+
         await notificationService.notifyClient({
             idCli: contract.reservation.idCli,
             mensaje: `Tu modificación del contrato #${id} fue aprobada y aplicada. Quedó pendiente de tu firma.`,
             tipo: "modificacion_aprobada",
             idContract: id
         });
-
-        const updatedContract = await contractModel.getById(id);
 
         return {
             ...updatedContract,
