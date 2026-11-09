@@ -119,6 +119,56 @@ class ReservationController {
         });
     });
 
+    // ============================== BAJA / REACTIVACIÓN
+
+    getPedidosReactivacion = asyncHandler(async (req, res) => {
+        const pedidos = await reservationService.getPedidosReactivacion();
+        return res.status(200).json(pedidos);
+    });
+
+    pedirReactivacion = asyncHandler(async (req, res) => {
+        const reservation = await reservationService.getById(req.params.id);
+
+        if (!reservation) {
+            throw httpError(404, "Reserva no encontrada.");
+        }
+
+        if (
+            req.usuario.rol === "cliente" &&
+            reservation.idCli !== req.usuario.idCli
+        ) {
+            throw httpError(403, "No tenés acceso a esta reserva.");
+        }
+
+        await reservationService.pedirReactivacion(req.params.id);
+
+        return res.status(200).json({
+            message: "Pedido de reactivación enviado. El administrador va a revisar tu solicitud."
+        });
+    });
+
+    aprobarReactivacion = asyncHandler(async (req, res) => {
+        const reservation = await reservationService.aprobarReactivacion(
+            req.params.id
+        );
+
+        return res.status(200).json({
+            message: "Reactivación aprobada correctamente.",
+            reservation
+        });
+    });
+
+    rechazarReactivacion = asyncHandler(async (req, res) => {
+        const reservation = await reservationService.rechazarReactivacion(
+            req.params.id
+        );
+
+        return res.status(200).json({
+            message: "Pedido de reactivación rechazado correctamente.",
+            reservation
+        });
+    });
+
     delete = asyncHandler(async (req, res) => {
         const reservation = await reservationService.getById(req.params.id);
 

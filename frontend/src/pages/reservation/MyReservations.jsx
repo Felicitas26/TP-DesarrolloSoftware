@@ -28,12 +28,19 @@ const IconSearch = () => (
     </svg>
 );
 
+const IconRestore = () => (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+        <path d="M3 3v5h5" />
+    </svg>
+);
+
 const STATUS_OPTIONS = [
     { value: "todas", label: "Todas" },
     { value: "pendiente", label: "Pendientes" },
     { value: "aceptada", label: "Aceptadas" },
     { value: "confirmada", label: "Confirmadas" },
-    { value: "cancelada", label: "Canceladas" },
+    { value: "cancelada", label: "Dadas de baja" },
     { value: "expiradas", label: "Expiradas" }
 ];
 
@@ -57,6 +64,7 @@ function MyReservations() {
 
     const [feedback, setFeedback] = useState(null);
     const [reservationToDeleteId, setReservationToDeleteId] = useState(null);
+    const [reservationToReactivateId, setReservationToReactivateId] = useState(null);
 
     useEffect(() => {
 
@@ -116,12 +124,12 @@ function MyReservations() {
 
     const handleDeleteClick = (id) => {
         setReservationToDeleteId(id);
-        setFeedback({ type: "confirm", title: "Eliminar reserva", message: "¿Estás seguro de que querés eliminar esta solicitud de reserva?", confirmLabel: "Eliminar", onConfirm: handleDeleteConfirm, onCancel: () => { setFeedback(null); setReservationToDeleteId(null); } });
+        setFeedback({ type: "confirm", title: "Dar de baja", message: "¿Estás seguro de que querés dar de baja esta reserva?", confirmLabel: "Sí, dar de baja", onConfirm: () => handleDeleteConfirm(id), onCancel: () => { setFeedback(null); setReservationToDeleteId(null); } });
     };
 
-    const handleDeleteConfirm = async () => {
+    const handleDeleteConfirm = async (idArg) => {
 
-        const id = reservationToDeleteId;
+        const id = idArg ?? reservationToDeleteId;
         setFeedback(null);
         setReservationToDeleteId(null);
 
@@ -135,7 +143,49 @@ function MyReservations() {
                 )
             );
 
-            setFeedback({ type: "success", title: "Reserva eliminada", message: "La reserva se eliminó correctamente." });
+            setFeedback({ type: "success", title: "Reserva dada de baja", message: "La reserva se dio de baja correctamente." });
+
+        } catch (err) {
+            setFeedback({ type: "error", title: "Error", message: err.message });
+        }
+    };
+
+    const handleReactivarClick = (id) => {
+        setReservationToReactivateId(id);
+        setFeedback({
+            type: "confirm",
+            title: "Pedir reactivación",
+            message: "¿Estás seguro de que querés pedir la reactivación de esta reserva? Enviaremos tu pedido al administrador, quien lo va a revisar antes de activarla otra vez.",
+            confirmLabel: "Sí, enviar pedido",
+            onConfirm: () => handleReactivarConfirm(id),
+            onCancel: () => { setFeedback(null); setReservationToReactivateId(null); }
+        });
+    };
+
+    const handleReactivarConfirm = async (idArg) => {
+
+        const id = idArg ?? reservationToReactivateId;
+        setFeedback(null);
+        setReservationToReactivateId(null);
+
+        try {
+
+            await reservationService.pedirReactivacion(id);
+
+            setReservations((prev) =>
+                prev.map(
+                    (r) =>
+                        r.idReservation === id
+                            ? { ...r, pedirReactivacion: true }
+                            : r
+                )
+            );
+
+            setFeedback({
+                type: "success",
+                title: "Pedido enviado",
+                message: "Enviamos tu pedido al administrador. Te avisaremos su decisión."
+            });
 
         } catch (err) {
             setFeedback({ type: "error", title: "Error", message: err.message });
@@ -279,9 +329,23 @@ function MyReservations() {
                                                         reservation.idReservation
                                                     )
                                                 }
-                                                title="Eliminar solicitud"
+                                                title="Dar de baja"
                                             >
                                                 <IconTrash />
+                                            </button>
+                                        )}
+
+                                        {reservation.status === "cancelada" && !reservation.pedirReactivacion && (
+                                            <button
+                                                className="my-reservation-restore"
+                                                onClick={() =>
+                                                    handleReactivarClick(
+                                                        reservation.idReservation
+                                                    )
+                                                }
+                                                title="Pedir reactivación"
+                                            >
+                                                <IconRestore />
                                             </button>
                                         )}
                                     </div>
@@ -336,6 +400,11 @@ function MyReservations() {
                                     {reservation.isExpired && (
                                         <span className="my-reservation-expired">
                                             Expirada
+                                        </span>
+                                    )}
+                                    {reservation.status === "cancelada" && reservation.pedirReactivacion && (
+                                        <span className="my-reservation-reactivacion">
+                                            Reactivación en revisión
                                         </span>
                                     )}
                                 </p>

@@ -34,12 +34,26 @@ const IconEdit = () => (
     </svg>
 );
 
+const IconCheck = () => (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+        <polyline points="20 6 9 17 4 12" />
+    </svg>
+);
+
+const IconX = () => (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+        <line x1="18" y1="6" x2="6" y2="18" />
+        <line x1="6" y1="6" x2="18" y2="18" />
+    </svg>
+);
+
 const STATUS_OPTIONS = [
     { value: "todas", label: "Todas" },
     { value: "pendiente", label: "Pendientes" },
     { value: "aceptada", label: "Aceptadas" },
     { value: "confirmada", label: "Confirmadas" },
-    { value: "cancelada", label: "Canceladas" }
+    { value: "cancelada", label: "Dadas de baja" },
+    { value: "reactivaciones", label: "Pedidos de reactivación" }
 ];
 
 function ReservationList() {
@@ -86,9 +100,60 @@ function ReservationList() {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
-    const filteredReservations = statusFilter === "todas"
-        ? reservations
-        : reservations.filter(r => r.status === statusFilter);
+    const filteredReservations =
+        statusFilter === "todas"
+            ? reservations
+            : statusFilter === "reactivaciones"
+                ? reservations.filter(r => r.pedirReactivacion)
+                : reservations.filter(r => r.status === statusFilter);
+
+    const contarReactivaciones = reservations.filter(r => r.pedirReactivacion).length;
+
+    const handleApproveReactivacionClick = (id) => {
+        setFeedback({
+            type: "confirm",
+            title: "Aprobar reactivación",
+            message: `¿Seguro que querés aprobar la reactivación de la reserva #${id}? Volverá a estar pendiente y el cliente será notificado.`,
+            confirmLabel: "Sí, aprobar",
+            onConfirm: () => aprobarReactivacion(id),
+            onCancel: () => setFeedback(null)
+        });
+    };
+
+    const aprobarReactivacion = async (id) => {
+        setFeedback(null);
+        try {
+            await reservationService.aprobarReactivacion(id);
+            getReservations();
+            showFeedback("success", "Reactivación aprobada", `La reserva #${id} volvió a estar pendiente. El cliente fue notificado.`);
+        } catch (error) {
+            console.error(error);
+            showFeedback("error", "Error", error.message);
+        }
+    };
+
+    const handleRejectReactivacionClick = (id) => {
+        setFeedback({
+            type: "confirm",
+            title: "Rechazar pedido",
+            message: `¿Seguro que querés rechazar el pedido de reactivación de la reserva #${id}? La reserva quedará dada de baja y el cliente será notificado.`,
+            confirmLabel: "Sí, rechazar",
+            onConfirm: () => rechazarReactivacion(id),
+            onCancel: () => setFeedback(null)
+        });
+    };
+
+    const rechazarReactivacion = async (id) => {
+        setFeedback(null);
+        try {
+            await reservationService.rechazarReactivacion(id);
+            getReservations();
+            showFeedback("success", "Pedido rechazado", `El pedido de la reserva #${id} quedó rechazado: la reserva continúa dada de baja. El cliente fue notificado.`);
+        } catch (error) {
+            console.error(error);
+            showFeedback("error", "Error", error.message);
+        }
+    };
 
     const handleAcceptClick = (id) => {
         setFeedback({
@@ -196,7 +261,9 @@ function ReservationList() {
                             className={`reservation-filter-btn ${statusFilter === opt.value ? "active" : ""}`}
                             onClick={() => setStatusFilter(opt.value)}
                         >
-                            {opt.label}
+                            {opt.value === "reactivaciones"
+                                ? `${opt.label} (${contarReactivaciones})`
+                                : opt.label}
                         </button>
                     ))}
                 </div>
@@ -218,14 +285,12 @@ function ReservationList() {
                                 <thead>
                                     <tr>
                                         <th>ID</th>
-                                        <th>Fecha reserva</th>
                                         <th>Fecha evento</th>
                                         <th>Tipo de evento</th>
                                         <th>Estado</th>
                                         <th>Invitados</th>
                                         <th>Cliente</th>
                                         <th>Salón</th>
-                                        <th>Tipo de salón</th>
                                         <th>Acciones</th>
                                     </tr>
                                 </thead>
@@ -241,21 +306,24 @@ function ReservationList() {
                                             </td>
 
                                             <td>
-                                                {formatDate(reservation.dateReservation)}
-                                            </td>
-
-                                            <td>
                                                 {formatDate(reservation.dateEvent)}
                                             </td>
 
-                                            <td>
+                                            <td className="cell-wrap">
                                                 {reservation.eventType}
                                             </td>
 
                                             <td>
-                                                <span className={`status-badge ${reservation.status}`}>
-                                                    {reservation.statusLabel}
-                                                </span>
+                                                <div className="estado-stack">
+                                                    <span className={`status-badge ${reservation.status}`}>
+                                                        {reservation.statusLabel}
+                                                    </span>
+                                                    {reservation.pedirReactivacion && (
+                                                        <span className="status-badge reactivacion">
+                                                            Reactivación
+                                                        </span>
+                                                    )}
+                                                </div>
                                             </td>
 
                                             <td>
@@ -264,73 +332,102 @@ function ReservationList() {
                                                     : reservation.cantInvit}
                                             </td>
 
-                                            <td>
+                                            <td className="cell-wrap">
                                                 {reservation.client?.nameCli}{" "}
                                                 {reservation.client?.surnameCli}
                                             </td>
 
-                                            <td>
-                                                {reservation.lounge?.name}
-                                            </td>
-
-                                            <td>
-                                                {reservation.loungeType?.nameLoungeType}
+                                            <td className="cell-wrap">
+                                                <span className="salon-nombre">
+                                                    {reservation.lounge?.name}
+                                                </span>
+                                                <span className="salon-tipo-sub">
+                                                    {reservation.loungeType?.nameLoungeType}
+                                                </span>
                                             </td>
 
                                             <td>
 
                                                 <div className="actions-cell">
 
-                                                    <button
-                                                        type="button"
-                                                        className="btn-action-view"
-                                                        onClick={() =>
-                                                            setClientToDetail(
-                                                                reservation.client
-                                                            )
-                                                        }
-                                                        title="Ver cliente"
-                                                    >
-                                                        <IconEye />
-                                                    </button>
+                                                    {reservation.pedirReactivacion ? (
+                                                        <>
+                                                            <button
+                                                                className="reservation-btn-accept"
+                                                                onClick={() =>
+                                                                    handleApproveReactivacionClick(
+                                                                        reservation.idReservation
+                                                                    )
+                                                                }
+                                                            >
+                                                                <IconCheck /> Aprobar
+                                                            </button>
 
-                                                    <button
-                                                        type="button"
-                                                        className="btn-action-view"
-                                                        onClick={() =>
-                                                            navigate(
-                                                                `/reservation/edit/${reservation.idReservation}`
-                                                            )
-                                                        }
-                                                        title="Editar reserva"
-                                                    >
-                                                        <IconEdit />
-                                                    </button>
+                                                            <button
+                                                                className="reservation-btn-cancel"
+                                                                onClick={() =>
+                                                                    handleRejectReactivacionClick(
+                                                                        reservation.idReservation
+                                                                    )
+                                                                }
+                                                            >
+                                                                <IconX /> Rechazar
+                                                            </button>
+                                                        </>
+                                                    ) : (
+                                                        <>
+                                                            <button
+                                                                type="button"
+                                                                className="btn-action-view"
+                                                                onClick={() =>
+                                                                    setClientToDetail(
+                                                                        reservation.client
+                                                                    )
+                                                                }
+                                                                title="Ver cliente"
+                                                            >
+                                                                <IconEye />
+                                                            </button>
 
-                                                    {reservation.status === "pendiente" && (
-                                                        <button
-                                                            className="reservation-btn-accept"
-                                                            onClick={() =>
-                                                                handleAcceptClick(
-                                                                    reservation.idReservation
-                                                                )
-                                                            }
-                                                        >
-                                                            Aceptar
-                                                        </button>
-                                                    )}
+                                                            <button
+                                                                type="button"
+                                                                className="btn-action-view"
+                                                                onClick={() =>
+                                                                    navigate(
+                                                                        `/reservation/edit/${reservation.idReservation}`
+                                                                    )
+                                                                }
+                                                                title="Editar reserva"
+                                                            >
+                                                                <IconEdit />
+                                                            </button>
 
-                                                    {reservation.status === "pendiente" && (
-                                                        <button
-                                                            className="reservation-btn-cancel"
-                                                            onClick={() =>
-                                                                handleCancelClick(
-                                                                    reservation.idReservation
-                                                                )
-                                                            }
-                                                        >
-                                                            Cancelar
-                                                        </button>
+                                                            {reservation.status === "pendiente" && (
+                                                                <button
+                                                                    className="reservation-btn-accept"
+                                                                    onClick={() =>
+                                                                        handleAcceptClick(
+                                                                            reservation.idReservation
+                                                                        )
+                                                                    }
+                                                                >
+                                                                    Aceptar
+                                                                </button>
+                                                            )}
+
+                                                            {reservation.status === "pendiente" && (
+                                                                <button
+                                                                    className="reservation-btn-cancel"
+                                                                    onClick={() =>
+                                                                        handleCancelClick(
+                                                                            reservation.idReservation
+                                                                        )
+                                                                    }
+                                                                >
+                                                                    Cancelar
+                                                                </button>
+                                                            )}
+                                                        </>
                                                     )}
 
                                                 </div>

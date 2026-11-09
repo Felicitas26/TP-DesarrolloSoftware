@@ -275,6 +275,86 @@ class ReservationModel {
             return null;
         }
     }
+
+    // ============================== BAJA / REACTIVACIÓN
+
+    async getPedidosReactivacion() {
+        const reservations = await prisma.reservation.findMany({
+            where: { pedirReactivacion: true },
+            orderBy: { dateEvent: "desc" },
+            include: {
+                client: {
+                    select: {
+                        nameCli: true,
+                        surnameCli: true,
+                        dniCli: true,
+                        phoneCli: true,
+                        emailCli: true,
+                        addressCli: true,
+                        location: {
+                            select: {
+                                city: true,
+                                zipCode: true
+                            }
+                        }
+                    }
+                },
+                lounge: {
+                    select: { name: true }
+                },
+                loungeType: {
+                    select: { nameLoungeType: true }
+                },
+                cardDetail: true,
+                extraServices: {
+                    include: {
+                        extraService: {
+                            select: {
+                                idService: true,
+                                nameService: true,
+                                detailService: true,
+                                cost: true
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        return reservations.map(r => ({
+            ...r,
+            extraServices: r.extraServices.map(es => es.extraService)
+        }));
+    }
+
+    async setPedirReactivacion(id, valor) {
+        try {
+            return await prisma.reservation.update({
+                where: { idReservation: Number(id) },
+                data: { pedirReactivacion: valor }
+            });
+        } catch {
+            return null;
+        }
+    }
+
+    async aprobarReactivacion(id) {
+        try {
+            return await prisma.reservation.update({
+                where: { idReservation: Number(id) },
+                data: {
+                    status: "pendiente",
+                    pedirReactivacion: false
+                }
+            });
+        } catch {
+            return null;
+        }
+    }
+
+    async rechazarReactivacion(id) {
+        return await this.setPedirReactivacion(id, false);
+    }
 }
 
 export default new ReservationModel();

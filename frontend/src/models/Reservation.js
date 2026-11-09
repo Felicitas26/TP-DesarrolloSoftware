@@ -17,7 +17,7 @@ const STATUS_LABEL = {
     pendiente: "Pendiente",
     aceptada: "Aceptada",
     confirmada: "Confirmada",
-    cancelada: "Cancelada"
+    cancelada: "Dada de baja"
 };
 
 export class Reservation {

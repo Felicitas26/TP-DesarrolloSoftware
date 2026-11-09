@@ -371,6 +371,31 @@
     box-shadow: 0 0 16px rgba(248, 113, 113, 0.2);
 }
 
+.my-reservation-restore {
+    width: 38px;
+    height: 38px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    background: rgba(250, 204, 21, 0.1);
+    border: 1px solid rgba(250, 204, 21, 0.35);
+    border-radius: 10px;
+    color: #fbbf24;
+    cursor: pointer;
+    transition:
+        background 0.2s ease,
+        color 0.2s ease,
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.my-reservation-restore:hover {
+    background: rgba(250, 204, 21, 0.22);
+    transform: translateY(-2px);
+    box-shadow: 0 0 16px rgba(250, 204, 21, 0.25);
+}
+
 .my-reservation-card-actions {
     display: flex;
     align-items: center;
@@ -470,6 +495,19 @@
     background: rgba(148, 163, 184, 0.12);
     border: 1px solid rgba(148, 163, 184, 0.35);
     color: #cbd5e1;
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+}
+
+.my-reservation-reactivacion {
+    display: inline-block;
+    margin-left: 8px;
+    padding: 7px 14px;
+    border-radius: 999px;
+    background: rgba(168, 85, 247, 0.14);
+    border: 1px solid rgba(168, 85, 247, 0.4);
+    color: #d8b4fe;
     font-size: 0.72rem;
     font-weight: 600;
     letter-spacing: 0.05em;

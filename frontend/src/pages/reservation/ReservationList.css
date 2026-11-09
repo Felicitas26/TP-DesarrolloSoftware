@@ -343,17 +343,17 @@
 
   text-align: left;
 
-  font-size: 0.82rem;
+  font-size: 0.74rem;
 }
 
 .reservation-list-table th {
-  padding: 16px 18px;
+  padding: 10px 8px;
 
   background: rgba(255, 255, 255, 0.06);
 
   color: rgba(255, 255, 255, 0.65);
 
-  font-size: 0.7rem;
+  font-size: 0.66rem;
   font-weight: 700;
 
   letter-spacing: 0.08em;
@@ -365,13 +365,53 @@
 }
 
 .reservation-list-table td {
-  padding: 16px 18px;
+  padding: 10px 8px;
 
   color: rgba(255, 255, 255, 0.75);
 
   border-bottom: 1px solid rgba(255, 255, 255, 0.07);
 
   white-space: nowrap;
+}
+
+/* Badges de estado apilados en su celda */
+.estado-stack {
+  display: flex;
+  flex-direction: column;
+
+  align-items: flex-start;
+
+  gap: 4px;
+}
+
+.estado-stack .status-badge.reactivacion {
+  margin-left: 0;
+}
+
+/* Columnas de texto: pueden cortar en dos líneas
+   para que la tabla no se desborde hacia la derecha */
+.reservation-list-table td.cell-wrap {
+  white-space: normal;
+
+  max-width: 170px;
+
+  overflow-wrap: break-word;
+
+  word-break: break-word;
+}
+
+.salon-nombre {
+  display: block;
+}
+
+.salon-tipo-sub {
+  display: block;
+
+  margin-top: 2px;
+
+  font-size: 0.68rem;
+
+  color: rgba(255, 255, 255, 0.45);
 }
 
 .reservation-list-table tbody tr {
@@ -405,7 +445,7 @@
   align-items: center;
   justify-content: center;
 
-  gap: 7px;
+  gap: 4px;
 }
 
 .btn-action-view {
@@ -454,11 +494,11 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
-  padding: 9px 15px;
+  gap: 5px;
+  padding: 6px 10px;
   border-radius: 999px;
   font-family: "Montserrat", system-ui, sans-serif;
-  font-size: 0.72rem;
+  font-size: 0.66rem;
   font-weight: 700;
   letter-spacing: 0.04em;
   cursor: pointer;
@@ -909,6 +949,14 @@
   background: rgba(239, 68, 68, 0.14);
   color: #f87171;
   border: 1px solid rgba(239, 68, 68, 0.4);
+}
+
+.status-badge.reactivacion {
+  margin-left: 6px;
+
+  background: rgba(168, 85, 247, 0.16);
+  color: #d8b4fe;
+  border: 1px solid rgba(168, 85, 247, 0.4);
 }
 
 /* RESPONSIVE */

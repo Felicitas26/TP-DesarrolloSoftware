@@ -102,6 +102,7 @@ model Reservation {
   idLounge       Int
   idLoungeType   Int
   idCardDetail   Int?
+  pedirReactivacion Boolean @default(false)
 
   client      Client      @relation(fields: [idCli], references: [idCli])
   lounge      Lounge      @relation(fields: [idLounge], references: [idLounge])
