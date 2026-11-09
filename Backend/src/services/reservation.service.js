@@ -18,6 +18,23 @@ class ReservationService {
     }
 
     async create(reservation, idCli) {
+        if (!reservation || !reservation.dateEvent || !reservation.idLounge || !reservation.idLoungeType) {
+            const error = new Error("Faltan datos obligatorios para crear la reserva (fecha, salón o tipo).");
+            error.statusCode = 400;
+            throw error;
+        }
+
+        if (isNaN(new Date(reservation.dateEvent).getTime())) {
+            const error = new Error("La fecha del evento no es válida.");
+            error.statusCode = 400;
+            throw error;
+        }
+
+        reservation = {
+            ...reservation,
+            status: reservation.status || "pendiente"
+        };
+
         const lounge = await loungeModel.getById(reservation.idLounge);
         if (!lounge || !lounge.activo) {
             const error = new Error("El salón seleccionado fue dado de baja y ya no acepta reservas.");
