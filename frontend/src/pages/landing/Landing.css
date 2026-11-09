@@ -1,6 +1,13 @@
 .landing section[id],
 .landing footer[id] {
-  scroll-margin-top: 90px;
+  scroll-margin-top: 160px; /* navbar compacta mobile (~152px) */
+}
+
+@media (min-width: 1024px) {
+  .landing section[id],
+  .landing footer[id] {
+    scroll-margin-top: 90px; /* navbar en una sola fila en desktop */
+  }
 }
 
 .landing-contact {

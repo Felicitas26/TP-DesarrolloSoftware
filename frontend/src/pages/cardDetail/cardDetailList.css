@@ -235,6 +235,8 @@ tbody tr:hover {
 .modal-card {
     width: 100%;
     max-width: 550px;
+    max-height: calc(100dvh - 40px);
+    overflow-y: auto;
     background: #111827;
     border: 1px solid rgba(148, 163, 184, 0.15);
     border-radius: 18px;
@@ -256,8 +258,10 @@ tbody tr:hover {
 }
 
 .modal-close {
-    width: 34px;
-    height: 34px;
+    width: 44px;
+    height: 44px;
+    margin-right: -18px;
+    flex-shrink: 0;
     border: none;
     border-radius: 8px;
     background: rgba(255, 255, 255, 0.06);

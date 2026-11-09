@@ -1,6 +1,12 @@
 .events-section {
   position: relative;
-  padding: 90px 48px 110px;
+  padding: 90px 20px 110px;
+}
+
+@media (min-width: 600px) {
+  .events-section {
+    padding: 90px 48px 110px;
+  }
 }
 
 .events-section::before {

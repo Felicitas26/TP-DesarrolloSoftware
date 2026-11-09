@@ -51,7 +51,7 @@
 .bell-dropdown {
     position: absolute;
     top: calc(100% + 12px);
-    right: -60px;
+    right: 0;
     width: min(380px, calc(100vw - 32px));
     background: #0d1226;
     border: 1px solid rgba(34, 211, 238, 0.35);
@@ -81,8 +81,10 @@
 }
 
 .bell-close {
-    width: 28px;
-    height: 28px;
+    width: 44px;
+    height: 44px;
+    margin-right: -10px;
+    flex-shrink: 0;
     color: rgba(255, 255, 255, 0.7);
     background: transparent;
     border: none;
@@ -199,5 +201,16 @@
 @media (min-width: 1024px) {
     .bell-dropdown {
         right: 0;
+    }
+}
+
+/* En phones la campana vive arriba a la izquierda del header:
+el dropdown se abre abarcando el viewport con margen 24px. */
+@media (max-width: 599px) {
+    .bell-dropdown {
+        right: auto;
+        left: 0;
+        width: calc(100vw - 48px);
+        max-width: 380px;
     }
 }

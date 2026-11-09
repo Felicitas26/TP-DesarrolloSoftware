@@ -668,6 +668,30 @@
     font-size: 1rem;
 }
 
+/* En mobile no hay espacio para 4 columnas: se apila
+   "campo / original / → / nuevo" en una sola columna. */
+@media (max-width: 599px) {
+    .contract-mod-diff-head,
+    .contract-mod-diff-row {
+        grid-template-columns: 1fr;
+        gap: 6px;
+    }
+
+    .contract-mod-diff-head-actual,
+    .contract-mod-diff-head-nuevo,
+    .contract-mod-diff-campo,
+    .contract-mod-diff-val.actual,
+    .contract-mod-diff-val.nuevo,
+    .contract-mod-diff-val-full,
+    .contract-mod-diff-arrow {
+        grid-column: auto;
+    }
+
+    .contract-mod-diff-arrow {
+        margin: -2px 0;
+    }
+}
+
 .contract-mod-comment {
     margin-bottom: 8px;
 }

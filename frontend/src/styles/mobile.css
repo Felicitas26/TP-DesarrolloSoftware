@@ -1,0 +1,122 @@
+/* ============================================================
+   ENDURECIDO MOBILE (<=599px)
+   Una sola capa global que corrige los defectos que se
+   repetían en todas las páginas del dashboard. Los estilos
+   por página quedan intactos desde 600px.
+   ============================================================ */
+
+@media (max-width: 599px) {
+
+    /* 1) Controles de formulario a 16px.
+       iOS Safari aplica auto-zoom al enfocar cualquier input
+       con font-size < 16px, desplazando el layout y dejando
+       los botones fuera de la vista (peor dentro de modales).
+       1rem = 16px en esta región del media query. */
+    input,
+    select,
+    textarea {
+        font-size: 1rem !important;
+        max-width: 100%;
+    }
+
+    /* 2) Objetivo táctil mínimo de 44px (WCAG / Material).
+       min-* beat las width/height fijas de los estilos por página
+       sin necesidad de tocarlas una por una. */
+    .btn-action-view,
+    .btn-action-edit,
+    .btn-action-delete,
+    .btn-action {
+        min-width: 44px;
+        min-height: 44px;
+    }
+
+    /* Botones de cierre (X) de modales, dropdowns y confirmaciones */
+    .btn-close,
+    .modal-close,
+    .contract-terms-close,
+    .feedback-modal-close,
+    .reservation-modal-close,
+    .res-cancel-close,
+    .edit-confirm-close,
+    .bell-close,
+    .bell-item-delete {
+        min-width: 44px;
+        min-height: 44px;
+    }
+
+    /* Icono mostrar/ocultar contraseña */
+    .login-eye,
+    .forgot-eye,
+    .changepass-eye,
+    .password-toggle {
+        min-width: 44px;
+        min-height: 44px;
+    }
+
+    /* 3) Botones de acción con consecuencia (aceptar/rechazar/
+       aprobar): de ~32px a 44px de alto. */
+    .reservation-btn-accept,
+    .reservation-btn-cancel,
+    .contract-action-view,
+    .contract-action-approve,
+    .contract-action-reject,
+    .btn-action-text,
+    .filter-btn,
+    .my-contracts-filter-btn,
+    .reservation-filter-btn,
+    .btn-j-link {
+        min-height: 44px;
+        padding: 12px 16px;
+    }
+
+    /* Botones secundarios de navegación (volver) */
+    .login-back,
+    .forgot-back,
+    .changepass-back,
+    .my-contracts-back-button {
+        min-height: 44px;
+    }
+
+    /* 4) Tablas de gestión: en mobile scrollean horizontalmente;
+    la primera columna queda fija como referencia mientras se
+    scrollea hacia la columna de acciones. */
+    .clients-table th:first-child,
+    .clients-table td:first-child,
+    .reservation-list-table th:first-child,
+    .reservation-list-table td:first-child,
+    .contract-list-table th:first-child,
+    .contract-list-table td:first-child,
+    .loungetypes-table th:first-child,
+    .loungetypes-table td:first-child {
+    position: sticky;
+        left: 0;
+        z-index: 2;
+        background: #171b25;
+        box-shadow: 8px 0 14px -8px rgba(0, 0, 0, 0.8);
+    }
+
+    .card-body-table,
+    .table-wrapper {
+        overscroll-behavior-x: contain;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    /* 5) Piso de legibilidad: etiquetas y errores del formulario
+       a 12.8-12.8px en lugar de los 10.9-12px actuales. */
+    .form-group label,
+    .gestion-form-group label {
+        font-size: 0.8rem;
+    }
+
+    .form-group .error-message,
+    .gestion-form-group .error-message,
+    .error-message {
+        font-size: 0.78rem;
+    }
+
+    /* 6) Márgenes laterales mínimos para contenedores de página */
+    .page-wrapper {
+        padding-left: 16px;
+        padding-right: 16px;
+    }
+}

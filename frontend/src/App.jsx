@@ -37,6 +37,7 @@ import ContractEdit from "./pages/contract/ContractEdit";
 import MyContracts from "./pages/contract/MyContracts";
 
 import "./App.css";
+import "./styles/mobile.css";
 
 const ADMIN = [ROLES.administrador];
 const CLIENTE = [ROLES.cliente];
