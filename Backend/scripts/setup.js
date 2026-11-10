@@ -64,7 +64,7 @@ async function setup() {
     await ensureDatabase();
 
     console.log("\nAplicando el esquema (prisma db push)...");
-    run(process.execPath, [path.join(ROOT, "node_modules/prisma/build/index.js"), "db", "push", "--skip-generate"]);
+    run(process.execPath, [path.join(ROOT, "node_modules/prisma/build/index.js"), "db", "push"]);
 
     console.log("\n[2/2] Cargando datos de ejemplo (seeds)...");
     for (const seed of SEEDS) {
