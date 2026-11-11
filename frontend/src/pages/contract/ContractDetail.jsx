@@ -56,6 +56,8 @@ function ContractDetail() {
     const [confirmEliminar, setConfirmEliminar] = useState(false);
     const [confirmContinuar, setConfirmContinuar] = useState(false);
     const [confirmEnviar, setConfirmEnviar] = useState(false);
+    const [confirmGuardarAdmin, setConfirmGuardarAdmin] = useState(false);
+    const [confirmFirma, setConfirmFirma] = useState(false);
     const [confirmAprobarMod, setConfirmAprobarMod] = useState(false);
     const [confirmSolicitarMod, setConfirmSolicitarMod] = useState(false);
     const [confirmPago, setConfirmPago] = useState(null);
@@ -85,7 +87,7 @@ function ContractDetail() {
         contract?.status === "firmado" &&
         contract?.modificationStatus === "rechazada";
 
-    const puedeEditar = canEdit;
+    const puedeEditar = rol === "administrador" ? true : canEdit;
 
     const showMessage = (type, title, text) => {
         setMessage({ type, title, text });
@@ -267,6 +269,50 @@ function ContractDetail() {
             }));
 
             showMessage("success", "Contrato guardado", "Los cambios se guardaron correctamente.");
+        } catch (error) {
+            showMessage("error", "Error", error.message);
+        } finally {
+            setSaving(false);
+        }
+    };
+
+    const handleGuardarAdmin = async () => {
+        setConfirmGuardarAdmin(false);
+        setMessage(null);
+        setSaving(true);
+
+        try {
+            const data = await contractService.updateEdit(id, {
+                dateEvent: form.dateEvent,
+                eventType: form.eventType,
+                idCardDetail: form.idCardDetail
+                    ? Number(form.idCardDetail)
+                    : null,
+                idServices: form.idServices,
+                cantExactaInvit: form.cantExactaInvit
+                    ? Number(form.cantExactaInvit)
+                    : null,
+                eventStartTime: form.eventStartTime || null,
+                eventEndTime: form.eventEndTime || null
+            });
+
+            setContract(data.contract);
+            setForm((prev) => ({
+                ...prev,
+                cantExactaInvit:
+                    data.contract.cantExactaInvit !== null &&
+                        data.contract.cantExactaInvit !== undefined
+                        ? String(data.contract.cantExactaInvit)
+                        : "",
+                eventStartTime: formatTime(data.contract.eventStartTime),
+                eventEndTime: formatTime(data.contract.eventEndTime)
+            }));
+
+            showMessage(
+                "success",
+                "Contrato guardado",
+                "Los cambios se guardaron y el contrato quedó nuevamente en revisión."
+            );
         } catch (error) {
             showMessage("error", "Error", error.message);
         } finally {
@@ -461,7 +507,12 @@ function ContractDetail() {
             const data = await contractService.aceptar(id);
 
             setContract(data.contract);
-            navigate("/client-home");
+            setPendingRedirect(true);
+            showMessage(
+                "success",
+                "Contrato firmado",
+                "Firmaste la conformidad del contrato. El administrador fue notificado."
+            );
         } catch (error) {
             showMessage("error", "Error", error.message);
         } finally {
@@ -1116,6 +1167,16 @@ function ContractDetail() {
                         Ver historial de versiones
                     </button>
 
+                    {rol === "administrador" && (
+                        <button
+                            className="contract-btn-save"
+                            onClick={() => setConfirmGuardarAdmin(true)}
+                            disabled={saving}
+                        >
+                            {saving ? "Guardando..." : "Guardar cambios"}
+                        </button>
+                    )}
+
                     {rol === "cliente" && canEdit && (
                         <>
                             <button className="contract-btn-save" onClick={handleSave} disabled={saving}>
@@ -1322,7 +1383,7 @@ function ContractDetail() {
                                 className="contract-btn-accept"
                                 onClick={() => {
                                     setShowTerminos(false);
-                                    handleAceptar();
+                                    setConfirmFirma(true);
                                 }}
                                 disabled={saving}
                             >
@@ -1480,6 +1541,33 @@ function ContractDetail() {
                         )}
                     </div>
                 </div>
+            )}
+
+            {confirmGuardarAdmin && (
+                <FeedbackModal
+                    type="confirm"
+                    title="Guardar cambios"
+                    message={`¿Confirmás que querés guardar los cambios del contrato #${contract.idContract}? El contrato quedará nuevamente en revisión.`}
+                    confirmLabel="Sí, guardar"
+                    cancelLabel="Volver"
+                    onConfirm={handleGuardarAdmin}
+                    onCancel={() => setConfirmGuardarAdmin(false)}
+                />
+            )}
+
+            {confirmFirma && (
+                <FeedbackModal
+                    type="confirm"
+                    title="Firmar contrato"
+                    message={`¿Confirmás que querés firmar el contrato #${contract.idContract}? Se notificará al administrador y quedará registrada tu conformidad.`}
+                    confirmLabel="Sí, firmar"
+                    cancelLabel="Volver"
+                    onConfirm={() => {
+                        setConfirmFirma(false);
+                        handleAceptar();
+                    }}
+                    onCancel={() => setConfirmFirma(false)}
+                />
             )}
 
             {confirmEnviar && (

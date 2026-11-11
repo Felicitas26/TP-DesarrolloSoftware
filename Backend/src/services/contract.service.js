@@ -186,6 +186,27 @@ class ContractService {
             throw error;
         }
 
+        if (admin) {
+            if (cantExactaReal === null) {
+                const error = new Error(
+                    `Ingresá la cantidad exacta de invitados (entre ${reservation.cantInvit} y ${reservation.maxCantInvit}) antes de guardar.`
+                );
+                error.statusCode = 400;
+                throw error;
+            }
+
+            if (
+                !timeToDate(data.eventStartTime) ||
+                !timeToDate(data.eventEndTime)
+            ) {
+                const error = new Error(
+                    "Indicá la hora de inicio y fin del evento antes de guardar."
+                );
+                error.statusCode = 400;
+                throw error;
+            }
+        }
+
         const conflicts = await prisma.reservation.count({
             where: {
                 idLounge: reservation.idLounge,
@@ -242,6 +263,10 @@ class ContractService {
             cantExactaInvit: cantExactaReal,
             finalValue: calc.total
         });
+
+        if (admin) {
+            await contractModel.updateStatus(id, "en_revision");
+        }
 
         const updatedContract = await contractModel.getById(id);
 
